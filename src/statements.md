@@ -16,5 +16,7 @@
     `return [expression]`
 - file:
     `file <name> <mode> <expression>`
-    
-etc
+- while: `while (condition) {}` 
+   
+--- might be added
+- for 
