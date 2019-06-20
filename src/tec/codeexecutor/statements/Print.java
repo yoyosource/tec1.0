@@ -6,10 +6,10 @@ import tec.utils.Token;
 
 import java.util.ArrayList;
 
-public class print implements Statement {
+public class Print implements Statement {
 	@Override
 	public String getName() {
-		return "print";
+		return "Print";
 	}
 
 	@Override
