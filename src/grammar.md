@@ -1,0 +1,62 @@
+- primitive types:
+	- int (int)
+	    - -?(\d+)
+	- boolean (bol)
+	    - (true)|(false)
+	- string (str)
+	    - "<TEXT>"
+	    - '<TEXT>'
+	- character (chr)
+	    - '<CHARACTER>'
+	- num (num)
+	    - -?(\d+)(.(\d+))
+- operators (OPE):
+    - multiply (*)
+    - divide (/)
+    - plus (+)
+    - minus (-)
+    - modulo (%)
+    - remainder (#)
+    - power of (^)
+    - brackets ( () ) 
+    - math( )
+        - factorial (!)
+        - root (root)
+        - sin (sin)
+        - absolute (|)
+        - cos (cos)
+        - tan (tan)
+        - asin (asin)
+        - atan (atan)
+        - acos (acos)
+        - log (log)
+        - ln (ln)
+        - gauss (gauss)
+        - sigmoid (sig)
+        - tau (pi * 2)
+        - pi (3.14159265359)
+        - e (2.71828182846)
+        - c (299792458)
+- compares
+    - equals (==)
+    - not equal (!=)
+    - greater than (>)
+    - less than (<)
+    - greater than or equal to (>=)
+    - less than or equal to (<=)
+- logic
+    - not and (!&)
+    - not (!!)
+    - and (&&)
+    - or (||)
+    - xor (x|)
+    - nor (n|)
+    - xnor (xn)
+- separators
+    - dot (.)
+    - colon (:)
+    - comma (,)
+- brackets
+    - curly braces {}
+    - square brackets []
+    - brackets ()

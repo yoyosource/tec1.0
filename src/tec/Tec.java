@@ -13,7 +13,10 @@ import tec.codescanner.FileScanner;
 import tec.codescanner.TrimmerManager;
 import tec.utils.Token;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -24,11 +27,12 @@ import java.util.stream.Collectors;
  * ---
  */
 public class Tec {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Tec file Path:");
-        String url = scanner.next();
+	    InputStreamReader inputStreamReader = new InputStreamReader(System.in);
+	    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+	    System.out.println("Tec file Path:");
+	    String url = bufferedReader.readLine();
 
         long time = System.currentTimeMillis();
 
