@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class History {
 
-    private HashMap<String, Double> history = new HashMap<>();
+    private HashMap<String, Float> history = new HashMap<>();
 
     public History() {
 
@@ -14,21 +14,21 @@ public class History {
         this.set(st);
     }
 
-    public History add(String string, Double d) {
+    public History add(String string, Float d) {
         if (!(history.containsKey(string))) {
             history.put(string, d);
         }
         return this;
     }
 
-    public History put(String string, Double d) {
+    public History put(String string, Float d) {
         if (!(history.containsKey(string))) {
             history.put(string, d);
         }
         return this;
     }
 
-    public Double get(String string) {
+    public Float get(String string) {
         return history.get(string);
     }
 
@@ -57,7 +57,7 @@ public class History {
             String[] hist = histories[i].split(";;;");
             String[] h1 = hist[0].split("=");
             String[] h2 = hist[1].split("=");
-            this.put(h1[1], Double.parseDouble(h2[1]));
+            this.put(h1[1], Float.parseFloat(h2[1]));
         }
         return this;
     }

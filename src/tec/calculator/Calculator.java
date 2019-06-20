@@ -8,7 +8,7 @@ public class Calculator {
 
     private History calculations = new History();
     private String lastCalculation = "";
-    private Double lastAnswer = 0.0;
+    private Float lastAnswer = 0f;
 
     private ArrayList<Object> objects;
     private ArrayList<Integer> priorities;
@@ -52,10 +52,11 @@ public class Calculator {
         calcTime2 *= -1;
     }
 
-    public double calc(String s) {
+    public float calc(String s) {
         calcTime1 = System.currentTimeMillis();
         calcTime2 = System.nanoTime();
 
+        /*
         if (s.equals("?")) {
             System.out.println("");
             System.out.println("calculator.Calculator:");
@@ -82,6 +83,7 @@ public class Calculator {
             time();
             return 0;
         }
+        */
 
         if (s.equals("=")) {
             if (lastCalculation.length() != 0) {
@@ -107,13 +109,13 @@ public class Calculator {
             removeNotNeded();
 
             if (objects.size() == 1) {
-                Double d = calculate();
+                Float d = calculate();
                 lastAnswer = d;
                 lastCalculation = st;
                 time();
                 return d;
             } else {
-                Double d = calculate();
+                Float d = calculate();
                 lastAnswer = d;
                 calculations.put(s, d);
                 lastCalculation = st;
@@ -132,8 +134,12 @@ public class Calculator {
             throw new IllegalArgumentException("No Spaces in Numbers");
         }
         char[] chars = s.replaceAll("root", "r")
-                .replaceAll("pi", Math.PI + "").replaceAll("lspeed", "299792458").replaceAll("e", Math.E + "")
+                .replaceAll("pi", Math.PI + "").replaceAll("e", Math.E + "").replaceAll("tau", (Math.PI * 2) + "")
+                .replaceAll("c(?!o)(?!s)", "299792458")
+                .replaceAll("asin", "ä").replaceAll("acos", "ö").replaceAll("atan", "ü")
                 .replaceAll("sin", "s").replaceAll("cos", "c").replaceAll("tan", "t")
+                .replaceAll("ln", Math.E + "log").replaceAll("log", "l")
+                .replaceAll("gauss", "g").replaceAll("sig", "w")
                 .replaceAll(" ", "")
                 .toCharArray();
         ArrayList<Object> objects = new ArrayList<>();
@@ -149,9 +155,9 @@ public class Calculator {
                     objects.add("*");
                 }
                 try {
-                    if (c == '(' && st.length() == 0 && objects.get(objects.size() - 1).toString().equals("-") && !(objects.get(objects.size() - 2) instanceof Double)) {
+                    if (c == '(' && st.length() == 0 && objects.get(objects.size() - 1).toString().equals("-") && !(objects.get(objects.size() - 2) instanceof Float)) {
                         objects.set(objects.size() - 1, "(");
-                        objects.add(Double.parseDouble("-1"));
+                        objects.add(Float.parseFloat("-1"));
                         objects.add(")");
                         objects.add("*");
                     }
@@ -159,7 +165,7 @@ public class Calculator {
                     try {
                         if (c == '(' && st.length() == 0 && objects.get(objects.size() - 1).toString().equals("-")) {
                             objects.set(objects.size() - 1, "(");
-                            objects.add(Double.parseDouble("-1"));
+                            objects.add(Float.parseFloat("-1"));
                             objects.add(")");
                             objects.add("*");
                         }
@@ -168,10 +174,13 @@ public class Calculator {
                     }
                 }
                 if (c == 'r' && st.length() == 0) {
-                    objects.add(Double.parseDouble("2"));
+                    objects.add(Float.parseFloat("2"));
                 }
-                if ((c == 's' || c == 'c' || c == 't') && st.length() == 0) {
-                    objects.add(Double.parseDouble("1"));
+                if ((c == 's' || c == 'c' || c == 't' || c == 'ä' || c == 'ö' || c == 'ü' || c == 'g' || c == 'w') && st.length() == 0) {
+                    objects.add(Float.parseFloat("1"));
+                }
+                if ((c == 'l') && st.length() == 0) {
+                    objects.add(Float.parseFloat("10"));
                 }
                 st = new StringBuilder();
                 objects.add(c + "");
@@ -194,19 +203,19 @@ public class Calculator {
 
                             }
                             objects.remove(objects.size() - 1);
-                            objects.add(Double.parseDouble("-" + st.toString()));
+                            objects.add(Float.parseFloat("-" + st.toString()));
                         } else {
-                            objects.add(Double.parseDouble(st.toString()));
+                            objects.add(Float.parseFloat(st.toString()));
                         }
                     } catch (IndexOutOfBoundsException e) {
                         objects.remove(objects.size() - 1);
-                        objects.add(Double.parseDouble("-" + st.toString()));
+                        objects.add(Float.parseFloat("-" + st.toString()));
                     }
                 } else {
-                    objects.add(Double.parseDouble(st.toString()));
+                    objects.add(Float.parseFloat(st.toString()));
                 }
             } catch (IndexOutOfBoundsException e) {
-                objects.add(Double.parseDouble(st.toString()));
+                objects.add(Float.parseFloat(st.toString()));
             }
         }
 
@@ -217,8 +226,8 @@ public class Calculator {
         try {
             if (objects.get(index + 1).toString().equals("-")) {
                 if (absolute && objects.get(index).toString().equals("|")) {
-                    if (objects.get(index + 2) instanceof Double) {
-                        objects.set(index + 2, (double)objects.get(index + 2) * -1);
+                    if (objects.get(index + 2) instanceof Float) {
+                        objects.set(index + 2, (float)objects.get(index + 2) * -1);
                         objects.set(index + 1, "");
                     }
                 }
@@ -258,7 +267,7 @@ public class Calculator {
                 priorities.add(i + 1);
             } else if (object.toString().matches("[*]|[/]|[%]|[!]")) {
                 priorities.add(i + 2);
-            } else if (object.toString().matches("[\\^]|[r]|[s]|[c]|[t]")) {
+            } else if (object.toString().matches("[\\^]|[r]|[s]|[c]|[t]|[ä]|[ö]|[ü]|[l]|[g]|[w]")) {
                 priorities.add(i + 3);
             } else if (object.toString().matches("[(]|[)]")) {
                 priorities.add(0);
@@ -294,10 +303,10 @@ public class Calculator {
         }
     }
 
-    private double calculate() {
+    private float calculate() {
         removeNotNeded();
         if (objects.size() == 1) {
-            return (double) objects.get(0);
+            return (float) objects.get(0);
         }
 
         int hP = 0;
@@ -314,15 +323,15 @@ public class Calculator {
         if (objects.size() > 1) {
                 calculate();
         }
-        return (double) objects.get(0);
+        return (float) objects.get(0);
     }
 
-    private double calcCO(int hP) {
+    private float calcCO(int hP) {
         String op = (String) objects.get(hP + 0);
         try {
             if (priorities.get(hP - 1) == -1 && priorities.get(hP + 1) == -1) {
-                double d1 = (double) objects.get(hP - 1);
-                double d2 = (double) objects.get(hP + 1);
+                float d1 = (float) objects.get(hP - 1);
+                float d2 = (float) objects.get(hP + 1);
                 if (op.equals("+")) {
                     return d1 + d2;
                 } else if (op.equals("-")) {
@@ -334,25 +343,37 @@ public class Calculator {
                 } else if (op.equals("%")) {
                     return d1 % d2;
                 } else if (op.equals("^")) {
-                    return Math.pow(d1, d2);
+                    return (float) Math.pow(d1, d2);
                 } else if (op.equals("r")) {
                     if (d1 == 2) {
-                        return Math.sqrt(d2);
+                        return (float) Math.sqrt(d2);
                     }
-                    return Math.pow(Math.E, Math.log(d2) / d1);
+                    return (float) Math.pow(Math.E, Math.log(d2) / d1);
                 } else if (op.equals("s")) {
-                    return d1 * Math.sin(d2);
+                    return (float) (d1 * Math.sin(d2));
                 } else if (op.equals("c")) {
-                    return d1 * Math.cos(d2);
+                    return (float) (d1 * Math.cos(d2));
                 } else if (op.equals("t")) {
-                    return d1 * Math.tan(d2);
+                    return (float) (d1 * Math.tan(d2));
+                } else if (op.equals("ä")) {
+                    return (float) (d1 * Math.asin(d2));
+                } else if (op.equals("ö")) {
+                    return (float) (d1 * Math.acos(d2));
+                } else if (op.equals("ü")) {
+                    return (float) (d1 * Math.atan(d2));
+                } else if (op.equals("l")) {
+                    return (float) (Math.log(d2) / Math.log(d1));
+                } else if (op.equals("g")) {
+                    return (float)((double)d1 * (1 / (Math.sqrt(2 * Math.PI)) * Math.exp(-Math.pow((double) d2, 2) / 2)));
+                } else if (op.equals("w")) {
+                    return d1 * (float)(1 / (1 + Math.exp(-d2)));
                 }
             }
         } catch (IndexOutOfBoundsException e) {
 
         }
         if (op.equals("!") && priorities.get(hP - 1) == -1) {
-            double d1 = (double) objects.get(hP - 1);
+            float d1 = (float) objects.get(hP - 1);
             String[] s = (d1 + "").split("\\.");
             char[] chars = s[1].toCharArray();
             if (!(chars.length == 1 && (chars[0] + "").equals("0"))) {
@@ -368,7 +389,7 @@ public class Calculator {
         throw new IllegalArgumentException("Operation not recognized or Factor is missing");
     }
 
-    private void remove(int hP, double output) {
+    private void remove(int hP, float output) {
         boolean b = false;
         if (objects.get(hP).toString().equals("!")) {
             b = true;
@@ -411,8 +432,8 @@ public class Calculator {
             if (objects.get(hP).toString().equals("|") && objects.get(hP - 2).toString().equals("|")) {
                 objects.remove(hP);
                 priorities.remove(hP);
-                if ((double)objects.get(hP - 1) < 0) {
-                    objects.set(hP - 1, (double) objects.get(hP - 1) * -1);
+                if ((float)objects.get(hP - 1) < 0) {
+                    objects.set(hP - 1, (float) objects.get(hP - 1) * -1);
                 }
                 objects.remove(hP - 2);
                 priorities.remove(hP - 2);

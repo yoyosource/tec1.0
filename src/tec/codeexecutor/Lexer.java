@@ -20,7 +20,7 @@ public class Lexer {
 
             for (char c : chars) {
 
-                if (c == ' ' && inString == false && backspace == false) {
+                if (c == ' ' && !inString && !backspace) {
                     cTokens.addAll(tokify(s.toString()));
                     s = new StringBuilder();
                 } else if (c == '"') {
