@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 /**
@@ -29,10 +28,10 @@ import java.util.stream.Collectors;
 public class Tec {
     public static void main(String[] args) throws IOException {
 
-	    InputStreamReader inputStreamReader = new InputStreamReader(System.in);
-	    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-	    System.out.println("Tec file Path:");
-	    String url = bufferedReader.readLine();
+        InputStreamReader inputStreamReader = new InputStreamReader(System.in);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        System.out.println("Tec file Path:");
+        String url = bufferedReader.readLine();
 
         long time = System.currentTimeMillis();
 
