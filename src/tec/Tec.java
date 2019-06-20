@@ -28,7 +28,7 @@ public class Tec {
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Tec file Path:");
-        String url = "";
+        String url = scanner.next();
 
         long time = System.currentTimeMillis();
 
