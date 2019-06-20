@@ -1,4 +1,4 @@
-package calculator;
+package tec.calculator;
 
 import java.util.HashMap;
 

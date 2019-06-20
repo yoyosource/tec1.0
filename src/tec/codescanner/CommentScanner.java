@@ -1,4 +1,4 @@
-package codescanner;
+package tec.codescanner;
 
 import java.util.ArrayList;
 

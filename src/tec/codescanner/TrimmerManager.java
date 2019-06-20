@@ -1,4 +1,4 @@
-package codescanner;
+package tec.codescanner;
 
 public class TrimmerManager {
 

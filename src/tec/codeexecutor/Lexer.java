@@ -1,4 +1,4 @@
-package codeexecutor;
+package tec.codeexecutor;
 
 import utils.Token;
 
