@@ -31,7 +31,7 @@ public class Executor {
 	}
 
 	private boolean isStatement() {
-		if (index != 0) {
+		if (index == 0) {
 
 		} else if (tokens.get(index - 1).getKey().equals("NNN")) {
 
@@ -39,7 +39,7 @@ public class Executor {
 			return false;
 		}
 		for (Statement statement : implementor.get()) {
-			if (statement.getName().equals(tokens.get(index))) {
+			if (statement.getName().equals(tokens.get(index).getVal())) {
 				return true;
 			}
 		}
@@ -48,7 +48,7 @@ public class Executor {
 
 	private boolean runStatement() {
 		for (Statement statement : implementor.get()) {
-			if (statement.getName().equals(tokens.get(index))) {
+			if (statement.getName().equals(tokens.get(index).getVal())) {
 				return statement.execute(getTokensToNextLine(), this);
 			}
 		}
@@ -57,11 +57,11 @@ public class Executor {
 
 	private ArrayList<Token> getTokensToNextLine() {
 		ArrayList<Token> tokens = new ArrayList<>();
-		for (int i = index + 1; i < tokens.size(); i++) {
-			if (tokens.get(i).getKey().equals("NNN")) {
+		for (int i = index + 1; i < this.tokens.size(); i++) {
+			if (this.tokens.get(i).getKey().equals("NNN")) {
 				break;
 			}
-			tokens.add(tokens.get(i));
+			tokens.add(this.tokens.get(i));
 		}
 		return tokens;
 	}

@@ -7,7 +7,10 @@
 
 package tec;
 
+import tec.codeexecutor.Executor;
+import tec.codeexecutor.Implementor;
 import tec.codeexecutor.Lexer;
+import tec.codeexecutor.statements.Print;
 import tec.codescanner.CommentScanner;
 import tec.codescanner.FileScanner;
 import tec.codescanner.TrimmerManager;
@@ -29,10 +32,13 @@ public class Tec {
 
     public static void main(String[] args) throws IOException {
 
-        InputStreamReader inputStreamReader = new InputStreamReader(System.in);
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-        System.out.println("Tec file Path:");
-        String url = bufferedReader.readLine();
+        String url = "/Users/jojo/IdeaProjects/tec/src/test.tec";
+        if (false) {
+            InputStreamReader inputStreamReader = new InputStreamReader(System.in);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            System.out.println("Tec file Path:");
+            url = bufferedReader.readLine();
+        }
 
         long time = System.currentTimeMillis();
 
@@ -60,6 +66,12 @@ public class Tec {
         System.out.println("Tokens       > " + tokens.size());
         System.out.println("Compile Time > " + (time2 - time));
         System.out.println("---");
+
+        Implementor implementor = new Implementor();
+        implementor.add(new Print());
+
+        Executor executor = new Executor(tokens, implementor);
+        executor.run();
     }
 
 }
