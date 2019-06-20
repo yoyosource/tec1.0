@@ -1,10 +1,9 @@
 package tec.codeexecutor;
 
 import tec.utils.Token;
-
 import java.util.ArrayList;
 
-public class Lexer {
+public class Lexer {    
     
     private ArrayList<Token> tokens = new ArrayList<>();
     private StringBuilder s = new StringBuilder();
@@ -161,12 +160,12 @@ public class Lexer {
             tokens.add(new Token("ACb", s));
             return tokens;
         }
-        if (s.matches("\\{|\\}")) {
+        if (s.matches("[\\{\\}]")) {
             tokens.add(new Token("BLb", s));
             return tokens;
         }
         if (s.equals(".") || s.equals(":") || s.equals(",")) {
-            tokens.add(new Token("SEp", s));
+            tokens.add(new Token("SEP", s));
             return tokens;
         }
 
