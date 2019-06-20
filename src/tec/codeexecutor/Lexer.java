@@ -139,7 +139,7 @@ public class Lexer {
             tokens.add(new Token("OPE", s));
             return tokens;
         }
-        if (s.matches("([=<>!][=]?)")) {
+        if (s.matches("(==)|(<>[=]?)|(!=)")) {
             tokens.add(new Token("COM", s));
             return tokens;
         }
@@ -147,7 +147,7 @@ public class Lexer {
             tokens.add(new Token("RET", s));
             return tokens;
         }
-        if (s.matches("&&|\\|\\|")) {
+        if (s.matches("(&&)|(\\|\\|)|(!!)|(!&)|(x\\|)|(n\\|)|(xn)")) {
             tokens.add(new Token("LOG", s));
             return tokens;
         }

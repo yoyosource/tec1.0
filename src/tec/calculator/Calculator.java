@@ -139,7 +139,7 @@ public class Calculator {
                 .replaceAll("asin", "ä").replaceAll("acos", "ö").replaceAll("atan", "ü")
                 .replaceAll("sin", "s").replaceAll("cos", "c").replaceAll("tan", "t")
                 .replaceAll("ln", Math.E + "log").replaceAll("log", "l")
-                .replaceAll("gauss", "g").replaceAll("sig", "w")
+                .replaceAll("gauss", "g").replaceAll("sigmoid", "w").replaceAll("sig", "w")
                 .replaceAll(" ", "")
                 .toCharArray();
         ArrayList<Object> objects = new ArrayList<>();
