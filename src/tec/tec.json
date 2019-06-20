@@ -6,5 +6,8 @@
   "updates": [
     "insert updates here"
   ],
-  "authors": ["YoyoNow", "Technotype"]
+  "authors": ["YoyoNow", "Technotype"],
+  "dependencies": [
+    "json-simple"
+  ]
 }

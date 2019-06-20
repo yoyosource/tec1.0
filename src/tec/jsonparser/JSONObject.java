@@ -4,8 +4,8 @@ import tec.exceptions.DefinitonException;
 
 import java.util.ArrayList;
 
-@SuppressWarnings("Convert2Diamond")
-public class JSONObject {
+@SuppressWarnings("ALL")
+public class JSONObject extends Object {
 	private ArrayList<Variable<Object>> obj;
 	public JSONObject() {
 		this.obj = new ArrayList<Variable<Object>>();
@@ -35,5 +35,13 @@ public class JSONObject {
 	}
 	public void set(String identifier, Object value) throws DefinitonException {
 		this.set(new Variable<Object>(identifier, value));
+	}
+	public Variable<Object> get(String identifier) throws DefinitonException {
+		for (Variable<Object> current : obj) {
+			if (current.getIdentifier().equals(identifier)) {
+				return current;
+			}
+		}
+		throw new DefinitonException(identifier + " is not defined!");
 	}
 }

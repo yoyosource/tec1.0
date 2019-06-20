@@ -1,14 +1,21 @@
 package tec.jsonparser;
+import com.github.cliftonlabs.json_simple.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.lang.reflect.Field;
 
 public class JSONParser {
-	String url = "tec.json";
-	public JSONParser(String file) throws IOException {
-		InputStreamReader inputStreamReader = new InputStreamReader(System.in);
-		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-		url = bufferedReader.readLine();
+	private File file;
+	public JSONParser(String file) {
+		this.file = new File(file);
+	}
+	public JSONObject read() throws JsonException, IOException {
+		JsonObject json = (JsonObject) Jsoner.deserialize(new FileReader(file));
+		Object[] array = json.values().toArray();
+		for (Object o : array) {
+			Field[] fields = o.getClass().getFields();
+
+		}
+		return null;
 	}
 }
