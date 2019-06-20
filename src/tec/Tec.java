@@ -13,5 +13,12 @@ package tec;
  * ---
  */
 public class Tec {
+	public static void main(String[] args) {
 
+		for (String str : args) {
+			if (str.startsWith("file:")) {
+				
+			}
+		}
+	}
 }
