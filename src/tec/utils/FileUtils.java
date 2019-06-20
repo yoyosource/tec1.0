@@ -3,7 +3,7 @@ package tec.utils;
 import java.io.*;
 
 public class FileUtils {
-	public static File inputStreamToFile(InputStream is) throws IOException {
+	public static File inputStreamToFile(InputStream is) throws Exception {
 		OutputStream outputStream = null;
 		try
 		{
@@ -16,6 +16,10 @@ public class FileUtils {
 				outputStream.write(bytes, 0, read);
 			}
 			file.deleteOnExit();
+			return file;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 		finally
 		{
@@ -24,5 +28,6 @@ public class FileUtils {
 				outputStream.close();
 			}
 		}
+		throw new Exception("An error occurred while executing.");
 	}
 }
