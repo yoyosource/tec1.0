@@ -6,83 +6,90 @@ import java.util.ArrayList;
 
 public class Lexer {
     
-    ArrayList<ArrayList<Token>> tokens = new ArrayList<>();
+    private ArrayList<Token> tokens = new ArrayList<>();
+    private StringBuilder s = new StringBuilder();
 
-    public void createTokens(ArrayList<String> codes) {
-        
-        for (String st : codes) {
-            char[] chars = st.toCharArray();
-            StringBuilder s = new StringBuilder();
-            ArrayList<Token> cTokens = new ArrayList<>();
+    public void createTokens(String codes) {
 
-            boolean inString = false;
-            boolean backspace = false;
+        char[] chars = codes.toCharArray();
+        ArrayList<Token> cTokens = new ArrayList<>();
 
-            for (char c : chars) {
+        boolean inString = false;
+        boolean backspace = false;
+        boolean endLine = false;
 
-                if (c == ' ' && !inString && !backspace) {
+        for (char c : chars) {
+
+            if (endLine) {
+                cTokens.addAll(tokify(s.toString().trim()));
+                cTokens.add(new Token("NNN", ""));
+                endLine = false;
+                s = new StringBuilder();
+            }
+            if (c == '\n') {
+                endLine = true;
+            }
+
+            if (c == ' ' && inString == false && backspace == false) {
+                cTokens.addAll(tokify(s.toString()));
+                s = new StringBuilder();
+            } else if (c == '"') {
+                if (!(backspace)) {
+                    if (inString) {
+                        inString = false;
+                    } else {
+                        inString = true;
+                    }
+                } else {
+                    backspace = false;
+                }
+                s.append(c);
+            } else if (c == '\\' && inString) {
+                backspace = true;
+            }
+            else {
+                if (c == '(' || c == ')') {
                     cTokens.addAll(tokify(s.toString()));
                     s = new StringBuilder();
-                } else if (c == '"') {
-                    if (!(backspace)) {
-                        if (inString) {
-                            inString = false;
-                        } else {
-                            inString = true;
-                        }
-                    } else {
-                        backspace = false;
-                    }
-                    s.append(c);
-                } else if (c == '\\' && inString) {
-                    backspace = true;
+                    cTokens.addAll(tokify(c + ""));
+                } else if (c == '{' || c == '}') {
+                    cTokens.addAll(tokify(s.toString()));
+                    s = new StringBuilder();
+                    cTokens.addAll(tokify(c + ""));
+                } else if (c == '[' || c == ']') {
+                    cTokens.addAll(tokify(s.toString()));
+                    s = new StringBuilder();
+                    cTokens.addAll(tokify(c + ""));
+                } else if (c == '.') {
+                    cTokens.addAll(tokify(s.toString()));
+                    s = new StringBuilder();
+                    cTokens.addAll(tokify(c + ""));
+                } else if (c == ':') {
+                    cTokens.addAll(tokify(s.toString()));
+                    s = new StringBuilder();
+                    cTokens.addAll(tokify(c + ""));
                 } else {
-                    if (c == '(' || c == ')') {
-                        cTokens.addAll(tokify(s.toString()));
-                        s = new StringBuilder();
-                        cTokens.addAll(tokify(c + ""));
-                    } else if (c == '{' || c == '}') {
-                        cTokens.addAll(tokify(s.toString()));
-                        s = new StringBuilder();
-                        cTokens.addAll(tokify(c + ""));
-                    } else if (c == '[' || c == ']') {
-                        cTokens.addAll(tokify(s.toString()));
-                        s = new StringBuilder();
-                        cTokens.addAll(tokify(c + ""));
-                    } else if (c == '.') {
-                        cTokens.addAll(tokify(s.toString()));
-                        s = new StringBuilder();
-                        cTokens.addAll(tokify(c + ""));
-                    } else if (c == ':') {
-                        cTokens.addAll(tokify(s.toString()));
-                        s = new StringBuilder();
-                        cTokens.addAll(tokify(c + ""));
-                    }
-                    else {
-                        s.append(c);
-                    }
-                }
-
-            }
-
-            if (s.length() != 0) {
-                cTokens.addAll(tokify(s.toString()));
-            }
-
-            tokens.add(cTokens);
-        }
-
-        for (ArrayList<Token> cTokens : tokens) {
-            for (int i = cTokens.size() - 1; i >= 0; i--) {
-                if (cTokens.get(i).getKey().equals("nul")) {
-                    cTokens.remove(i);
+                    s.append(c);
                 }
             }
+
         }
+
+        if (s.length() != 0) {
+            cTokens.addAll(tokify(s.toString()));
+        }
+
+        for (int i = cTokens.size() - 1; i >= 0; i--) {
+            if (cTokens.get(i).getKey().equals("nul")) {
+                cTokens.remove(i);
+            }
+        }
+
+        tokens = cTokens;
 
     }
 
-    public ArrayList<ArrayList<Token>> getTokens() {
+    public ArrayList<Token> getTokens() {
         return tokens;
     }
 
@@ -119,7 +126,7 @@ public class Lexer {
             tokens.add(new Token("int", Integer.parseInt(s, 16)));
             return tokens;
         }
-        if (s.matches("([true])|([false])")) {
+        if (s.matches("(true)|(false)")) {
             if (s.equals("true")) {
                 tokens.add(new Token("bol", true));
                 return tokens;
@@ -163,6 +170,10 @@ public class Lexer {
             return tokens;
         }
 
+        if (s.equals("char") || s.equals("character")) {
+            tokens.add(new Token("typ", "chr"));
+            return tokens;
+        }
         if (s.equals("boolean") || s.equals("bool") || s.equals("bol")) {
             tokens.add(new Token("typ", "bol"));
             return tokens;

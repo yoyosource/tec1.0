@@ -16,6 +16,7 @@ import tec.utils.Token;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * Main Class
@@ -45,19 +46,14 @@ public class Tec {
 
         long time2 = System.currentTimeMillis();
 
-        ArrayList<ArrayList<Token>> tokens = lexer.getTokens();
-        int i = 0;
-        for (ArrayList<Token> ctokens : tokens) {
-            i += ctokens.size();
-            StringBuilder stringBuilder = new StringBuilder();
-            for (Token token : ctokens) {
-                stringBuilder.append("<" + token.getKey() + ">" + token.getVal() + " ");
-            }
-            System.out.println(stringBuilder.toString().trim());
-        }
+        ArrayList<Token> tokens = lexer.getTokens();
+
+        String s = tokens.stream().map(token -> token.getKey().equals("NNN") ? "\n" : "<" + token.getKey() + ">" + token.getVal() + " ").collect(Collectors.joining(""));
+
+        System.out.println(s);
 
         System.out.println("---");
-        System.out.println("Tokens       > " + i);
+        System.out.println("Tokens       > " + tokens.size());
         System.out.println("Compile Time > " + (time2 - time));
         System.out.println("---");
     }
