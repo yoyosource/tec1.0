@@ -9,5 +9,5 @@ public interface Statement {
 	String getName();
 
 	boolean execute(ArrayList<Token> tokens, Executor executor);
-	
+
 }
