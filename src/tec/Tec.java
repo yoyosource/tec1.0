@@ -52,6 +52,8 @@ public class Tec {
 
         System.out.println(s);
 
+        System.out.println("elirgöirug");
+
         System.out.println("---");
         System.out.println("Tokens       > " + tokens.size());
         System.out.println("Compile Time > " + (time2 - time));
