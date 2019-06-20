@@ -1,10 +1,12 @@
 package tec.codescanner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class CommentScanner {
 
-    private ArrayList<String> code = new ArrayList<>();
+    private String code = "";
 
     public void removeComments(String s) {
         String[] code = s.split("\n");
@@ -29,10 +31,10 @@ public class CommentScanner {
         for (int i = 0; i < newCode.size(); i++) {
             code[i] = newCode.get(i);
         }
-        this.code = newCode;
+        this.code = Arrays.stream(code).collect(Collectors.joining("\n"));
     }
 
-    public ArrayList<String> getCode() {
+    public String getCode() {
         return code;
     }
 
