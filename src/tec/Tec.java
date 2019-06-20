@@ -33,9 +33,10 @@ import java.util.stream.Collectors;
  * since it's a pure Java project
  * ---
  */
+@SuppressWarnings("InstantiatingObjectToGetClassObject")
 public class Tec {
     public Tec() {}
-    public static void main(String[] args) throws IOException, JsonException {
+    public static void main(String[] args) throws IOException, JsonException, Exception {
         /*JSONParser parser = new JSONParser("tec.json");
         JSONObject tec = parser.read();*/
         InputStream is = new Tec().getClass().getClassLoader().getResourceAsStream("tec.json");
