@@ -107,88 +107,89 @@ public class Lexer {
             tokens.add(new Token("str", s.substring(1, s.length() - 1)));
             return tokens;
         }
-        if (s.matches("-?(\\d+)(\\.(\\d+))")) {
+        if (!s.matches("-?(\\d+)(\\.(\\d+))")) {
+            if (s.matches("-?(\\d+)")) {
+                tokens.add(new Token("int", Integer.parseInt(s)));
+                return tokens;
+            }
+            if (s.matches("##[0-9a-f]+")) {
+                tokens.add(new Token("int", Integer.parseInt(s, 16)));
+                return tokens;
+            }
+            if (s.matches("([true])|([false])")) {
+                if (s.equals("true")) {
+                    tokens.add(new Token("bol", true));
+                    return tokens;
+                } else {
+                    tokens.add(new Token("bol", false));
+                    return tokens;
+                }
+            }
+
+            if (s.matches("[+\\-*/%#^]")) {
+                tokens.add(new Token("OPE", s));
+                return tokens;
+            }
+            if (s.matches("([=<>!][=]?)")) {
+                tokens.add(new Token("COM", s));
+                return tokens;
+            }
+            if (s.matches("->")) {
+                tokens.add(new Token("RET", s));
+                return tokens;
+            }
+            if (s.matches("&&|\\|\\|")) {
+                tokens.add(new Token("LOG", s));
+                return tokens;
+            }
+
+            if (s.matches("\\(|\\)")) {
+                tokens.add(new Token("STb", s));
+                return tokens;
+            }
+            if (s.matches("\\[|\\]")) {
+                tokens.add(new Token("ACb", s));
+                return tokens;
+            }
+            if (s.matches("\\{|\\}")) {
+                tokens.add(new Token("BLb", s));
+                return tokens;
+            }
+            if (s.equals(".") || s.equals(":") || s.equals(",")) {
+                tokens.add(new Token("SEp", s));
+                return tokens;
+            }
+
+            if (s.equals("boolean") || s.equals("bool") || s.equals("bol")) {
+                tokens.add(new Token("typ", "bol"));
+                return tokens;
+            }
+            if (s.equals("number") || s.equals("num")) {
+                tokens.add(new Token("typ", "num"));
+                return tokens;
+            }
+            if (s.equals("integer") || s.equals("int")) {
+                tokens.add(new Token("typ", "int"));
+                return tokens;
+            }
+            if (s.equals("string")) {
+                tokens.add(new Token("typ", "str"));
+                return tokens;
+            }
+
+            if (s.contains("+") || s.contains("-") || s.contains("*") || s.contains("/") || s.contains("%") || s.contains("#") || s.contains("^") || s.contains("!")) {
+                char[] c = s.toCharArray();
+                for (char c1 : c) {
+                    tokens.addAll(tokify(c1 + ""));
+                }
+            } else {
+                tokens.add(new Token("COD", s));
+            }
+            return tokens;
+        } else {
             tokens.add(new Token("num", Double.parseDouble(s)));
             return tokens;
         }
-        if (s.matches("-?(\\d+)")) {
-            tokens.add(new Token("int", Integer.parseInt(s)));
-            return tokens;
-        }
-        if (s.matches("##[0-9a-f]+")) {
-            tokens.add(new Token("int", Integer.parseInt(s, 16)));
-            return tokens;
-        }
-        if (s.matches("([true])|([false])")) {
-            if (s.equals("true")) {
-                tokens.add(new Token("bol", true));
-                return tokens;
-            } else {
-                tokens.add(new Token("bol", false));
-                return tokens;
-            }
-        }
-
-        if (s.matches("[+\\-*/%#^]")) {
-            tokens.add(new Token("OPE", s));
-            return tokens;
-        }
-        if (s.matches("([=<>!][=]?)")) {
-            tokens.add(new Token("COM", s));
-            return tokens;
-        }
-        if (s.matches("->")) {
-            tokens.add(new Token("RET", s));
-            return tokens;
-        }
-        if (s.matches("&&|\\|\\|")) {
-            tokens.add(new Token("LOG", s));
-            return tokens;
-        }
-
-        if (s.matches("\\(|\\)")) {
-            tokens.add(new Token("STb", s));
-            return tokens;
-        }
-        if (s.matches("\\[|\\]")) {
-            tokens.add(new Token("ACb", s));
-            return tokens;
-        }
-        if (s.matches("\\{|\\}")) {
-            tokens.add(new Token("BLb", s));
-            return tokens;
-        }
-        if (s.equals(".") || s.equals(":") || s.equals(",")) {
-            tokens.add(new Token("SEp", s));
-            return tokens;
-        }
-
-        if (s.equals("boolean") || s.equals("bool") || s.equals("bol")) {
-            tokens.add(new Token("typ", "bol"));
-            return tokens;
-        }
-        if (s.equals("number") || s.equals("num")) {
-            tokens.add(new Token("typ", "num"));
-            return tokens;
-        }
-        if (s.equals("integer") || s.equals("int")) {
-            tokens.add(new Token("typ", "int"));
-            return tokens;
-        }
-        if (s.equals("string")) {
-            tokens.add(new Token("typ", "str"));
-            return tokens;
-        }
-
-        if (s.contains("+") || s.contains("-") || s.contains("*") || s.contains("/") || s.contains("%") || s.contains("#") || s.contains("^") || s.contains("!")) {
-            char[] c = s.toCharArray();
-            for (char c1 : c) {
-                tokens.addAll(tokify(c1 + ""));
-            }
-        } else {
-            tokens.add(new Token("COD", s));
-        }
-        return tokens;
 
     }
 
