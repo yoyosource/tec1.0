@@ -8,4 +8,7 @@ public class Executor {
 	public Executor(ArrayList<Token> tokens) {
 
 	}
+	public void jump(int index) {
+
+	}
 }
