@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
  * ---
  */
 public class Tec {
+
     public static void main(String[] args) throws IOException {
 
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);
@@ -60,4 +61,5 @@ public class Tec {
         System.out.println("Compile Time > " + (time2 - time));
         System.out.println("---");
     }
+
 }

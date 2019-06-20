@@ -70,7 +70,7 @@ public class Calculator {
             System.out.println("-- ( ) |");
             System.out.println("");
             System.out.println("calculator.History:");
-            calculations.print();
+            calculations.Print();
             System.out.println("");
             time();
             return 0;
