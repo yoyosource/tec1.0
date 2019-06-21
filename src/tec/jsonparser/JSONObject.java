@@ -1,6 +1,7 @@
 package tec.jsonparser;
 
 import tec.exceptions.DefinitonException;
+import tec.utils.Variable;
 
 import java.util.ArrayList;
 

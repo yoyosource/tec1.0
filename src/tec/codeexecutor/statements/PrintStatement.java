@@ -22,7 +22,8 @@ public class PrintStatement implements Statement {
 		Expression expression = new Expression(tokens, variableState);
 		expression.build();
 		if (Tec.debug) {
-			System.out.println("Expression build time: " + expression.getExpressionTime() + "ms");
+			System.out.println("Expression " + Tec.expressions + " build time: " + expression.getExpressionTime() + "ms");
+			Tec.expressions += 1;
 		}
 		if (expression.getString() == null) {
 			System.out.println("ERROR: " + expression.getError());

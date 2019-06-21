@@ -38,6 +38,7 @@ public class Tec {
     private static Tec tec = new Tec();
 
     public static boolean debug = false;
+    public static int expressions = 1;
 
     public static void main(String[] args) throws Exception {
 

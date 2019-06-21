@@ -1,4 +1,4 @@
-package tec.jsonparser;
+package tec.utils;
 
 public class Variable<T> {
 	private String identifier;
