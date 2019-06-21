@@ -25,12 +25,11 @@ public class PrintStatement implements Statement {
 			System.out.println("Expression " + Tec.expressions + " build time: " + expression.getExpressionTime() + "ms");
 			Tec.expressions += 1;
 		}
-		if (expression.getString() == null) {
+		if (expression.getObject() == null) {
 			System.out.println("ERROR: " + expression.getError());
 			return false;
 		}
-		String s = expression.getString();
-		System.out.println(s);
+		System.out.println(expression.getObject());
 
 		return true;
 	}

@@ -63,6 +63,8 @@ public class Tec {
             }
         }
 
+        debug = true;
+
         String url;
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
