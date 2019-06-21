@@ -39,7 +39,7 @@ public class Tec {
     public static void main(String[] args) throws IOException, JsonException, Exception {
         /*JSONParser parser = new JSONParser("tec.json");
         JSONObject tec = parser.read();*/
-        InputStream is = new Tec().getClass().getClassLoader().getResourceAsStream("tec.json");
+        InputStream is = new Tec().getClass().getResourceAsStream("tec.json");
         JsonObject json = (JsonObject) Jsoner.deserialize(new FileReader(FileUtils.inputStreamToFile(is)));
         for (String arg : args) {
             if (arg.equals("--info")) {

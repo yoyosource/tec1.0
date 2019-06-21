@@ -183,6 +183,9 @@ public class Expression {
             if (token.getKey().equals("LOG")) {
                 return true;
             }
+            if (token.getKey().equals("COM")) {
+                return true;
+            }
         }
         return false;
     }
