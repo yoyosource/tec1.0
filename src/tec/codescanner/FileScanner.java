@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+/**
+ * The type File scanner.
+ */
 public class FileScanner {
 
     private String groundPath = "";
@@ -12,14 +15,24 @@ public class FileScanner {
 
     private String text = "";
 
-    public void scan(File file) {
+	/**
+	 * Scan.
+	 *
+	 * @param file the file
+	 */
+	public void scan(File file) {
         filePath(file);
         if (fileName.endsWith(".tec")) {
             scanFile(file);
         }
     }
 
-    public String getText() {
+	/**
+	 * Gets text.
+	 *
+	 * @return the text
+	 */
+	public String getText() {
         return text;
     }
 

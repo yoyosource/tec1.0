@@ -6,6 +6,9 @@ import tec.utils.Token;
 import java.util.ArrayList;
 import java.util.Stack;
 
+/**
+ * The type Executor.
+ */
 public class Executor {
 
 	private int index = 0;
@@ -14,11 +17,20 @@ public class Executor {
 
 	private Stack<VariableState> variableStateStack = new Stack<>();
 
+	/**
+	 * Instantiates a new Executor.
+	 *
+	 * @param tokens      the tokens
+	 * @param implementor the implementor
+	 */
 	public Executor(ArrayList<Token> tokens, Implementor implementor) {
 		this.implementor = implementor;
 		this.tokens = tokens;
 	}
 
+	/**
+	 * Run.
+	 */
 	public void run() {
 		variableStateStack.add(new VariableState());
 		while (index < tokens.size()) {
@@ -30,6 +42,11 @@ public class Executor {
 		}
 	}
 
+	/**
+	 * Jump.
+	 *
+	 * @param index the index
+	 */
 	public void jump(int index) {
 
 	}
@@ -70,6 +87,9 @@ public class Executor {
 		return tokens;
 	}
 
+	/**
+	 * End execution.
+	 */
 	protected void endExecution() {
 		index = tokens.size();
 	}

@@ -9,6 +9,9 @@ import tec.utils.Token;
 
 import java.util.ArrayList;
 
+/**
+ * The type Print statement.
+ */
 public class PrintStatement implements Statement {
 
 	@Override

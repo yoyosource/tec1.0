@@ -6,6 +6,10 @@ import tec.utils.Token;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+/**
+ * The expression class.
+ * This is the core for handling statements.
+ */
 public class Expression {
 
     private Calculator calculator = new Calculator();
@@ -13,25 +17,60 @@ public class Expression {
     private ArrayList<Token> tokens;
     private VariableState variableState;
 
+    /**
+     * Instantiates a new expression.
+     *
+     * @param tokens        the tokens
+     * @param variableState the variable state
+     */
     public Expression(ArrayList<Token> tokens, VariableState variableState) {
         this.tokens = tokens;
         this.variableState = variableState;
     }
 
+    /**
+     * Instantiates a new Expression.
+     *
+     * @param tokens the tokens
+     */
     public Expression(ArrayList<Token> tokens) {
         this.tokens = tokens;
     }
 
 
+    /**
+     * The Output string (if the output was equal to a string value)
+     */
     String outputString;
+    /**
+     * The Output boolean (if the output was equal to a boolean value)
+     */
     Boolean outputBoolean;
+    /**
+     * The Output object (if the output was equal to a boolean value)
+     */
     Object outputObject;
 
+    /**
+     * The Expression time in milliseconds.
+     */
     long expressionTime;
+    /**
+     * The Plus time.
+     */
     long plusTime;
+    /**
+     * The Type.
+     */
     String type;
+    /**
+     * The Error.
+     */
     String error;
 
+    /**
+     * Build the expression.
+     */
     public void build() {
         expressionTime = System.currentTimeMillis();
         if (tokens.size() == 1) {
@@ -378,6 +417,11 @@ public class Expression {
     }
 
 
+    /**
+     * Gets an expressed string (if the output was equal to a string value)
+     *
+     * @return the expressed string.
+     */
     public String getString() {
         if (outputString == null && error == null) {
             error = "This Expression was not detected as a String Expression";
@@ -385,6 +429,11 @@ public class Expression {
         return outputString;
     }
 
+    /**
+     * Gets boolean.
+     *
+     * @return the boolean
+     */
     public boolean getBoolean() {
         if (outputBoolean == null && error == null) {
             error = "This Expression was not detected as a Boolean Expression";
@@ -392,18 +441,38 @@ public class Expression {
         return outputBoolean;
     }
 
+    /**
+     * Gets object.
+     *
+     * @return the object
+     */
     public Object getObject() {
         return outputObject;
     }
 
+    /**
+     * Gets error.
+     *
+     * @return the error
+     */
     public String getError() {
         return error;
     }
 
+    /**
+     * Gets expression time.
+     *
+     * @return the expression time
+     */
     public long getExpressionTime() {
         return expressionTime + plusTime;
     }
 
+    /**
+     * Gets type.
+     *
+     * @return the type
+     */
     public String getType() {
         return type;
     }

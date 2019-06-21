@@ -6,6 +6,9 @@ import tec.utils.Token;
 
 import java.util.ArrayList;
 
+/**
+ * The type Var statement.
+ */
 public class VarStatement implements Statement {
 
     @Override

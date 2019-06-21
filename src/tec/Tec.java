@@ -33,13 +33,28 @@ import java.util.stream.Collectors;
 @SuppressWarnings("InstantiatingObjectToGetClassObject")
 public class Tec {
 
+    /**
+     * Instantiates a new Tec.
+     */
     public Tec() {}
 
     private static Tec tec = new Tec();
 
+    /**
+     * The constant debug.
+     */
     public static boolean debug = false;
+    /**
+     * The constant expressions.
+     */
     public static int expressions = 1;
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws Exception the exception
+     */
     public static void main(String[] args) throws Exception {
 
         InputStream is = tec.getClass().getResourceAsStream("tec.json");

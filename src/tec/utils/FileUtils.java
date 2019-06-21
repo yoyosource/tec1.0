@@ -2,7 +2,17 @@ package tec.utils;
 
 import java.io.*;
 
+/**
+ * The type File utils.
+ */
 public class FileUtils {
+	/**
+	 * Input stream to file file.
+	 *
+	 * @param is the is
+	 * @return the file
+	 * @throws Exception the exception
+	 */
 	public static File inputStreamToFile(InputStream is) throws Exception {
 		OutputStream outputStream = null;
 		try

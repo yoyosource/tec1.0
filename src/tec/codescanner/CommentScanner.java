@@ -4,11 +4,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+/**
+ * The type Comment scanner.
+ */
 public class CommentScanner {
 
     private String code = "";
 
-    public void removeComments(String s) {
+	/**
+	 * Remove comments.
+	 *
+	 * @param s the s
+	 */
+	public void removeComments(String s) {
         String[] code = s.split("\n");
         ArrayList<String> newCode = new ArrayList<>();
         int inComment = 0;
@@ -34,7 +42,12 @@ public class CommentScanner {
         this.code = Arrays.stream(code).collect(Collectors.joining("\n"));
     }
 
-    public String getCode() {
+	/**
+	 * Gets code.
+	 *
+	 * @return the code
+	 */
+	public String getCode() {
         return code;
     }
 

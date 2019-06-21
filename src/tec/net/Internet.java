@@ -9,8 +9,20 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * The type Internet.
+ */
 public class Internet {
 	private static String token = "b78958089ea555081b967bd94400c55be64e43c7";
+
+	/**
+	 * Read url object.
+	 *
+	 * @param baseurl the baseurl
+	 * @return the object
+	 * @throws IOException   the io exception
+	 * @throws JsonException the json exception
+	 */
 	public static Object readURL(String baseurl) throws IOException, JsonException {
 		URL url = new URL(baseurl);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
