@@ -18,6 +18,7 @@ import tec.codeexecutor.statements.VarStatement;
 import tec.codescanner.CommentScanner;
 import tec.codescanner.FileScanner;
 import tec.codescanner.TrimmerManager;
+import tec.jsonparser.JSONArray;
 import tec.net.Internet;
 import tec.utils.FileUtils;
 import tec.utils.Token;
@@ -57,17 +58,17 @@ public class Tec {
      * @throws Exception the exception, in case an error happens
      */
     public static void main(String[] args) throws Exception {
-
         InputStream is = tec.getClass().getResourceAsStream("tec.json");
         JsonObject json = (JsonObject) Jsoner.deserialize(new FileReader(FileUtils.inputStreamToFile(is)));
+        System.out.println("Running tec executor v" + json.get("version"));
         for (String arg : args) {
             if (arg.equals("--info")) {
                 PrintStream out = System.out;
                 out.println("tec executor v" + json.get("version") + " by " + json.get("authors"));
-                out.println("Updates:");
-                for (Object obj : (JsonArray) json.get("updates")) {
-                    out.println();
-                }
+                out.println("Updates: ");
+                JSONArray updates = (JSONArray) json.get("updates");
+                out.println(updates.join(" and "));
+
                 return;
             }
             if (arg.equals("--updates")) {
