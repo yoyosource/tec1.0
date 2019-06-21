@@ -43,7 +43,7 @@ public class Tec {
     /**
      * The constant debug.
      */
-    public static boolean debug = false;
+    public static int debug = 0;
     /**
      * The constant expressions.
      */
@@ -74,11 +74,11 @@ public class Tec {
             }
             if (arg.equals(":debug")) {
                 System.out.println("Running debug mode");
-                debug = true;
+                debug = 1;
             }
         }
 
-        debug = true;
+        debug = 1;
 
         String url;
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);

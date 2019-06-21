@@ -22,9 +22,16 @@ public class Executor {
 	}
 
 	public static boolean runExpressionInfo(Expression expression) {
-		if (Tec.debug) {
+		System.out.println(expression.toString());
+		if (Tec.debug > 0) {
 			System.out.println("Expression " + Tec.expressions + " build time: " + expression.getExpressionTime() + "ms");
 			Tec.expressions += 1;
+			if (Tec.debug == 2) {
+				System.out.println(expression.toString());
+			}
+			if (Tec.debug > 2) {
+				System.out.println(expression.advancedInfo().toString());
+			}
 		}
 		if (expression.getObject() == null) {
 			System.out.println("ERROR: " + expression.getError());
