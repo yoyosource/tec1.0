@@ -82,7 +82,7 @@ public class Expression {
                 type = tokens.get(0).getKey();
                 outputObject = tokens.get(0).getVal();
             } catch (NullPointerException e) {
-
+				e.printStackTrace();
             }
         } else if (isLogic()) {
             booleanOutput();

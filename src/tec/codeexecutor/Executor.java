@@ -23,13 +23,13 @@ public class Executor {
 
 	public static boolean runExpressionInfo(Expression expression) {
 		System.out.println(expression.toString());
-		if (Tec.debug > 0) {
+		if (Tec.debug.getDebugLevel() > 0) {
 			System.out.println("Expression " + Tec.expressions + " build time: " + expression.getExpressionTime() + "ms");
 			Tec.expressions += 1;
-			if (Tec.debug == 2) {
+			if (Tec.debug.getDebugLevel() == 2) {
 				System.out.println(expression.toString());
 			}
-			if (Tec.debug > 2) {
+			if (Tec.debug.getDebugLevel() > 2) {
 				System.out.println(expression.advancedInfo().toString());
 			}
 		}
