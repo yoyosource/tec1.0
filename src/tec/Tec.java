@@ -20,6 +20,7 @@ import tec.codescanner.TrimmerManager;
 import tec.exceptions.DefinitonException;
 import tec.jsonparser.JSONObject;
 import tec.jsonparser.JSONParser;
+import tec.utils.FileUtils;
 import tec.utils.Token;
 
 import java.io.*;
@@ -32,12 +33,14 @@ import java.util.stream.Collectors;
  * since it's a pure Java project
  * ---
  */
+@SuppressWarnings("InstantiatingObjectToGetClassObject")
 public class Tec {
-
-    public static void main(String[] args) throws IOException, JsonException {
+    public Tec() {}
+    public static void main(String[] args) throws IOException, JsonException, Exception {
         /*JSONParser parser = new JSONParser("tec.json");
         JSONObject tec = parser.read();*/
-        /*JsonObject json = (JsonObject) Jsoner.deserialize(new FileReader(new File("tec.json")));
+        InputStream is = new Tec().getClass().getClassLoader().getResourceAsStream("tec.json");
+        JsonObject json = (JsonObject) Jsoner.deserialize(new FileReader(FileUtils.inputStreamToFile(is)));
         for (String arg : args) {
             if (arg.equals("--info")) {
                 PrintStream out = System.out;
@@ -48,7 +51,7 @@ public class Tec {
             if (arg.equals("-updates")) {
                 URL updateJson = new URL("");
             }
-        }*/
+        }
 
 
         String url = "/Users/jojo/IdeaProjects/tec/src/test.tec";
