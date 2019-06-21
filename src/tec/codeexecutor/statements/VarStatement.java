@@ -1,5 +1,7 @@
 package tec.codeexecutor.statements;
 
+import tec.Tec;
+import tec.codeexecutor.Executor;
 import tec.codeexecutor.Expression;
 import tec.codeexecutor.Var;
 import tec.codeexecutor.VariableState;
@@ -34,6 +36,10 @@ public class VarStatement implements Statement {
         tokens.remove(0);
         Expression expression = new Expression(tokens);
         expression.build();
+
+        if (!Executor.runExpressionInfo(expression)) {
+            return false;
+        }
 
         String type = expression.getType();
         Object object = expression.getObject();
