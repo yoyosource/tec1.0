@@ -29,7 +29,7 @@ public class Executor {
 			if (Tec.debug == 2) {
 				System.out.println(expression.toString());
 			}
-			if (Tec.debug > 2) {
+			if (Tec.debug > 1) {
 				System.out.println(expression.advancedInfo().toString());
 			}
 		}

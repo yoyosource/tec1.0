@@ -18,9 +18,7 @@ public class IfStatement implements Statement {
     @Override
     public boolean execute(ArrayList<Token> tokens, VariableState variableState) {
 
-        System.out.println("if");
-
-        if (tokens.get(tokens.size() - 1).getKey().equals("BLb") && tokens.get(tokens.size() - 1).getVal().toString().equals("{")) {
+        if (!(tokens.get(tokens.size() - 1).getKey().equals("BLb") && tokens.get(tokens.size() - 1).getVal().toString().equals("{"))) {
             return false;
         }
 

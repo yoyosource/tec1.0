@@ -304,6 +304,13 @@ public class Expression {
         String compare = compareToken.getVal().toString();
 
         if (compare.equals("==")) {
+            if ((t1.equals("num") && t2.equals("int")) || (t1.equals("int") && t2.equals("num"))) {
+                if (s1.equals(s2)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
             if (s1.equals(s2) && t1.equals(t2)) {
                 return true;
             } else {
@@ -311,6 +318,13 @@ public class Expression {
             }
         }
         if (compare.equals("!=")) {
+            if (!((t1.equals("num") && t2.equals("int")) || (t1.equals("int") && t2.equals("num")))) {
+                if (!s1.equals(s2)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
             if (!s1.equals(s2) || !t1.equals(t2)) {
                 return true;
             } else {
