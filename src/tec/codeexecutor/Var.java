@@ -32,6 +32,7 @@ public class Var {
         }
         if (this.type.equals("int") && type.equals("num")) {
             this.value = (int)value;
+            System.out.println("something");
         }
     }
 
