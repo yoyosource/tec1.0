@@ -90,6 +90,7 @@ public class Expression {
         }
         expressionTime -= System.currentTimeMillis();
         expressionTime *= -1;
+
     }
 
     private ArrayList<Token> replaceVars(ArrayList<Token> tokens) {
