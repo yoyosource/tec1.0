@@ -36,3 +36,7 @@ print string
 
 num = 3
 print num
+
+if (num == 3) {
+
+}
