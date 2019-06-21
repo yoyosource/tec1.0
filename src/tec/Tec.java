@@ -37,7 +37,7 @@ public class Tec {
     public static void main(String[] args) throws IOException, JsonException {
         /*JSONParser parser = new JSONParser("tec.json");
         JSONObject tec = parser.read();*/
-        JsonObject json = (JsonObject) Jsoner.deserialize(new FileReader(new File("tec.json")));
+        /*JsonObject json = (JsonObject) Jsoner.deserialize(new FileReader(new File("tec.json")));
         for (String arg : args) {
             if (arg.equals("--info")) {
                 PrintStream out = System.out;
@@ -48,7 +48,7 @@ public class Tec {
             if (arg.equals("-updates")) {
                 URL updateJson = new URL("");
             }
-        }
+        }*/
 
 
         String url = "/Users/jojo/IdeaProjects/tec/src/test.tec";
