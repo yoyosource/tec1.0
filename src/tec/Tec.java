@@ -18,6 +18,7 @@ import tec.codescanner.CommentScanner;
 import tec.codescanner.FileScanner;
 import tec.codescanner.TrimmerManager;
 import tec.exceptions.DefinitonException;
+import tec.github.GitHub;
 import tec.jsonparser.JSONObject;
 import tec.jsonparser.JSONParser;
 import tec.utils.FileUtils;
@@ -36,25 +37,27 @@ import java.util.stream.Collectors;
 @SuppressWarnings("InstantiatingObjectToGetClassObject")
 public class Tec {
     public Tec() {}
-    public static void main(String[] args) throws IOException, JsonException, Exception {
-        /*JSONParser parser = new JSONParser("tec.json");
-        JSONObject tec = parser.read();*/
-        InputStream is = new Tec().getClass().getClassLoader().getResourceAsStream("tec.json");
+    private static Tec tec = new Tec();
+    public static void main(String[] args) throws Exception {
+        InputStream is = tec.getClass().getResourceAsStream("tec.json");
         JsonObject json = (JsonObject) Jsoner.deserialize(new FileReader(FileUtils.inputStreamToFile(is)));
         for (String arg : args) {
             if (arg.equals("--info")) {
                 PrintStream out = System.out;
-                out.println("tec executor v" + json.get("version"));
-                out.println("");
+                out.println("tec executor v" + json.get("version") + " by " + json.get("authors") );
+                out.println("Updates:");
+                for (String s: json.get("updates")) {
+                    
+                }
                 return;
             }
             if (arg.equals("-updates")) {
-                URL updateJson = new URL("");
+                GitHub.readURL("https://");
             }
         }
 
 
-        String url = "/Users/jojo/IdeaProjects/tec/src/test.tec";
+        String url;
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         System.out.println("Tec file Path:");
