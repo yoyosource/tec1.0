@@ -20,23 +20,23 @@ public class Expression {
     private ArrayList<Token> tokens;
     private VariableState variableState;
 
-    /**
-     * Instantiates a new expression.
-     *
-     * @param tokens        the tokens
-     * @param variableState the variable state
-     */
-    public Expression(ArrayList<Token> tokens, VariableState variableState) {
+	/**
+	 * Instantiates a new expression.
+	 *
+	 * @param tokens        the tokens
+	 * @param variableState the variable state
+	 */
+	public Expression(ArrayList<Token> tokens, VariableState variableState) {
         this.tokens = tokens;
         this.variableState = variableState;
     }
 
-    /**
-     * Instantiates a new Expression.
-     *
-     * @param tokens the tokens
-     */
-    public Expression(ArrayList<Token> tokens) {
+	/**
+	 * Instantiates a new Expression.
+	 *
+	 * @param tokens the tokens
+	 */
+	public Expression(ArrayList<Token> tokens) {
         this.tokens = tokens;
     }
 
@@ -71,10 +71,10 @@ public class Expression {
      */
     private String error;
 
-    /**
-     * Build the expression.
-     */
-    public void build() {
+	/**
+	 * Build the expression.
+	 */
+	public void build() {
         expressionTime = System.currentTimeMillis();
         if (tokens.size() == 1) {
             tokens = replaceVars(tokens);
@@ -93,10 +93,12 @@ public class Expression {
         }
         expressionTime -= System.currentTimeMillis();
         expressionTime *= -1;
-        DebugHandler debug = new DebugHandler(DebugLevel.NORMAL, "Expression " + Tec.expressions + " built.");
-        debug.send();
-        debug = new DebugHandler(DebugLevel.ADVANCED, "Expression " + Tec.expressions + " built.\nErrors detected while compiling: " + error);
-        debug.send();
+		DebugHandler debug = new DebugHandler(DebugLevel.NONE, "Expression " + Tec.expressions + " built.", (int) expressionTime);
+		debug.send();
+		debug = new DebugHandler(DebugLevel.NORMAL, "Expression " + Tec.expressions + " built.\nErrors detected while compiling: " + error + "\nExpression as string: " + this.toString());
+		debug.send();
+		debug = new DebugHandler(DebugLevel.ADVANCED, "Expression " + Tec.expressions + " built.\nErrors detected while compiling: " + error + "\nExpression as string: " + this.toString() + "Expression advanced info: " + this.advancedInfo().toString(), (int) expressionTime);
+		debug.send();
         Tec.expressions += 1;
     }
 
@@ -173,9 +175,6 @@ public class Expression {
                 booleans.set(0, !booleans.get(0));
             }
         }
-
-        System.out.println();
-
         while (booleans.size() > 1) {
             int index = getTop(priority);
 
@@ -430,63 +429,63 @@ public class Expression {
     }
 
 
-    /**
-     * Gets an expressed string (if the output was equal to a string value)
-     *
-     * @return the expressed string.
-     */
-    public String getString() {
+	/**
+	 * Gets an expressed string (if the output was equal to a string value)
+	 *
+	 * @return the expressed string.
+	 */
+	public String getString() {
         if (outputString == null && error == null) {
             error = "This Expression was not detected as a String Expression";
         }
         return outputString;
     }
 
-    /**
-     * Gets boolean.
-     *
-     * @return the boolean
-     */
-    public boolean getBoolean() {
+	/**
+	 * Gets boolean.
+	 *
+	 * @return the boolean
+	 */
+	public boolean getBoolean() {
         if (outputBoolean == null && error == null) {
             error = "This Expression was not detected as a Boolean Expression";
         }
         return outputBoolean;
     }
 
-    /**
-     * Gets object.
-     *
-     * @return the object
-     */
-    public Object getObject() {
+	/**
+	 * Gets object.
+	 *
+	 * @return the object
+	 */
+	public Object getObject() {
         return outputObject;
     }
 
-    /**
-     * Gets error.
-     *
-     * @return the error
-     */
-    public String getError() {
+	/**
+	 * Gets error.
+	 *
+	 * @return the error
+	 */
+	public String getError() {
         return error;
     }
 
-    /**
-     * Gets expression time.
-     *
-     * @return the expression time
-     */
-    public long getExpressionTime() {
+	/**
+	 * Gets expression time.
+	 *
+	 * @return the expression time
+	 */
+	public long getExpressionTime() {
         return expressionTime + plusTime;
     }
 
-    /**
-     * Gets type.
-     *
-     * @return the type
-     */
-    public String getType() {
+	/**
+	 * Gets type.
+	 *
+	 * @return the type
+	 */
+	public String getType() {
         return type;
     }
 
@@ -579,9 +578,16 @@ public class Expression {
 
     private boolean advancedInfo = false;
 
-    public Expression advancedInfo() {
+	/**
+	 * Advanced info expression.
+	 *
+	 * @return the expression
+	 */
+	public ExpressionAdvancedInfo advancedInfo() {
         advancedInfo = true;
-        return this;
+		ExpressionAdvancedInfo advancedObject = new ExpressionAdvancedInfo();
+		advancedObject.set(InfoID.TOKENS, tokens);
+        return advancedObject;
     }
 
     @Override

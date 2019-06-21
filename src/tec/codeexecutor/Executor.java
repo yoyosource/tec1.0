@@ -2,11 +2,17 @@ package tec.codeexecutor;
 
 import tec.Tec;
 import tec.interfaces.Statement;
+import tec.utils.DebugHandler;
+import tec.utils.DebugLevel;
 import tec.utils.Token;
 
 import java.util.ArrayList;
 import java.util.Stack;
 
+/**
+ * The type Executor.
+ */
+@SuppressWarnings("ALL")
 public class Executor {
 
 	private int index = 0;
@@ -16,23 +22,25 @@ public class Executor {
 
 	private Stack<VariableState> variableStateStack = new Stack<>();
 
+	/**
+	 * Instantiates a new Executor.
+	 *
+	 * @param tokens      the tokens
+	 * @param implementor the implementor
+	 */
 	public Executor(ArrayList<Token> tokens, Implementor implementor) {
 		this.implementor = implementor;
 		this.tokens = tokens;
 	}
 
+	/**
+	 * Run expression info boolean.
+	 *
+	 * @param expression the expression
+	 * @return the boolean
+	 */
 	public static boolean runExpressionInfo(Expression expression) {
 		System.out.println(expression.toString());
-		if (Tec.debug.getDebugLevel() > 0) {
-			System.out.println("Expression " + Tec.expressions + " build time: " + expression.getExpressionTime() + "ms");
-			Tec.expressions += 1;
-			if (Tec.debug.getDebugLevel() == 2) {
-				System.out.println(expression.toString());
-			}
-			if (Tec.debug.getDebugLevel() > 2) {
-				System.out.println(expression.advancedInfo().toString());
-			}
-		}
 		if (expression.getObject() == null) {
 			System.out.println("ERROR: " + expression.getError());
 			return false;
@@ -40,6 +48,9 @@ public class Executor {
 		return true;
 	}
 
+	/**
+	 * Run.
+	 */
 	public void run() {
 		variableStateStack.add(new VariableState());
 		while (running && index < tokens.size()) {
@@ -55,6 +66,9 @@ public class Executor {
 		}
 	}
 
+	/**
+	 * Jump to line end.
+	 */
 	public void jumpToLineEnd() {
 		for (int i = index + 1; i < this.tokens.size(); i++) {
 			if (this.tokens.get(i).getKey().equals("NNN")) {
@@ -132,6 +146,9 @@ public class Executor {
 		return tokens;
 	}
 
+	/**
+	 * End execution.
+	 */
 	protected void endExecution() {
 		running = false;
 	}

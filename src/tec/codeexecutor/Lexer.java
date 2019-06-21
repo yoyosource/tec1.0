@@ -11,12 +11,12 @@ public class Lexer {
     private ArrayList<Token> tokens = new ArrayList<>();
     private StringBuilder s = new StringBuilder();
 
-	/**
-	 * Create tokens.
-	 *
-	 * @param codes the codes
-	 */
-	public void createTokens(String codes) {
+    /**
+     * Create tokens.
+     *
+     * @param codes the codes
+     */
+    public void createTokens(String codes) {
 
         char[] chars = codes.toCharArray();
         ArrayList<Token> cTokens = new ArrayList<>();
@@ -96,12 +96,12 @@ public class Lexer {
 
     }
 
-	/**
-	 * Gets tokens.
-	 *
-	 * @return the tokens
-	 */
-	public ArrayList<Token> getTokens() {
+    /**
+     * Gets tokens.
+     *
+     * @return the tokens
+     */
+    public ArrayList<Token> getTokens() {
         return tokens;
     }
 
