@@ -19,6 +19,7 @@ import tec.codescanner.CommentScanner;
 import tec.codescanner.FileScanner;
 import tec.codescanner.TrimmerManager;
 import tec.net.Internet;
+import tec.utils.DebugLevel;
 import tec.utils.FileUtils;
 import tec.utils.Token;
 
