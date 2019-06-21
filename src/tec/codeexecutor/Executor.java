@@ -9,6 +9,7 @@ import java.util.Stack;
 public class Executor {
 
 	private int index = 0;
+	private boolean running = true;
 	private Implementor implementor;
 	private ArrayList<Token> tokens;
 
@@ -21,17 +22,29 @@ public class Executor {
 
 	public void run() {
 		variableStateStack.add(new VariableState());
-		while (index < tokens.size()) {
+		while (running && index < tokens.size()) {
 			if (isStatement()) {
 				runStatement();
+				jumpToLineEnd();
+			} else if (isVariable()) {
+				runVariable();
+				jumpToLineEnd();
 			}
 
 			index++;
 		}
 	}
 
-	public void jump(int index) {
-
+	public void jumpToLineEnd() {
+		for (int i = index + 1; i < this.tokens.size(); i++) {
+			if (this.tokens.get(i).getKey().equals("NNN")) {
+				index = i;
+				break;
+			}
+			if (i == tokens.size() - 1) {
+				running = false;
+			}
+		}
 	}
 
 	private boolean isStatement() {
@@ -59,6 +72,34 @@ public class Executor {
 		return false;
 	}
 
+	private boolean isVariable() {
+		if (variableStateStack.lastElement().isVariable(tokens.get(index).getVal().toString())) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean runVariable() {
+		if (tokens.get(index + 1).getKey().equals("ASG")) {
+
+			String name = tokens.get(index).getVal().toString();
+			index++;
+
+			ArrayList<Token> tokens = getTokensToNextLine();
+			Expression expression = new Expression(tokens);
+			expression.build();
+
+			if (expression.getObject() == null) {
+				return false;
+			}
+			if (variableStateStack.lastElement().setVar(name, new Var(name, expression.getObject(), expression.getType()))) {
+				return true;
+			}
+
+		}
+		return false;
+	}
+
 	private ArrayList<Token> getTokensToNextLine() {
 		ArrayList<Token> tokens = new ArrayList<>();
 		for (int i = index + 1; i < this.tokens.size(); i++) {
@@ -71,6 +112,6 @@ public class Executor {
 	}
 
 	protected void endExecution() {
-		index = tokens.size();
+		running = false;
 	}
 }

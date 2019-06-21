@@ -23,5 +23,16 @@ print false x| false
 print false n| false
 print false n| true*/
 
+/*
 print « false == true || « true == true || false » » && false
 print « false == true || « true == true || false » » && true
+*/
+
+var string = "test"
+var num = 1+1
+var bool = << false == true || << true == true || false >> >> && false
+
+print string
+
+num = 3
+print num

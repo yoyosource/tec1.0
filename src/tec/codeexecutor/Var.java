@@ -27,8 +27,11 @@ public class Var {
     }
 
     public void setValue(Object value, String type) {
-        if (this.type.equals(type)) {
+        if (this.type.equals(type) || (this.type.equals("num") && type.equals("int"))) {
             this.value = value;
+        }
+        if (this.type.equals("int") && type.equals("num")) {
+            this.value = (int)value;
         }
     }
 

@@ -35,8 +35,13 @@ public class Expression {
     public void build() {
         expressionTime = System.currentTimeMillis();
         if (tokens.size() == 1) {
-            type = tokens.get(0).getKey();
-            outputObject = tokens.get(0).getVal();
+            tokens = replaceVars(tokens);
+            try {
+                type = tokens.get(0).getKey();
+                outputObject = tokens.get(0).getVal();
+            } catch (NullPointerException e) {
+
+            }
         } else if (isLogic()) {
             booleanOutput();
             outputObject = outputBoolean;

@@ -143,6 +143,10 @@ public class Lexer {
             tokens.add(new Token("COM", s));
             return tokens;
         }
+        if (s.matches("(=)")) {
+            tokens.add(new Token("ASG", s));
+            return tokens;
+        }
         if (s.matches("->")) {
             tokens.add(new Token("RET", s));
             return tokens;
@@ -179,23 +183,23 @@ public class Lexer {
             return tokens;
         }
 
-        if (s.equals("char") || s.equals("character")) {
+        if (s.equals("*char") || s.equals("*character")) {
             tokens.add(new Token("typ", "chr"));
             return tokens;
         }
-        if (s.equals("boolean") || s.equals("bool") || s.equals("bol")) {
+        if (s.equals("*boolean") || s.equals("*bool") || s.equals("*bol")) {
             tokens.add(new Token("typ", "bol"));
             return tokens;
         }
-        if (s.equals("number") || s.equals("num")) {
+        if (s.equals("*number") || s.equals("*num")) {
             tokens.add(new Token("typ", "num"));
             return tokens;
         }
-        if (s.equals("integer") || s.equals("int")) {
+        if (s.equals("*integer") || s.equals("*int")) {
             tokens.add(new Token("typ", "int"));
             return tokens;
         }
-        if (s.equals("string")) {
+        if (s.equals("*string")) {
             tokens.add(new Token("typ", "str"));
             return tokens;
         }
