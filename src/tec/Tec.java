@@ -18,6 +18,7 @@ import tec.codescanner.CommentScanner;
 import tec.codescanner.FileScanner;
 import tec.codescanner.TrimmerManager;
 import tec.net.Internet;
+import tec.utils.DebugLevel;
 import tec.utils.FileUtils;
 import tec.utils.Token;
 
@@ -43,7 +44,7 @@ public class Tec {
     /**
      * The constant debug.
      */
-    public static int debug = 0;
+    public static DebugLevel debug = DebugLevel.NONE;
     /**
      * The constant expressions.
      */
@@ -72,13 +73,14 @@ public class Tec {
             if (arg.equals("-updates")) {
                 Internet.readURL("");
             }
-            if (arg.equals(":debug")) {
+            if (arg.startsWith(":debug.")) {
+            	arg = arg.substring(7);
                 System.out.println("Running debug mode");
-                debug = 1;
+                debug = DebugLevel.getDebugLevel(arg);
             }
         }
 
-        debug = 1;
+        debug = DebugLevel.NORMAL;
 
         String url;
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);

@@ -1,6 +1,9 @@
 package tec.codeexecutor;
 
+import tec.Tec;
 import tec.calculator.Calculator;
+import tec.utils.DebugHandler;
+import tec.utils.DebugLevel;
 import tec.utils.Token;
 
 import java.util.ArrayList;
@@ -90,7 +93,11 @@ public class Expression {
         }
         expressionTime -= System.currentTimeMillis();
         expressionTime *= -1;
-
+        DebugHandler debug = new DebugHandler(DebugLevel.NORMAL, "Expression " + Tec.expressions + " built.");
+        debug.send();
+        debug = new DebugHandler(DebugLevel.ADVANCED, "Expression " + Tec.expressions + " built.\nErrors detected while compiling: " + error);
+        debug.send();
+        Tec.expressions += 1;
     }
 
     private ArrayList<Token> replaceVars(ArrayList<Token> tokens) {
