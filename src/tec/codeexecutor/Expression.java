@@ -50,7 +50,7 @@ public class Expression {
     }
 
     private void booleanOutput() {
-
+        outputBoolean = false;
     }
 
     private void stringOutput() {
