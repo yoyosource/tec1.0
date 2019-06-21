@@ -19,7 +19,9 @@ public class Print implements Statement {
 
 		Expression expression = new Expression(tokens);
 		expression.build();
+		System.out.println("Expression build time: " + expression.getExpressionTime() + "ms");
 		if (expression.getString() == null) {
+			System.out.println("ERROR: " + expression.getError());
 			return false;
 		}
 		String s = expression.getString();

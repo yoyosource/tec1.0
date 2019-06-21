@@ -38,15 +38,20 @@ public class Expression {
     }
 
 
+    String Error;
     String outputString;
     boolean outputBoolean;
+    long expressionTime;
 
     public void build() {
+        expressionTime = System.currentTimeMillis();
         if (isLogic()) {
             booleanOutput();
         } else {
             stringOutput();
         }
+        expressionTime -= System.currentTimeMillis();
+        expressionTime *= -1;
     }
 
     private void booleanOutput() {
@@ -87,7 +92,8 @@ public class Expression {
             if (tokens.get(i).isType() && tokens.get(i + 1).getKey().equals("OPE") && tokens.get(i + 1).getVal().equals("+")) {
                 i++;
             } else {
-                throw new IllegalArgumentException("To many or to few Operators");
+                Error = "To many or to few Operators";
+                return;
             }
         }
 
@@ -115,11 +121,25 @@ public class Expression {
 
 
     public String getString() {
+        if (outputString == null) {
+            Error = "This Expression was not detected as a String Expression";
+        }
         return outputString;
     }
 
     public boolean getBoolean() {
+        if ((Boolean)outputBoolean == null) {
+            Error = "This Expression was not detected as a Boolean Expression";
+        }
         return outputBoolean;
+    }
+
+    public String getError() {
+        return Error;
+    }
+
+    public long getExpressionTime() {
+        return expressionTime;
     }
 
 
