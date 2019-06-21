@@ -41,32 +41,32 @@ public class Expression {
     /**
      * The Output string (if the output was equal to a string value)
      */
-    String outputString;
+    private String outputString;
     /**
      * The Output boolean (if the output was equal to a boolean value)
      */
-    Boolean outputBoolean;
+    private Boolean outputBoolean;
     /**
      * The Output object (if the output was equal to a boolean value)
      */
-    Object outputObject;
+    private Object outputObject;
 
     /**
      * The Expression time in milliseconds.
      */
-    long expressionTime;
+    private long expressionTime;
     /**
      * The Plus time.
      */
-    long plusTime;
+    private long plusTime;
     /**
      * The Type.
      */
-    String type;
+    private String type;
     /**
      * The Error.
      */
-    String error;
+    private String error;
 
     /**
      * Build the expression.
@@ -568,4 +568,38 @@ public class Expression {
         return true;
     }
 
+
+    private boolean advancedInfo = false;
+
+    public Expression advancedInfo() {
+        advancedInfo = true;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        if (advancedInfo) {
+            advancedInfo = false;
+            return "Expression{" +
+                    "tokens=" + tokens +
+                    ", outputString='" + outputString + '\'' +
+                    ", outputBoolean=" + outputBoolean +
+                    ", outputObject=" + outputObject +
+                    ", expressionTime=" + expressionTime +
+                    ", plusTime=" + plusTime +
+                    ", type='" + type + '\'' +
+                    ", error='" + error + '\'' +
+                    '}';
+        } else {
+            return "Expression{" +
+                    "outputString='" + outputString + '\'' +
+                    ", outputBoolean=" + outputBoolean +
+                    ", outputObject=" + outputObject +
+                    ", expressionTime=" + expressionTime +
+                    ", plusTime=" + plusTime +
+                    ", type='" + type + '\'' +
+                    ", error='" + error + '\'' +
+                    '}';
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package tec.codeexecutor;
 
+import tec.Tec;
 import tec.interfaces.Statement;
 import tec.utils.Token;
 
@@ -18,6 +19,25 @@ public class Executor {
 	public Executor(ArrayList<Token> tokens, Implementor implementor) {
 		this.implementor = implementor;
 		this.tokens = tokens;
+	}
+
+	public static boolean runExpressionInfo(Expression expression) {
+		System.out.println(expression.toString());
+		if (Tec.debug > 0) {
+			System.out.println("Expression " + Tec.expressions + " build time: " + expression.getExpressionTime() + "ms");
+			Tec.expressions += 1;
+			if (Tec.debug == 2) {
+				System.out.println(expression.toString());
+			}
+			if (Tec.debug > 2) {
+				System.out.println(expression.advancedInfo().toString());
+			}
+		}
+		if (expression.getObject() == null) {
+			System.out.println("ERROR: " + expression.getError());
+			return false;
+		}
+		return true;
 	}
 
 	public void run() {
@@ -89,9 +109,10 @@ public class Executor {
 			Expression expression = new Expression(tokens);
 			expression.build();
 
-			if (expression.getObject() == null) {
+			if (!runExpressionInfo(expression)) {
 				return false;
 			}
+
 			if (variableStateStack.lastElement().setVar(name, new Var(name, expression.getObject(), expression.getType()))) {
 				return true;
 			}
