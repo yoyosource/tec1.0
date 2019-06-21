@@ -12,9 +12,15 @@ public class Expression {
     private Calculator calculator = new Calculator();
 
     private ArrayList<Token> tokens = new ArrayList<>();
+    private VariableState variableState;
 
     public Expression() {
 
+    }
+
+    public Expression(ArrayList<Token> tokens, VariableState variableState) {
+        this.tokens = tokens;
+        this.variableState = variableState;
     }
 
     public Expression(ArrayList<Token> tokens) {
@@ -54,11 +60,44 @@ public class Expression {
         expressionTime *= -1;
     }
 
+    private ArrayList<Token> replaceVars(ArrayList<Token> tokens) {
+        if (variableState != null) {
+            for (int i = 0; i < tokens.size(); i++) {
+                if (tokens.get(i).getKey().equals("COD")) {
+                    if (variableState.isVariable(tokens.get(i).getVal().toString())) {
+                        tokens.set(i, new Token(variableState.getVarType(tokens.get(i).getVal().toString()), variableState.getVarValue(tokens.get(i).getVal().toString())));
+                    } else {
+                        Error = "It is not allowed to have Statements in Expressions or the Variable is not assigned";
+                        return null;
+                    }
+                }
+            }
+        }
+        return tokens;
+    }
+
     private void booleanOutput() {
+        ArrayList<Token> compareToken = new ArrayList<>();
+        ArrayList<ArrayList<Token>> lineToken = new ArrayList<>();
+
+        ArrayList<Token> nTokens = new ArrayList<>();
+        for (int i = 0; i < tokens.size(); i++) {
+            if (tokens.get(i).getKey().equals("LOG")) {
+
+            }
+        }
+
         outputBoolean = false;
     }
 
     private void stringOutput() {
+
+        if (replaceVars(tokens) != null) {
+            tokens = replaceVars(tokens);
+        } else {
+            return;
+        }
+
         if (isCalculation(tokens)) {
             float f = calculator.calc(tokens.stream().map(token -> token.getVal().toString()).collect(Collectors.joining()));
             outputString = "" + f;
@@ -121,14 +160,14 @@ public class Expression {
 
 
     public String getString() {
-        if (outputString == null) {
+        if (outputString == null && Error == null) {
             Error = "This Expression was not detected as a String Expression";
         }
         return outputString;
     }
 
     public boolean getBoolean() {
-        if ((Boolean)outputBoolean == null) {
+        if ((Boolean)outputBoolean == null && Error == null) {
             Error = "This Expression was not detected as a Boolean Expression";
         }
         return outputBoolean;

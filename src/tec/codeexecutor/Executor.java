@@ -4,6 +4,7 @@ import tec.interfaces.Statement;
 import tec.utils.Token;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class Executor {
 
@@ -11,12 +12,15 @@ public class Executor {
 	private Implementor implementor;
 	private ArrayList<Token> tokens;
 
+	private Stack<VariableState> variableStateStack = new Stack<>();
+
 	public Executor(ArrayList<Token> tokens, Implementor implementor) {
 		this.implementor = implementor;
 		this.tokens = tokens;
 	}
 
 	public void run() {
+		variableStateStack.add(new VariableState());
 		while (index < tokens.size()) {
 			if (isStatement()) {
 				runStatement();
@@ -49,7 +53,7 @@ public class Executor {
 	private boolean runStatement() {
 		for (Statement statement : implementor.get()) {
 			if (statement.getName().equals(tokens.get(index).getVal())) {
-				return statement.execute(getTokensToNextLine(), this);
+				return statement.execute(getTokensToNextLine(), variableStateStack.lastElement());
 			}
 		}
 		return false;
@@ -64,5 +68,9 @@ public class Executor {
 			tokens.add(this.tokens.get(i));
 		}
 		return tokens;
+	}
+
+	protected void endExecution() {
+		index = tokens.size();
 	}
 }

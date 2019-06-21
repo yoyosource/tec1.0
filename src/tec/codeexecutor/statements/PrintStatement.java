@@ -3,12 +3,13 @@ package tec.codeexecutor.statements;
 import tec.Tec;
 import tec.codeexecutor.Executor;
 import tec.codeexecutor.Expression;
+import tec.codeexecutor.VariableState;
 import tec.interfaces.Statement;
 import tec.utils.Token;
 
 import java.util.ArrayList;
 
-public class Print implements Statement {
+public class PrintStatement implements Statement {
 
 	@Override
 	public String getName() {
@@ -16,9 +17,9 @@ public class Print implements Statement {
 	}
 
 	@Override
-	public boolean execute(ArrayList<Token> tokens, Executor executor) {
+	public boolean execute(ArrayList<Token> tokens, VariableState variableState) {
 
-		Expression expression = new Expression(tokens);
+		Expression expression = new Expression(tokens, variableState);
 		expression.build();
 		if (Tec.debug) {
 			System.out.println("Expression build time: " + expression.getExpressionTime() + "ms");
