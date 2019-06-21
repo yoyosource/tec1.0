@@ -27,5 +27,4 @@ public interface Statement {
 	 * @return the boolean
 	 */
 	boolean execute(ArrayList<Token> tokens, VariableState variableState);
-
 }
