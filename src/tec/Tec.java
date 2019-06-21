@@ -31,10 +31,15 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("InstantiatingObjectToGetClassObject")
 public class Tec {
+
     public Tec() {}
+
     private static Tec tec = new Tec();
+
     public static boolean debug = false;
+
     public static void main(String[] args) throws Exception {
+
         InputStream is = tec.getClass().getResourceAsStream("tec.json");
         JsonObject json = (JsonObject) Jsoner.deserialize(new FileReader(FileUtils.inputStreamToFile(is)));
         for (String arg : args) {
@@ -55,6 +60,7 @@ public class Tec {
                 debug = true;
             }
         }
+
         String url;
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);

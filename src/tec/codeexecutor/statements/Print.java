@@ -1,5 +1,6 @@
 package tec.codeexecutor.statements;
 
+import tec.Tec;
 import tec.codeexecutor.Executor;
 import tec.codeexecutor.Expression;
 import tec.interfaces.Statement;
@@ -19,7 +20,9 @@ public class Print implements Statement {
 
 		Expression expression = new Expression(tokens);
 		expression.build();
-		System.out.println("Expression build time: " + expression.getExpressionTime() + "ms");
+		if (Tec.debug) {
+			System.out.println("Expression build time: " + expression.getExpressionTime() + "ms");
+		}
 		if (expression.getString() == null) {
 			System.out.println("ERROR: " + expression.getError());
 			return false;
