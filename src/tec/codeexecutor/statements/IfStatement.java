@@ -8,6 +8,9 @@ import tec.utils.Token;
 
 import java.util.ArrayList;
 
+/**
+ * The type If statement.
+ */
 public class IfStatement implements Statement {
 
     @Override

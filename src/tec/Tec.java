@@ -12,7 +12,6 @@ import com.github.cliftonlabs.json_simple.Jsoner;
 import tec.codeexecutor.Executor;
 import tec.codeexecutor.Implementor;
 import tec.codeexecutor.Lexer;
-import tec.codeexecutor.statements.ElseStatement;
 import tec.codeexecutor.statements.IfStatement;
 import tec.codeexecutor.statements.PrintStatement;
 import tec.codeexecutor.statements.VarStatement;
@@ -45,7 +44,7 @@ public class Tec {
     /**
      * The constant debug.
      */
-    public static int debug = 0;
+    public static DebugLevel debug = DebugLevel.NONE;
     /**
      * The constant expressions.
      */
@@ -74,13 +73,14 @@ public class Tec {
             if (arg.equals("-updates")) {
                 Internet.readURL("");
             }
-            if (arg.equals(":debug")) {
+            if (arg.startsWith(":debug.")) {
+            	arg = arg.substring(7);
                 System.out.println("Running debug mode");
-                debug = 1;
+                debug = DebugLevel.getDebugLevel(arg);
             }
         }
 
-        debug = 0;
+        debug = DebugLevel.NORMAL;
 
         String url;
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);
