@@ -7,6 +7,7 @@
 
 package tec;
 
+import com.github.cliftonlabs.json_simple.JsonArray;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.Jsoner;
 import tec.codeexecutor.Executor;
@@ -62,18 +63,18 @@ public class Tec {
         for (String arg : args) {
             if (arg.equals("--info")) {
                 PrintStream out = System.out;
-                out.println("tec executor v" + json.get("version") + " by " + json.get("authors") );
+                out.println("tec executor v" + json.get("version") + " by " + json.get("authors"));
                 out.println("Updates:");
-                for (String s: (String[]) json.get("updates")) {
-                    
+                for (Object obj : (JsonArray) json.get("updates")) {
+                    out.println();
                 }
                 return;
             }
-            if (arg.equals("-updates")) {
+            if (arg.equals("--updates")) {
                 Internet.readURL("");
             }
-            if (arg.equals(":debug")) {
-                System.out.println("Running debug mode");
+            if (arg.equals("-debug")) {
+                System.out.println("Running debug mode : showing extra information.");
                 debug = true;
             }
         }
