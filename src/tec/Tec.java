@@ -12,10 +12,7 @@ import com.github.cliftonlabs.json_simple.Jsoner;
 import tec.codeexecutor.Executor;
 import tec.codeexecutor.Implementor;
 import tec.codeexecutor.Lexer;
-import tec.codeexecutor.statements.ElseStatement;
-import tec.codeexecutor.statements.IfStatement;
-import tec.codeexecutor.statements.PrintStatement;
-import tec.codeexecutor.statements.VarStatement;
+import tec.codeexecutor.statements.*;
 import tec.codescanner.CommentScanner;
 import tec.codescanner.FileScanner;
 import tec.codescanner.TrimmerManager;
@@ -122,6 +119,7 @@ public class Tec {
         implementor.add(new VarStatement());
         implementor.add(new IfStatement());
         implementor.add(new ElseStatement());
+        implementor.add(new SleepStatement());
 
         Executor executor = new Executor(tokens, implementor);
         executor.run();

@@ -446,7 +446,7 @@ public class Expression {
 	 *
 	 * @return the boolean
 	 */
-	public boolean getBoolean() {
+	public Boolean getBoolean() {
         if (outputBoolean == null && error == null) {
             error = "This Expression was not detected as a Boolean Expression";
         }
