@@ -9,10 +9,10 @@ import java.util.Stack;
 
 public class Executor {
 
-	private int index = 0;
+	private static int index = 0;
 	private boolean running = true;
 	private Implementor implementor;
-	private ArrayList<Token> tokens;
+	private static ArrayList<Token> tokens;
 
 	private Stack<VariableState> variableStateStack = new Stack<>();
 
@@ -21,8 +21,35 @@ public class Executor {
 		this.tokens = tokens;
 	}
 
+	public static void incrementIndex() {
+		index++;
+	}
+
+	public static void jumpToOpeningBracket() {
+		for (int i = index; i < tokens.size(); i++) {
+			if (tokens.get(index).getKey().equals("BLb") && tokens.get(index).getVal().equals("{")) {
+				index = i;
+				break;
+			}
+		}
+	}
+
+	public static void jumpToClosingBracket() {
+		int brCount = 0;
+		boolean st = false;
+		while (!st && (brCount != 0 || index < tokens.size())) {
+			if (tokens.get(index).getKey().equals("STb") && tokens.get(index).getVal().toString().equals("(")) {
+				brCount++;
+				st = true;
+			}
+			if (tokens.get(index).getKey().equals("STb") && tokens.get(index).getVal().toString().equals(")")) {
+				brCount--;
+			}
+			index++;
+		}
+	}
+
 	public static boolean runExpressionInfo(Expression expression) {
-		System.out.println(expression.toString());
 		if (Tec.debug > 0) {
 			System.out.println("Expression " + Tec.expressions + " build time: " + expression.getExpressionTime() + "ms");
 			Tec.expressions += 1;
@@ -44,12 +71,17 @@ public class Executor {
 		variableStateStack.add(new VariableState());
 		while (running && index < tokens.size()) {
 			if (isStatement()) {
+				System.out.println(" " + tokens.get(index));
 				runStatement();
 				jumpToLineEnd();
 			} else if (isVariable()) {
+				System.out.println(">" + tokens.get(index));
 				runVariable();
 				jumpToLineEnd();
+			} else {
+				System.out.println("-" + tokens.get(index));
 			}
+
 
 			index++;
 		}
@@ -72,7 +104,10 @@ public class Executor {
 
 		} else if (tokens.get(index - 1).getKey().equals("NNN")) {
 
-		} else {
+		} else if (tokens.get(index - 1).getKey().equals("BLb") && tokens.get(index - 1).getVal().equals("}")) {
+
+		}
+		else {
 			return false;
 		}
 		for (Statement statement : implementor.get()) {

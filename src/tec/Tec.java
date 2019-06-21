@@ -12,6 +12,7 @@ import com.github.cliftonlabs.json_simple.Jsoner;
 import tec.codeexecutor.Executor;
 import tec.codeexecutor.Implementor;
 import tec.codeexecutor.Lexer;
+import tec.codeexecutor.statements.ElseStatement;
 import tec.codeexecutor.statements.IfStatement;
 import tec.codeexecutor.statements.PrintStatement;
 import tec.codeexecutor.statements.VarStatement;
@@ -79,7 +80,7 @@ public class Tec {
             }
         }
 
-        debug = 1;
+        debug = 0;
 
         String url;
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);
@@ -118,6 +119,7 @@ public class Tec {
         implementor.add(new PrintStatement());
         implementor.add(new VarStatement());
         implementor.add(new IfStatement());
+        implementor.add(new ElseStatement());
 
         Executor executor = new Executor(tokens, implementor);
         executor.run();

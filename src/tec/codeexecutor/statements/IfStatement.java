@@ -35,7 +35,7 @@ public class IfStatement implements Statement {
         expression.build();
 
         if (!Executor.runExpressionInfo(expression)) {
-            return false;
+
         }
         if (expression.getBoolean() == null) {
             System.out.println("ERROR: " + expression.getError());
@@ -45,6 +45,13 @@ public class IfStatement implements Statement {
         boolean expressionBoolean = expression.getBoolean();
 
         System.out.println(expressionBoolean);
+
+        if (expressionBoolean) {
+            Executor.jumpToOpeningBracket();
+        } else {
+            Executor.jumpToClosingBracket();
+            Executor.incrementIndex();
+        }
 
         return false;
     }
