@@ -152,6 +152,16 @@ public class Lexer {
             return tokens;
         }
 
+        if (s.matches("(>>)|(<<)|(»)|(«)")) {
+            if (s.matches("(»)")) {
+                s = ">>";
+            }
+            if (s.matches("(«)")) {
+                s = "<<";
+            }
+            tokens.add(new Token("LOb", s));
+            return tokens;
+        }
         if (s.matches("\\(|\\)")) {
             tokens.add(new Token("STb", s));
             return tokens;
