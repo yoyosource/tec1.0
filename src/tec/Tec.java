@@ -7,7 +7,6 @@
 
 package tec;
 
-import com.github.cliftonlabs.json_simple.JsonException;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.Jsoner;
 import tec.codeexecutor.Executor;
@@ -17,15 +16,11 @@ import tec.codeexecutor.statements.Print;
 import tec.codescanner.CommentScanner;
 import tec.codescanner.FileScanner;
 import tec.codescanner.TrimmerManager;
-import tec.exceptions.DefinitonException;
-import tec.github.GitHub;
-import tec.jsonparser.JSONObject;
-import tec.jsonparser.JSONParser;
+import tec.net.Internet;
 import tec.utils.FileUtils;
 import tec.utils.Token;
 
 import java.io.*;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -38,6 +33,7 @@ import java.util.stream.Collectors;
 public class Tec {
     public Tec() {}
     private static Tec tec = new Tec();
+    public static boolean debug = false;
     public static void main(String[] args) throws Exception {
         InputStream is = tec.getClass().getResourceAsStream("tec.json");
         JsonObject json = (JsonObject) Jsoner.deserialize(new FileReader(FileUtils.inputStreamToFile(is)));
@@ -46,17 +42,19 @@ public class Tec {
                 PrintStream out = System.out;
                 out.println("tec executor v" + json.get("version") + " by " + json.get("authors") );
                 out.println("Updates:");
-                for (String s: json.get("updates")) {
+                for (String s: (String[]) json.get("updates")) {
                     
                 }
                 return;
             }
             if (arg.equals("-updates")) {
-                GitHub.readURL("https://");
+                Internet.readURL("");
+            }
+            if (arg.equals(":debug")) {
+                System.out.println("Running debug mode");
+                debug = true;
             }
         }
-
-
         String url;
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);

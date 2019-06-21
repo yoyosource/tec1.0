@@ -1,4 +1,4 @@
-package tec.github;
+package tec.net;
 
 
 import com.github.cliftonlabs.json_simple.JsonException;
@@ -9,11 +9,10 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class GitHub {
+public class Internet {
 	private static String token = "b78958089ea555081b967bd94400c55be64e43c7";
 	public static Object readURL(String baseurl) throws IOException, JsonException {
-		baseurl = baseurl.replace("https://", "");
-		URL url = new URL("https://" + token + ":x-oauth-basic@" + baseurl);
+		URL url = new URL(baseurl);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setRequestMethod("GET");
 		InputStream is = connection.getInputStream();

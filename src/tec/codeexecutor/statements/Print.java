@@ -1,6 +1,7 @@
 package tec.codeexecutor.statements;
 
 import tec.codeexecutor.Executor;
+import tec.codeexecutor.Expression;
 import tec.interfaces.Statement;
 import tec.utils.Token;
 
@@ -15,10 +16,16 @@ public class Print implements Statement {
 
 	@Override
 	public boolean execute(ArrayList<Token> tokens, Executor executor) {
-		for (Token token : tokens) {
-			System.out.println("<" + token.getKey() + ">" + token.getVal());
+
+		Expression expression = new Expression(tokens);
+		expression.build();
+		if (expression.getString() == null) {
+			return false;
 		}
-		return false;
+		String s = expression.getString();
+		System.out.println(s);
+
+		return true;
 	}
 
 }

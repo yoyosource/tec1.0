@@ -133,6 +133,9 @@ public class Calculator {
             time();
             throw new IllegalArgumentException("No Spaces in Numbers");
         }
+        if (s.startsWith("(")) {
+            s = "0+" + s;
+        }
         char[] chars = s.replaceAll("root", "r")
                 .replaceAll("pi", Math.PI + "").replaceAll("e", Math.E + "").replaceAll("tau", (Math.PI * 2) + "")
                 .replaceAll("c(?!o)(?!s)", "299792458")
