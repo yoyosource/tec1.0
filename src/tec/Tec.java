@@ -117,8 +117,11 @@ public class Tec {
         Implementor implementor = new Implementor();
         implementor.add(new PrintStatement());
         implementor.add(new VarStatement());
+        implementor.add(new ConstStatement());
+
         implementor.add(new IfStatement());
         implementor.add(new ElseStatement());
+
         implementor.add(new SleepStatement());
 
         Executor executor = new Executor(tokens, implementor);
