@@ -1,10 +1,18 @@
 package tec.codescanner;
 
+/**
+ * The type Trimmer manager.
+ */
 public class TrimmerManager {
 
     private String text = "";
 
-    public void trim(String s) {
+	/**
+	 * Trim.
+	 *
+	 * @param s the s
+	 */
+	public void trim(String s) {
         String[] strings = s.split("\n");
 
         StringBuilder st = new StringBuilder();
@@ -16,7 +24,12 @@ public class TrimmerManager {
         text = st.toString();
     }
 
-    public String getText() {
+	/**
+	 * Gets text.
+	 *
+	 * @return the text
+	 */
+	public String getText() {
         return text;
     }
 }

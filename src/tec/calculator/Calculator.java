@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The type Calculator.
+ */
 public class Calculator {
 
     private History calculations = new History();
@@ -16,21 +19,45 @@ public class Calculator {
     private long calcTime1 = 0;
     private long calcTime2 = 0;
 
-    public Calculator() { }
+	/**
+	 * Instantiates a new Calculator.
+	 */
+	public Calculator() { }
 
-    public Calculator(History history) {
+	/**
+	 * Instantiates a new Calculator.
+	 *
+	 * @param history the history
+	 */
+	public Calculator(History history) {
         calculations = history;
     }
 
-    public String getLastCalculation() {
+	/**
+	 * Gets last calculation.
+	 *
+	 * @return the last calculation
+	 */
+	public String getLastCalculation() {
         return lastCalculation;
     }
 
-    public History getHistory() {
+	/**
+	 * Gets history.
+	 *
+	 * @return the history
+	 */
+	public History getHistory() {
         return calculations;
     }
 
-    public long getCalcTime(String mode) {
+	/**
+	 * Gets calc time.
+	 *
+	 * @param mode the mode
+	 * @return the calc time
+	 */
+	public long getCalcTime(String mode) {
         if (mode.equals("ms")) {
             return calcTime1;
         } else if (mode.equals("ns")) {
@@ -41,7 +68,12 @@ public class Calculator {
         return calcTime1;
     }
 
-    public long getCalcTime() {
+	/**
+	 * Gets calc time.
+	 *
+	 * @return the calc time
+	 */
+	public long getCalcTime() {
         return calcTime1;
     }
 
@@ -52,7 +84,13 @@ public class Calculator {
         calcTime2 *= -1;
     }
 
-    public float calc(String s) {
+	/**
+	 * Calc float.
+	 *
+	 * @param s the s
+	 * @return the float
+	 */
+	public float calc(String s) {
         calcTime1 = System.currentTimeMillis();
         calcTime2 = System.nanoTime();
 

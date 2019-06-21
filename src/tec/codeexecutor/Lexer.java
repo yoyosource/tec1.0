@@ -3,12 +3,20 @@ package tec.codeexecutor;
 import tec.utils.Token;
 import java.util.ArrayList;
 
-public class Lexer {    
+/**
+ * The type Lexer.
+ */
+public class Lexer {
     
     private ArrayList<Token> tokens = new ArrayList<>();
     private StringBuilder s = new StringBuilder();
 
-    public void createTokens(String codes) {
+	/**
+	 * Create tokens.
+	 *
+	 * @param codes the codes
+	 */
+	public void createTokens(String codes) {
 
         char[] chars = codes.toCharArray();
         ArrayList<Token> cTokens = new ArrayList<>();
@@ -88,7 +96,12 @@ public class Lexer {
 
     }
 
-    public ArrayList<Token> getTokens() {
+	/**
+	 * Gets tokens.
+	 *
+	 * @return the tokens
+	 */
+	public ArrayList<Token> getTokens() {
         return tokens;
     }
 
