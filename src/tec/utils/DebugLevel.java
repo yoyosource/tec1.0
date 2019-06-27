@@ -1,7 +1,5 @@
 package tec.utils;
 
-import tec.exceptions.DefinitonException;
-
 public enum DebugLevel {
 	NONE(0), NORMAL(1), ADVANCED(2);
 	private int debugLevel;

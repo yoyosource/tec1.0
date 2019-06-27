@@ -27,7 +27,7 @@ public class DebugHandler {
 			if (time >= 0) System.out.println(message + "\nBuild time: " + time);
 			else System.out.println(message + "\nBuild time unspecified.");
 		}
-		else if (Tec.debug.equals(DebugLevel.NORMAL) && level.equals(DebugLevel.NORMAL)) {
+		else if (Tec.debug.equals(DebugLevel.ADVANCED) && level.equals(DebugLevel.ADVANCED)) {
 			if (time >= 0) System.out.println(message + "\nBuild time: " + time);
 		}
 	}
