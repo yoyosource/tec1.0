@@ -11,6 +11,8 @@ public class Var {
     private Object value;
     private String type;
 
+    private boolean constant = false;
+
 	/**
 	 * Instantiates a new Var.
 	 *
@@ -22,6 +24,10 @@ public class Var {
         this.name = name;
         this.value = value;
         this.type = type;
+    }
+
+    public void setConstant() {
+	    constant = true;
     }
 
 	/**
@@ -58,6 +64,9 @@ public class Var {
 	 * @param type  the type
 	 */
 	public void setValue(Object value, String type) {
+	    if (constant) {
+	        return;
+        }
         if (this.type.equals(type) || (this.type.equals("num") && type.equals("int"))) {
             this.value = value;
         }
