@@ -37,16 +37,12 @@ public class IfStatement implements Statement {
                 tokenArrayList.remove(tokenArrayList.size() - 1);
             }
 
-            System.out.println(tokenArrayList);
-
             Expression expression = new Expression(tokenArrayList, variableState);
             expression.build();
 
             if (!executor.runExpressionInfo(expression)) {
                 return false;
             }
-
-            System.out.println("-> " + expression.getBoolean());
 
             jumpPoint.add(stop + 1);
             booleans.add(expression.getBoolean());

@@ -1,4 +1,4 @@
-#tec
+# tec
 '**tec**' is a new programming languge that is user friendly as you can just write your Code. You do not have to mess with any **main** functions if you do not want to. If you want to start with tec you do not need to have any knowledge of any programming languages what so ever.
 To change to a new language you can use this a ground basis to change to Java, Swift, Python, JavaScript, Go. If you have any knowledge in Java, Swift, Python, Go or JavaScript you should not have any trouble to write programms in **tec** if you know the basics.
 
@@ -75,4 +75,35 @@ print j + i
 // To put String together you can also use +
 let k = " World"
 print "Hello" + k 
+```
+
+## Slowing things down
+Use the 'sleep' statement with a milliseconds time behind it to sleep for x milliseconds.
+```
+print "Starting to Sleep"
+
+sleep 1000
+
+print "Finished to Sleep"
+```
+
+## Conditional Statements
+If you want to do choose what you do use 'if'
+```
+// Use an Boolean Expression in the Brackets of the is Statement.
+if (true) {
+
+}
+
+if (1 == 1) {
+
+}
+
+if (true == false) {
+
+}
+
+if (true || false) {
+
+}
 ```
