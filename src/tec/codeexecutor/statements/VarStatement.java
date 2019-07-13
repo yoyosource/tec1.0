@@ -21,7 +21,7 @@ public class VarStatement implements Statement {
     }
 
     @Override
-    public boolean execute(ArrayList<Token> tokens, VariableState variableState) {
+    public boolean execute(ArrayList<Token> tokens, VariableState variableState, Executor executor) {
         if (tokens.size() < 3) {
             return false;
         }
@@ -37,7 +37,7 @@ public class VarStatement implements Statement {
         Expression expression = new Expression(tokens, variableState);
         expression.build();
 
-        if (!Executor.runExpressionInfo(expression)) {
+        if (!executor.runExpressionInfo(expression)) {
             return false;
         }
 

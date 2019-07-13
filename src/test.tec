@@ -28,6 +28,8 @@ print « false == true || « true == true || false » » && false
 print « false == true || « true == true || false » » && true
 */
 
+
+/*
 var string = "test"
 var num = 1+1
 var bool = << false == true || << true == true || false >> >> && false
@@ -38,3 +40,32 @@ sleep 1000
 
 num = 3
 print num
+*/
+
+/*
+var i = 0
+
+if (i == 0) {
+    print "is zero"
+    var b = false
+        print b
+        if (b) {
+            print b
+            var j = 0
+        }
+    print j
+} else if (i == 1) {
+    print "is one"
+} else {
+    print "is not zero or one"
+}
+
+print "hi"*/
+
+var b = false
+var c = true
+print b
+if (b || c) {
+    print b || c
+    var j = 0
+}

@@ -80,12 +80,16 @@ public class Tec {
         debug = DebugLevel.NORMAL;
 
         String url;
-        InputStreamReader inputStreamReader = new InputStreamReader(System.in);
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-        System.out.println("Tec file Path:");
-        url = bufferedReader.readLine();
 
-        long time = System.currentTimeMillis();
+        if (true) {
+            url = "/Users/jojo/IdeaProjects/tec/src/test.tec";
+            debug = DebugLevel.NONE;
+        } else {
+            InputStreamReader inputStreamReader = new InputStreamReader(System.in);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            System.out.println("Tec file Path:");
+            url = bufferedReader.readLine();
+        }
 
         FileScanner fileScanner = new FileScanner();
         fileScanner.scan(new File(url));
@@ -96,6 +100,8 @@ public class Tec {
         CommentScanner commentScanner = new CommentScanner();
         commentScanner.removeComments(trimmerManager.getText());
 
+        long time = System.currentTimeMillis();
+
         Lexer lexer = new Lexer();
         lexer.createTokens(commentScanner.getCode());
 
@@ -103,13 +109,26 @@ public class Tec {
 
         ArrayList<Token> tokens = lexer.getTokens();
 
-        String s = tokens.stream().map(token -> token.getKey().equals("NNN") ? "\n" : "<" + token.getKey() + ">" + token.getVal() + " ").collect(Collectors.joining(""));
+        StringBuilder stringBuilder = new StringBuilder();
+        int i = 0;
+        for (Token token : tokens) {
+            if (token.getKey().equals("NNN")) {
+                stringBuilder.append("<" + i + ": NNN>" + "NNN \n");
+            } else {
+                stringBuilder.append("<" + i + ": " + token.getKey() + ">" + token.getVal() + " ");
+            }
+            i++;
+        }
 
-        System.out.println(s);
+        System.out.println(stringBuilder);
 
         System.out.println("---");
         System.out.println("Tokens       > " + tokens.size());
-        System.out.println("Compile Time > " + (time2 - time));
+        if (time2 - time > 1000) {
+            System.out.println("Compile Time > " + (((float)(time2 - time)) / 1000) + "s");
+        } else {
+            System.out.println("Compile Time > " + (time2 - time) + "ms");
+        }
         System.out.println("---");
 
         Implementor implementor = new Implementor();

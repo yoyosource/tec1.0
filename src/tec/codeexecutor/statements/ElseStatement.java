@@ -15,8 +15,8 @@ public class ElseStatement implements Statement {
     }
 
     @Override
-    public boolean execute(ArrayList<Token> tokens, VariableState variableState) {
-        Executor.jumpToClosingBracket();
+    public boolean execute(ArrayList<Token> tokens, VariableState variableState, Executor executor) {
+        executor.jumpToClosingBracket();
 
         return false;
     }

@@ -19,41 +19,51 @@ public class IfStatement implements Statement {
     }
 
     @Override
-    public boolean execute(ArrayList<Token> tokens, VariableState variableState) {
+    public boolean execute(ArrayList<Token> tokens, VariableState variableState, Executor executor) {
 
-        if (!(tokens.get(tokens.size() - 1).getKey().equals("BLb") && tokens.get(tokens.size() - 1).getVal().toString().equals("{"))) {
-            return false;
-        }
+        int[] ints = executor.getIfRange();
 
-        tokens.remove(tokens.size() - 1);
+        ArrayList<Boolean> booleans = new ArrayList<>();
+        ArrayList<Integer> jumpPoint = new ArrayList<>();
 
-        if (tokens.get(tokens.size() - 1).getKey().equals("STb") && tokens.get(tokens.size() - 1).getVal().toString().equals(")")) {
-            if (tokens.get(0).getKey().equals("STb") && tokens.get(0).getVal().toString().equals("(")) {
-                tokens.remove(tokens.size() - 1);
-                tokens.remove(0);
+        for (int i = 0; i < ints.length - 2; i += 2) {
+            int start = ints[i];
+            int stop = ints[i + 1];
+
+            ArrayList<Token> tokenArrayList = executor.getRange(start, stop);
+
+            if (tokenArrayList.get(0).getKey().equals("STb") && tokenArrayList.get(tokenArrayList.size() - 1).getKey().equals("STb")) {
+                tokenArrayList.remove(0);
+                tokenArrayList.remove(tokenArrayList.size() - 1);
             }
+
+            System.out.println(tokenArrayList);
+
+            Expression expression = new Expression(tokenArrayList, variableState);
+            expression.build();
+
+            if (!executor.runExpressionInfo(expression)) {
+                return false;
+            }
+
+            System.out.println("-> " + expression.getBoolean());
+
+            jumpPoint.add(stop + 1);
+            booleans.add(expression.getBoolean());
         }
 
-        Expression expression = new Expression(tokens, variableState);
-        expression.build();
+        jumpPoint.add(ints[ints.length - 1]);
+        booleans.add(true);
 
-        if (!Executor.runExpressionInfo(expression)) {
+        int end = executor.getBlockRange(ints[ints.length - 1])[1];
 
-        }
-        if (expression.getBoolean() == null) {
-            System.out.println("ERROR: " + expression.getError());
-            return false;
-        }
-
-        boolean expressionBoolean = expression.getBoolean();
-
-        System.out.println(expressionBoolean);
-
-        if (expressionBoolean) {
-            Executor.jumpToOpeningBracket();
-        } else {
-            Executor.jumpToClosingBracket();
-            Executor.incrementIndex();
+        for (int i = 0; i < booleans.size(); i++) {
+            if (booleans.get(i).booleanValue()) {
+                executor.jumpToIndex(jumpPoint.get(i));
+                executor.addVariableStateRemoveTrigger(end);
+                executor.createVariableStateFromPrevious();
+                return true;
+            }
         }
 
         return false;

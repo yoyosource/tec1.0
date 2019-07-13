@@ -1,7 +1,11 @@
 package tec.codeexecutor;
 
+import tec.exceptions.DefinitonException;
+import tec.exceptions.StringException;
 import tec.utils.Token;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * The type Lexer.
@@ -218,15 +222,65 @@ public class Lexer {
         }
 
         if (s.contains("+") || s.contains("-") || s.contains("*") || s.contains("/") || s.contains("%") || s.contains("#") || s.contains("^") || s.contains("!")) {
-            char[] c = s.toCharArray();
-            for (char c1 : c) {
-                tokens.addAll(tokify(c1 + ""));
+            String[] strings = splitString(s, "+-*/%#^!()".toCharArray(), true, false);
+
+            for (String s1 : strings) {
+                tokens.addAll(tokify(s1));
             }
         } else {
             tokens.add(new Token("COD", s));
         }
         return tokens;
 
+    }
+
+    private String[] splitString(String string, char[] splitChars, boolean ReviveSplitted, boolean addToLast) {
+        char[] chars = string.toCharArray();
+        if (chars.length == 0) {
+            throw new StringException("No String");
+        }
+        if (splitChars.length == 0) {
+            throw new StringException("No Split Chars");
+        }
+        ArrayList<String> words = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
+        int i = 0;
+        int lastSplit = 0;
+        while (i < chars.length) {
+            char c = chars[i];
+            int splitCharTest = 0;
+            for (char splitChar : splitChars) {
+                if (c == splitChar) {
+                    splitCharTest++;
+                }
+            }
+            if (splitCharTest == 0) {
+                stringBuilder.append(c);
+            } else {
+                if (ReviveSplitted) {
+                    if (addToLast) {
+                        stringBuilder.append(c);
+                        words.add(stringBuilder.toString());
+                        stringBuilder = new StringBuilder();
+                    } else {
+                        words.add(stringBuilder.toString());
+                        stringBuilder = new StringBuilder();
+                        stringBuilder.append(c);
+                        words.add(stringBuilder.toString());
+                        stringBuilder = new StringBuilder();
+                    }
+                } else {
+                    words.add(stringBuilder.toString());
+                    stringBuilder = new StringBuilder();
+                }
+                lastSplit = i;
+            }
+            i++;
+        }
+        if (lastSplit != string.length()) {
+            words.add(stringBuilder.toString());
+        }
+        return words.toArray(new String[0]);
     }
 
 }

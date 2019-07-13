@@ -5,6 +5,7 @@ import tec.interfaces.Statement;
 import tec.utils.Token;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Stack;
 
 /**
@@ -13,12 +14,14 @@ import java.util.Stack;
 @SuppressWarnings("ALL")
 public class Executor {
 
-	private static int index = 0;
+	private int index = 0;
 	private boolean running = true;
 	private Implementor implementor;
-	private static ArrayList<Token> tokens;
+	private ArrayList<Token> tokens;
 
 	private Stack<VariableState> variableStateStack = new Stack<>();
+
+	private ArrayList<Integer> triggerVariableStackRemove = new ArrayList<>();
 
 	/**
 	 * Instantiates a new Executor.
@@ -31,11 +34,15 @@ public class Executor {
 		this.tokens = tokens;
 	}
 
-	public static void incrementIndex() {
+	public void incrementIndex() {
 		index++;
 	}
 
-	public static void jumpToOpeningBracket() {
+	public void jumpToIndex(int in) {
+		index = in;
+	}
+
+	public void jumpToOpeningBracket() {
 		for (int i = index; i < tokens.size(); i++) {
 			if (tokens.get(index).getKey().equals("BLb") && tokens.get(index).getVal().equals("{")) {
 				index = i;
@@ -44,23 +51,22 @@ public class Executor {
 		}
 	}
 
-	public static void jumpToClosingBracket() {
+	public void jumpToClosingBracket() {
 		int brCount = 0;
 		boolean st = false;
 		while (!st && (brCount != 0 || index < tokens.size())) {
-			if (tokens.get(index).getKey().equals("STb") && tokens.get(index).getVal().toString().equals("(")) {
+			if (tokens.get(index).getKey().equals("BLb") && tokens.get(index).getVal().toString().equals("{")) {
 				brCount++;
 				st = true;
 			}
-			if (tokens.get(index).getKey().equals("STb") && tokens.get(index).getVal().toString().equals(")")) {
+			if (tokens.get(index).getKey().equals("BLb") && tokens.get(index).getVal().toString().equals("}")) {
 				brCount--;
 			}
 			index++;
 		}
 	}
 
-    public static boolean runExpressionInfo(Expression expression) {
-        System.out.println(expression.toString());
+    public boolean runExpressionInfo(Expression expression) {
         if (expression.getObject() == null) {
             System.out.println("ERROR: " + expression.getError());
             return false;
@@ -73,6 +79,8 @@ public class Executor {
 	 */
 	public void run() {
 		variableStateStack.add(new VariableState());
+		triggerVariableStackRemove.add(tokens.size() - 1);
+
 		while (running && index < tokens.size()) {
 			if (isStatement()) {
 				runStatement();
@@ -83,6 +91,44 @@ public class Executor {
 			}
 
 			index++;
+
+			if (index == triggerVariableStackRemove.get(0)) {
+				triggerVariableStackRemove.remove(0);
+				deleteLastVariableState();
+			}
+		}
+	}
+
+	public void addVariableStateRemoveTrigger(int triggerIndex) {
+		triggerVariableStackRemove.add(triggerIndex);
+		Collections.sort(triggerVariableStackRemove);
+	}
+
+	/**
+	 * Create new Variable State with previous Variables
+	 */
+	public void createVariableStateFromPrevious() {
+		ArrayList<Var> vars = variableStateStack.lastElement().getVars();
+		VariableState variableState = new VariableState();
+		for (Var var : vars) {
+			variableState.addVar(var);
+		}
+		variableStateStack.add(variableState);
+	}
+
+	/**
+	 * Create new Variable State without previous Variables
+	 */
+	public void createNewVariableState() {
+		variableStateStack.add(new VariableState());
+	}
+
+	/**
+	 * Removes the last Variable State
+	 */
+	public void deleteLastVariableState() {
+		if (variableStateStack.size() > 1) {
+			variableStateStack.pop();
 		}
 	}
 
@@ -123,7 +169,7 @@ public class Executor {
 	private boolean runStatement() {
 		for (Statement statement : implementor.get()) {
 			if (statement.getName().equals(tokens.get(index).getVal())) {
-				return statement.execute(getTokensToNextLine(), variableStateStack.lastElement());
+				return statement.execute(getTokensToNextLine(), variableStateStack.lastElement(), this);
 			}
 		}
 		return false;
@@ -167,6 +213,143 @@ public class Executor {
 			tokens.add(this.tokens.get(i));
 		}
 		return tokens;
+	}
+
+	public int[] getBlockRange() {
+		return getBlockRange(index);
+	}
+
+	public int[] getBlockRange(int index) {
+		int in = index;
+		while (in < tokens.size()) {
+			if (tokens.get(in).getKey().equals("NNN")) {
+				return null;
+			}
+			if (tokens.get(in).getKey().equals("BLb") && tokens.get(in).getVal().equals("{")) {
+				break;
+			}
+			in++;
+		}
+
+		in++;
+		int bracket = 1;
+		int ou = in;
+		for (int i = in; i < tokens.size(); i++) {
+			if (tokens.get(i).getKey().equals("BLb") && tokens.get(i).getVal().equals("{")) {
+				bracket++;
+			}
+			if (tokens.get(i).getKey().equals("BLb") && tokens.get(i).getVal().equals("}")) {
+				bracket--;
+			}
+			if (bracket == 0) {
+				ou = i;
+				break;
+			}
+		}
+
+		return new int[]{in, ou};
+	}
+
+	public int[] getIfRange() {
+		boolean gotElse = false;
+		boolean isDone = false;
+
+		if (!(tokens.get(index).getKey().equals("COD") && tokens.get(index).getVal().equals("if"))) {
+			return null;
+		}
+
+		int in = index;
+
+		ArrayList<Integer> indices = new ArrayList<>();
+		indices.add(in + 1);
+
+		while (!isDone) {
+
+			int[] ints = getBlockRange(in);
+			if (ints[1] != tokens.size() - 1) {
+				ints[1] = ints[1] + 1;
+			} else {
+				in = getBlockRange(in)[1];
+				break;
+			}
+
+			if (gotElse) {
+				break;
+			}
+
+			if (tokens.get(ints[1]).getKey().equals("COD") && tokens.get(ints[1]).getVal().equals("else")) {
+				if (ints[1] != tokens.size() - 1) {
+					ints[1] = ints[1] + 1;
+				}
+
+				if (!(tokens.get(ints[1]).getKey().equals("COD") && tokens.get(ints[1]).getVal().equals("if"))) {
+					gotElse = true;
+				} else {
+					indices.add(ints[1] + 1);
+				}
+				in = ints[1];
+			} else {
+				isDone = true;
+			}
+
+		}
+
+		ArrayList<Integer> indices2 = new ArrayList<>();
+
+		for (int i = 0; i < indices.size(); i++) {
+			indices2.add(getClosingBracket(indices.get(i)));
+		}
+
+		indices.add(in);
+		indices2.add(in);
+
+		ArrayList<Integer> ranges = new ArrayList<>();
+		for (int i = 0; i < indices.size(); i++) {
+			ranges.add(indices.get(i));
+			ranges.add(indices2.get(i));
+		}
+
+		int[] ints = new int[ranges.size()];
+		for (int i = 0; i < ranges.size(); i++) {
+			ints[i] = ranges.get(i);
+		}
+
+		return ints;
+	}
+
+	public int getClosingBracket(int start) {
+		if (!(tokens.get(start).getKey().equals("STb") && tokens.get(start).getVal().equals("("))) {
+			return start;
+		}
+		int bracket = 1;
+		int ou = start;
+		start++;
+		for (int i = start; i < tokens.size(); i++) {
+			if (tokens.get(i).getKey().equals("STb") && tokens.get(i).getVal().equals("(")) {
+				bracket++;
+			}
+			if (tokens.get(i).getKey().equals("STb") && tokens.get(i).getVal().equals(")")) {
+				bracket--;
+			}
+			if (bracket == 0) {
+				ou = i;
+				break;
+			}
+		}
+		return ou;
+	}
+
+	public ArrayList<Token> getRange(int start, int stop) {
+		int max = Math.max(start, stop);
+		int min = Math.min(start, stop);
+
+		ArrayList<Token> nTokens = new ArrayList<>();
+
+		for (int i = min; i <= max; i++) {
+			nTokens.add(tokens.get(i));
+		}
+
+		return nTokens;
 	}
 
 	/**

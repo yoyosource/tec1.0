@@ -81,8 +81,13 @@ public class Expression {
             try {
                 type = tokens.get(0).getKey();
                 outputObject = tokens.get(0).getVal();
+                if (type.equals("bol")) {
+                    outputBoolean = (boolean)tokens.get(0).getVal();
+                } else {
+                    outputString = outputObject + "";
+                }
             } catch (NullPointerException e) {
-				e.printStackTrace();
+
             }
         } else if (isLogic()) {
             booleanOutput();

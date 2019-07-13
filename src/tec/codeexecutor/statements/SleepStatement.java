@@ -16,12 +16,12 @@ public class SleepStatement implements Statement {
     }
 
     @Override
-    public boolean execute(ArrayList<Token> tokens, VariableState variableState) {
+    public boolean execute(ArrayList<Token> tokens, VariableState variableState, Executor executor) {
 
         Expression expression = new Expression(tokens);
         expression.build();
 
-        if (!Executor.runExpressionInfo(expression)) {
+        if (!executor.runExpressionInfo(expression)) {
             return false;
         }
 

@@ -1,5 +1,6 @@
 package tec.interfaces;
 
+import tec.codeexecutor.Executor;
 import tec.codeexecutor.VariableState;
 import tec.utils.Token;
 
@@ -26,5 +27,5 @@ public interface Statement {
 	 * @param variableState the variable state
 	 * @return the boolean
 	 */
-	boolean execute(ArrayList<Token> tokens, VariableState variableState);
+	boolean execute(ArrayList<Token> tokens, VariableState variableState, Executor executor);
 }

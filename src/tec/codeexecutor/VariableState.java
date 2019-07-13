@@ -137,4 +137,10 @@ public class VariableState {
         return vars;
     }
 
+	@Override
+	public String toString() {
+		return "VariableState{" +
+				"vars=" + vars +
+				'}';
+	}
 }

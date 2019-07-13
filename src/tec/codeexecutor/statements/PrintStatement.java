@@ -20,12 +20,12 @@ public class PrintStatement implements Statement {
 	}
 
 	@Override
-	public boolean execute(ArrayList<Token> tokens, VariableState variableState) {
+	public boolean execute(ArrayList<Token> tokens, VariableState variableState, Executor executor) {
 
 		Expression expression = new Expression(tokens, variableState);
 		expression.build();
 
-		if (!Executor.runExpressionInfo(expression)) {
+		if (!executor.runExpressionInfo(expression)) {
 			return false;
 		}
 
