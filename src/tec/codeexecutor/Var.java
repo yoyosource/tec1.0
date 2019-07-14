@@ -67,11 +67,12 @@ public class Var {
 	    if (constant) {
 	        return;
         }
+
         if (this.type.equals(type) || (this.type.equals("num") && type.equals("int"))) {
             this.value = value;
         }
         if (this.type.equals("int") && type.equals("num")) {
-            this.value = (int)value;
+            this.value = (Integer)value;
         }
     }
 

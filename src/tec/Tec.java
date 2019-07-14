@@ -120,7 +120,12 @@ public class Tec {
             i++;
         }
 
-        System.out.println(stringBuilder);
+        StringBuilder stringBuilderc = new StringBuilder();
+        for (Token token : tokens) {
+            stringBuilderc.append("<" + token.getKey() + ">" + token.getVal() + "\n");
+        }
+
+        System.out.println(stringBuilderc + "\n\n" + stringBuilder);
 
         System.out.println("---");
         System.out.println("Tokens       > " + tokens.size());
@@ -141,6 +146,10 @@ public class Tec {
 
         implementor.add(new IfStatement());
         implementor.add(new ElseStatement());
+
+        implementor.add(new WhileStatement());
+
+        implementor.add(new FuncStatement());
 
         Executor executor = new Executor(tokens, implementor);
         executor.run();

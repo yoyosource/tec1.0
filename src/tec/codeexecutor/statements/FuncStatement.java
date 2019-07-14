@@ -7,11 +7,11 @@ import tec.utils.Token;
 
 import java.util.ArrayList;
 
-public class ElseStatement implements Statement {
+public class FuncStatement implements Statement {
 
     @Override
     public String getName() {
-        return "else";
+        return "func";
     }
 
     @Override

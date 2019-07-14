@@ -83,8 +83,6 @@ public class Expression {
                 outputObject = tokens.get(0).getVal();
                 if (type.equals("bol")) {
                     outputBoolean = (boolean)tokens.get(0).getVal();
-                } else {
-                    outputString = outputObject + "";
                 }
             } catch (NullPointerException e) {
 
@@ -94,7 +92,21 @@ public class Expression {
             outputObject = outputBoolean;
         } else {
             stringOutput();
-            outputObject = outputString;
+            if (type != null) {
+                if (type.equals("num")) {
+                    outputObject = Float.parseFloat(outputString);
+
+                    if (outputString.endsWith(".0")) {
+                        outputObject = Integer.parseInt(outputString.substring(0, outputString.length() - 2));
+                    }
+                } else if (type.equals("int")) {
+                    outputObject = Integer.parseInt(outputString);
+                } else {
+                    outputObject = outputString;
+                }
+            } else {
+                outputObject = outputString;
+            }
         }
         expressionTime -= System.currentTimeMillis();
         expressionTime *= -1;
@@ -329,6 +341,7 @@ public class Expression {
                 return false;
             }
         }
+
         if (t1.equals("num") && t2.equals("num")) {
             if (compare.equals(">")) {
                 if ((float)s1 > (float)s2) {
@@ -353,6 +366,96 @@ public class Expression {
             }
             if (compare.equals("<=")) {
                 if ((float)s1 <= (float)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        if (t1.equals("int") && t2.equals("num")) {
+            if (compare.equals(">")) {
+                if ((int)s1 > (float)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals("<")) {
+                if ((int)s1 < (float)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals(">=")) {
+                if ((int)s1 >= (float)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals("<=")) {
+                if ((int)s1 <= (float)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        if (t1.equals("int") && t2.equals("int")) {
+            if (compare.equals(">")) {
+                if ((int)s1 > (int)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals("<")) {
+                if ((int)s1 < (int)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals(">=")) {
+                if ((int)s1 >= (int)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals("<=")) {
+                if ((int)s1 <= (int)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        if (t1.equals("num") && t2.equals("int")) {
+            if (compare.equals(">")) {
+                if ((float)s1 > (int)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals("<")) {
+                if ((float)s1 < (int)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals(">=")) {
+                if ((float)s1 >= (int)s2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals("<=")) {
+                if ((float)s1 <= (int)s2) {
                     return true;
                 } else {
                     return false;

@@ -54,7 +54,7 @@ var bol = true
 var str = "Hello World"
 var str2 = 'Hello World'
 
-// To Create  a Constant instead of using 'var' use 'let'
+// To Create a Constant instead of using 'var' use 'let'
 let str = "HELP"
 ```
 
@@ -88,7 +88,9 @@ print "Finished to Sleep"
 ```
 
 ## Conditional Statements
-If you want to do choose what you do use 'if'
+
+#### Basic If Statements
+If you want to do choose what you do use 'if'.
 ```
 // Use an Boolean Expression in the Brackets of the is Statement.
 if (true) {
@@ -105,5 +107,58 @@ if (true == false) {
 
 if (true || false) {
 
+}
+```
+
+#### Intermediary If Statements 
+You can also use variables in Boolean Expressions. The easiest is a boolean variable because you do not need to compare it to anything else.
+To compare use '==' '!=' '>' '<' '>=' '<='. Also you have some basic and advanced Logic Operators as || (or) && (and) and !! (not). Just have in mind that you need to use '<<' '>>' or '«' '»' as Priority Definition in Boolean Expressions.
+Advanced Logic Operators are !& (nand), x| (xor), n| (nor) and xn (xnor).
+Have in mind that the Not Operator '!!' needs to be behind the Boolean value and not before.
+You can also have a Boolean Expression after a print Statement.
+```
+// All Logic Operators
+var b1 = true
+var b2 = false
+
+print b1 || b2
+print b1 && b2
+print b1 !!
+print b1 !& b2
+print b1 x| b2
+print b1 n| b2
+print b1 xn b2
+
+// Variables in Boolean Expressions
+var i1 = 0
+
+if (i1 == 0) {
+    print "i1 is zero"
+}
+```
+
+#### Advanced If Statements
+To do something if the if failed you use the 'else' statement. If you want to check if something is something do one thing and if something is something else another thing and if nothing matches do a third things use the 'else if'.
+```
+var i = 0
+
+if (i == 0) {
+    print "i is zero"
+} else if (i == 1) {
+    print "i is one"
+} else {
+    print "i is not zero or one"
+}
+```
+
+## Repeating
+To Repeat something multiple times use the 'while' loop. This loop will check first before executing the Loop Part.
+```
+// Loop through the Numbers from zero to ten
+
+var i = 0;
+while (i < 10) {
+    print "Loop Iteration: " + i
+    i = i + 1
 }
 ```
