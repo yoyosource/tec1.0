@@ -16,7 +16,7 @@ One line Comments start with '//'. There are also Block comment which start with
 print "Hello World"
 
 /*Here are some prints for some formating
-also this system writes Hello World 3 Times*/
+also this system writes "Hello World" 3 Times*/
 print ""
 print "Hello World"
 print "Hello World"
@@ -92,7 +92,7 @@ print "Finished to Sleep"
 #### Basic If Statements
 If you want to do choose what you do use 'if'.
 ```
-// Use an Boolean Expression in the Brackets of the is Statement.
+// Use an Boolean Expression in the Brackets of the if Statement.
 if (true) {
 
 }
@@ -114,7 +114,7 @@ if (true || false) {
 You can also use variables in Boolean Expressions. The easiest is a boolean variable because you do not need to compare it to anything else.
 To compare use '==' '!=' '>' '<' '>=' '<='. Also you have some basic and advanced Logic Operators as || (or) && (and) and !! (not). Just have in mind that you need to use '<<' '>>' or '«' '»' as Priority Definition in Boolean Expressions.
 Advanced Logic Operators are !& (nand), x| (xor), n| (nor) and xn (xnor).
-Have in mind that the Not Operator '!!' needs to be behind the Boolean value and not before.
+Have in mind that the Not Operator '!!' needs to be behind the Boolean value and not before it.
 You can also have a Boolean Expression after a print Statement.
 ```
 // All Logic Operators
@@ -156,9 +156,175 @@ To Repeat something multiple times use the 'while' loop. This loop will check fi
 ```
 // Loop through the Numbers from zero to ten
 
-var i = 0;
+var i = 0
 while (i < 10) {
     print "Loop Iteration: " + i
     i = i + 1
 }
+```
+
+## Functions
+
+#### Definition
+Functions are used to declare one Code Snippet that you want to use multiple times throughout your project. The 'func' key will get used. After that there is the name of your function followed by an opening and closing Bracket.
+```
+// This is a valid function
+func example() {
+
+}
+```
+
+#### Calling
+To call a function use the function name with opening and closing bracket after it.
+```
+// This is to call the function.
+example()
+
+// This is a valid function
+func example() {
+
+}
+```
+You can call the function either above the Definition or below it.
+```
+// This is a valid function
+func example() {
+
+}
+
+// This is to call the function.
+example()
+```
+
+#### Parameter
+A function can have Parameters. These parameters are having a type and a name. To add a Parameter to a function the Parameter type followed by the name needs to be put into the '()' brackets. To have multiple Parameters you need to seperate each one by a colon ','.
+```
+// Function with one Parameter
+func oneParameter(*int i) {
+
+}
+
+// Function with two Parameters
+func twoParameters(*int i, *str s) {
+
+}
+```
+To call a function with Parameters as Input write your input in the call Brackets. The parameter needs to have the same type as the parameter of the function you want to call.
+```
+// Function with one Parameter
+func oneParameter(*int i) {
+
+}
+
+// Function with two Parameter
+func twoParameters(*int i, *str s) {
+
+}
+
+// Call the Function 'oneParameter' with the parameter 1
+oneParameter(1)
+
+// Call the Function 'twoParameters' with the parameters 1, "Hello"
+twoParameters(1, "Hello")
+```
+
+#### Function Overloading
+You can also define the same Function multiple times with different Parameters. It is not allowed to have the same function twice. So with the same parameter types in the same order.
+```
+// This defines the function 'overloaded' with a Parameter i of type int
+func overloaded(*int i) {
+
+}
+
+// This defines the function 'overloaded' with a Parameter i of type string
+func overloaded(*str i) {
+
+}
+```
+The Executor automatically calls the correct function to your parameters. At least if you have a Function with that kind of parameter configuration.
+```
+// This defines the function 'overloaded' with a Parameter i of type int
+func overloaded(*int i) {
+
+}
+
+// This defines the function 'overloaded' with a Parameter i of type string
+func overloaded(*str i) {
+
+}
+
+// This will call the 'overloaded(*int i)' function
+overloaded(1)
+
+// This will call the 'overloaded(*str i)' function
+overloaded("1")
+```
+
+#### Parameter Expressions
+You can also use a Parameter with Variables as well as an Expression as parameter.
+```
+// The Function Declaration
+func parameterExpressions(*int i) {
+
+}
+
+// Function call with Expression Syntax
+parameterExpressions(1+1)
+
+var i = 0
+parameterExpressions(i+1)
+```
+
+#### Return Statement
+The return statement can be used to exit a function before the real Block Exit of the function. But it can also return some value. To return something with a specific value write an Expression behind it and see what happends.
+If you return from the Main Thread it gets discontinued.
+```
+// This will give the Output '1'
+testReturn(1)
+
+// This wont give any Output
+testReturn(-1)
+
+return
+
+// This Statement wont be executed.
+testReturn(1)
+
+// Dont print value of i if the value is below zero
+func testReturn(*int i) {
+    if (i < 0) {
+        return
+    }
+    print i
+}
+``` 
+
+#### Recursion
+You can also call the same function within itself. This will create a Recursive Loop.
+```
+// Call the Method recursion with parameter 3
+recursion(3)
+
+// The Declaration of the recursion function with an *int as parameter
+func recursion(*int i) {
+    // Print "Current value: " + i
+    print "Current value: " + i
+    if (i > 0) {
+        // Call itself if i is greater than zero
+        recursion(i - 1)
+    }
+    // Print "end" + i
+    print "end" + i
+}
+```
+The output of the Code above is as follows.
+```
+Current value: 3
+Current value: 2
+Current value: 1
+Current value: 0
+end0
+end1
+end2
+end3
 ```

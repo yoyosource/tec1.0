@@ -1,6 +1,5 @@
 package tec.codeexecutor.statements;
 
-import tec.Tec;
 import tec.codeexecutor.Executor;
 import tec.codeexecutor.Expression;
 import tec.codeexecutor.Var;

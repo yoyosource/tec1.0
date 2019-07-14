@@ -150,6 +150,7 @@ public class Tec {
         implementor.add(new WhileStatement());
 
         implementor.add(new FuncStatement());
+        implementor.add(new ReturnStatement());
 
         Executor executor = new Executor(tokens, implementor);
         executor.run();

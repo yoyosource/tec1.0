@@ -5,6 +5,7 @@ import tec.utils.Token;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Stack;
 
 /**
@@ -22,6 +23,10 @@ public class Executor {
 
 	private ArrayList<Integer> triggerVariableStackRemove = new ArrayList<>();
     private ArrayList<Integer> triggerJumpBack = new ArrayList<>();
+
+    private ArrayList<Integer> jumpBackPointFunction = new ArrayList<>();
+    private ArrayList<Integer> triggerJumpBackFunction = new ArrayList<>();
+    private HashMap<String, Integer> funcPoints = new HashMap<>();
 
 	public int getIndex() {
 		return index;
@@ -71,7 +76,7 @@ public class Executor {
                 bracket--;
             }
 			if (b && bracket == 0) {
-				in = i;
+				in = i - 1;
 				break;
 			}
         }
@@ -88,16 +93,85 @@ public class Executor {
         return true;
     }
 
+    private void funcJumpPoints() {
+		ArrayList<Integer> indicies = new ArrayList<>();
+
+		int i = 0;
+
+		while (i < tokens.size()) {
+			if (tokens.get(i).getKey().equals("COD")  && tokens.get(i).getVal().equals("func")) {
+				indicies.add(i);
+			}
+			i = getLineEnd(i) + 1;
+		}
+
+		running = true;
+
+		if (indicies.isEmpty()) {
+			return;
+		}
+
+		for (int index : indicies) {
+			String s = getFuncHead(index).trim();
+			if (!s.isEmpty()) {
+				if (!funcPoints.containsKey(s)) {
+					funcPoints.put(s, getLineEnd(index));
+				}
+			}
+		}
+	}
+
+	private String getFuncHead(int index) {
+		int[] ints = getBlockRange(index);
+
+		ArrayList<Token> head = getRange(index, ints[0] - 1);
+
+		if (!(head.get(0).getKey().equals("COD") && head.get(0).getVal().equals("func"))) {
+			return "";
+		}
+		head.remove(0);
+
+		if (!(head.get(head.size() - 1).getKey().equals("BLb") && head.get(head.size() - 1).getVal().equals("{"))) {
+			return "";
+		}
+		head.remove(head.size() - 1);
+
+		StringBuilder st = new StringBuilder();
+		if (!head.get(0).getKey().equals("COD")) {
+			return "";
+		}
+		st.append(head.get(0).getVal().toString());
+		st.append(": ");
+		head.remove(0);
+
+		for (Token token : head) {
+			if (token.getKey().equals("RET")) {
+				break;
+			}
+			if (token.getKey().equals("typ")) {
+				st.append(token.getVal().toString());
+				st.append(" ");
+			}
+		}
+
+		return st.toString();
+	}
+
 	/**
 	 * Run.
 	 */
 	public void run() {
+		funcJumpPoints();
+
 		variableStateStack.add(new VariableState());
 		triggerVariableStackRemove.add(tokens.size() + 1);
         triggerJumpBack.add(tokens.size() + 1);
+        triggerJumpBackFunction.add(tokens.size() + 1);
 
 		while (running && index < tokens.size()) {
-			if (isStatement()) {
+			if (isFunction()) {
+				runFunction();
+			} else if (isStatement()) {
 				runStatement();
 				jumpToLineEnd();
 			} else if (isVariable()) {
@@ -107,6 +181,9 @@ public class Executor {
 
 			index++;
 
+			if (index == triggerJumpBackFunction.get(triggerJumpBackFunction.size() - 1)) {
+				jumpBackFunc();
+			}
 			if (index == triggerVariableStackRemove.get(0)) {
 				triggerVariableStackRemove.remove(0);
 				deleteLastVariableState();
@@ -117,6 +194,17 @@ public class Executor {
                 jumpBackStatement();
             }
 		}
+	}
+
+	public void jumpBackFunc() {
+		if (triggerJumpBackFunction.size() == 1) {
+			running = false;
+			return;
+		}
+		triggerJumpBackFunction.remove(triggerJumpBackFunction.size() - 1);
+		deleteLastVariableState();
+		index = jumpBackPointFunction.get(jumpBackPointFunction.size() - 1);
+		jumpBackPointFunction.remove(jumpBackPointFunction.size() - 1);
 	}
 
 	private void jumpBackBlock() {
@@ -167,6 +255,30 @@ public class Executor {
         this.index = in;
     }
 
+	private int jumpBackStatement(int index) {
+		int in = index;
+
+		boolean b = false;
+		int brackets = 0;
+		for (int i = index; i >= 0; i--) {
+			if (b && brackets == 0) {
+				in = i;
+				break;
+			}
+			if (tokens.get(i).getKey().equals("STb") && tokens.get(i).getVal().equals(")")) {
+				if (!b) {
+					b = true;
+				}
+				brackets++;
+			}
+			if (tokens.get(i).getKey().equals("STb") && tokens.get(i).getVal().equals("(")) {
+				brackets--;
+			}
+		}
+
+		return in;
+	}
+
     /**
      * Add a new Trigger Jump Back
      * @param triggerIndex Index where to trigger the jump Back
@@ -211,6 +323,25 @@ public class Executor {
 		if (variableStateStack.size() > 1) {
 			variableStateStack.pop();
 		}
+	}
+
+	/**
+	 * Get line End index
+	 */
+	public int getLineEnd(int index) {
+		if (tokens.get(index).getKey().equals("NNN")) {
+			return index;
+		}
+		for (int i = index + 1; i < this.tokens.size(); i++) {
+			if (this.tokens.get(i).getKey().equals("NNN")) {
+				index = i;
+				break;
+			}
+			if (i == tokens.size() - 1) {
+				running = false;
+			}
+		}
+		return index;
 	}
 
 	/**
@@ -290,12 +421,21 @@ public class Executor {
 
 	private boolean isFunction() {
 		ArrayList<Token> tokens = getTokensToNextLine();
+		tokens.add(0, this.tokens.get(index));
+
+		if (tokens.size() == 0) {
+			return false;
+		}
 
 		if (!tokens.get(0).getKey().equals("COD")) {
 			return false;
 		}
 
 		tokens.remove(0);
+
+		if (tokens.isEmpty()) {
+			return false;
+		}
 
 		if (!(tokens.get(0).getKey().equals("STb") && tokens.get(tokens.size() - 1).getKey().equals("STb"))) {
 			return false;
@@ -309,6 +449,96 @@ public class Executor {
 	}
 
 	private boolean runFunction() {
+		String funcName = tokens.get(index).getVal().toString();
+
+		ArrayList<Token> tokens = getTokensToNextLine();
+		if (tokens.get(0).getKey().equals("STb") && tokens.get(tokens.size() - 1).getKey().equals("STb")) {
+			tokens.remove(0);
+			tokens.remove(tokens.size() - 1);
+		}
+
+		ArrayList<ArrayList<Token>> tokenExpressions = new ArrayList<>();
+
+		if (tokens.size() > 0) {
+			ArrayList<Token> cTokens = new ArrayList<>();
+
+			int i = 0;
+			int l = 0;
+			for (Token token : tokens) {
+				if (token.getKey().equals("SEP") && token.getVal().equals(",")) {
+					tokenExpressions.add(cTokens);
+					cTokens = new ArrayList<>();
+					l = i;
+				} else {
+					cTokens.add(token);
+				}
+				i++;
+			}
+			if (l != tokens.size()) {
+				tokenExpressions.add(cTokens);
+			}
+		}
+
+		ArrayList<Object> parameter = new ArrayList<>();
+		ArrayList<String> type = new ArrayList<>();
+
+		for (ArrayList<Token> tokens1 : tokenExpressions) {
+			Expression expression = new Expression(tokens1, variableStateStack.lastElement());
+			expression.build();
+
+			if (!runExpressionInfo(expression)) {
+				return false;
+			}
+
+			parameter.add(expression.getObject());
+			type.add(expression.getType());
+		}
+
+		StringBuilder st = new StringBuilder();
+		st.append(funcName);
+		st.append(": ");
+
+		for (String s : type) {
+			st.append(s);
+			st.append(" ");
+		}
+
+		String s = st.toString().trim();
+
+		if (funcPoints.containsKey(s)) {
+			int nIndex = funcPoints.get(s);
+
+			jumpBackPointFunction.add(getLineEnd(index));
+			int[] ints = getBlockRange(nIndex - 1);
+			triggerJumpBackFunction.add(ints[1]);
+			createNewVariableState();
+
+			int parameterindex = jumpBackStatement(nIndex);
+			ArrayList<Token> parameterVarNames = getRange(parameterindex + 1, nIndex - 2);
+			ArrayList<String> varNames = new ArrayList<>();
+
+			boolean b = false;
+			for (Token token : parameterVarNames) {
+				if (b) {
+					varNames.add(token.getVal().toString());
+					b = false;
+					continue;
+				}
+				if (token.getKey().equals("typ")) {
+					b = true;
+				}
+			}
+
+			for (int i = 0; i < type.size(); i++) {
+				Var var = new Var(varNames.get(i), parameter.get(i), type.get(i));
+				variableStateStack.lastElement().addVar(var);
+			}
+
+			index = nIndex;
+
+			return true;
+		}
+
 		return false;
 	}
 
@@ -331,7 +561,7 @@ public class Executor {
 		int in = index;
 		while (in < tokens.size()) {
 			if (tokens.get(in).getKey().equals("NNN")) {
-				return null;
+				return new int[2];
 			}
 			if (tokens.get(in).getKey().equals("BLb") && tokens.get(in).getVal().equals("{")) {
 				break;
@@ -444,6 +674,37 @@ public class Executor {
 				break;
 			}
 		}
+		return ou;
+	}
+
+	public int getClosingBlock(int start) {
+		int in = start;
+		while (in < tokens.size()) {
+			if (tokens.get(in).getKey().equals("NNN")) {
+				return start;
+			}
+			if (tokens.get(in).getKey().equals("BLb") && tokens.get(in).getVal().equals("{")) {
+				break;
+			}
+			in++;
+		}
+
+		in++;
+		int bracket = 1;
+		int ou = in;
+		for (int i = in; i < tokens.size(); i++) {
+			if (tokens.get(i).getKey().equals("BLb") && tokens.get(i).getVal().equals("{")) {
+				bracket++;
+			}
+			if (tokens.get(i).getKey().equals("BLb") && tokens.get(i).getVal().equals("}")) {
+				bracket--;
+			}
+			if (bracket == 0) {
+				ou = i;
+				break;
+			}
+		}
+
 		return ou;
 	}
 

@@ -1,12 +1,9 @@
 package tec.codeexecutor;
 
-import tec.exceptions.DefinitonException;
 import tec.exceptions.StringException;
 import tec.utils.Token;
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * The type Lexer.
@@ -61,28 +58,22 @@ public class Lexer {
             }
             else {
                 if (!inString && !backspace) {
-                    if (c == '(' || c == ')') {
-                        cTokens.addAll(tokify(s.toString()));
-                        s = new StringBuilder();
-                        cTokens.addAll(tokify(c + ""));
-                    } else if (c == '{' || c == '}') {
-                        cTokens.addAll(tokify(s.toString()));
-                        s = new StringBuilder();
-                        cTokens.addAll(tokify(c + ""));
-                    } else if (c == '[' || c == ']') {
-                        cTokens.addAll(tokify(s.toString()));
-                        s = new StringBuilder();
-                        cTokens.addAll(tokify(c + ""));
-                    } else if (c == '.') {
-                        cTokens.addAll(tokify(s.toString()));
-                        s = new StringBuilder();
-                        cTokens.addAll(tokify(c + ""));
-                    } else if (c == ':') {
-                        cTokens.addAll(tokify(s.toString()));
-                        s = new StringBuilder();
-                        cTokens.addAll(tokify(c + ""));
-                    } else {
-                        s.append(c);
+                    switch (c) {
+                        case '(':
+                        case ')':
+                        case '{':
+                        case '}':
+                        case '[':
+                        case ']':
+                        case '.':
+                        case ':':
+                            cTokens.addAll(tokify(s.toString()));
+                            s = new StringBuilder();
+                            cTokens.addAll(tokify(c + ""));
+                            break;
+                        default:
+                            s.append(c);
+                            break;
                     }
                 } else {
                     s.append(c);
@@ -226,10 +217,17 @@ public class Lexer {
             return tokens;
         }
 
-        if (s.contains("+") || s.contains("-") || s.contains("*") || s.contains("/") || s.contains("%") || s.contains("#") || s.contains("^") || s.contains("!")) {
-            String[] splitter = new String[]{"+", "-", "*", "/", "%", "#", "^", "!", "(", ")", "root", "sin", "cos", "tan", "asin", "acos", "atan", "sigmoid", "sig", "gauss", "ln", "log"};
-            String[] strings = splitString(s, splitter, true, false);
+        String[] splitter = new String[]{"+", "-", "*", "/", "%", "#", "^", "!", "(", ")", "root", "sin", "cos", "tan", "asin", "acos", "atan", "sigmoid", "sig", "gauss", "ln", "log", ",", ".", ":"};
 
+        int checks = 0;
+        for (String check : splitter) {
+            if (s.contains(check)) {
+                checks++;
+            }
+        }
+
+        if (checks > 0) {
+            String[] strings = splitString(s, splitter, true, false);
             for (String s1 : strings) {
                 tokens.addAll(tokify(s1));
             }
@@ -237,59 +235,9 @@ public class Lexer {
             tokens.add(new Token("COD", s));
         }
         return tokens;
-
     }
 
-    private String[] splitString(String string, char[] splitChars, boolean ReviveSplitted, boolean addToLast) {
-        char[] chars = string.toCharArray();
-        if (chars.length == 0) {
-            throw new StringException("No String");
-        }
-        if (splitChars.length == 0) {
-            throw new StringException("No Split Chars");
-        }
-        ArrayList<String> words = new ArrayList<>();
-        StringBuilder stringBuilder = new StringBuilder();
-        int i = 0;
-        int lastSplit = 0;
-        while (i < chars.length) {
-            char c = chars[i];
-            int splitCharTest = 0;
-            for (char splitChar : splitChars) {
-                if (c == splitChar) {
-                    splitCharTest++;
-                }
-            }
-            if (splitCharTest == 0) {
-                stringBuilder.append(c);
-            } else {
-                if (ReviveSplitted) {
-                    if (addToLast) {
-                        stringBuilder.append(c);
-                        words.add(stringBuilder.toString());
-                        stringBuilder = new StringBuilder();
-                    } else {
-                        words.add(stringBuilder.toString());
-                        stringBuilder = new StringBuilder();
-                        stringBuilder.append(c);
-                        words.add(stringBuilder.toString());
-                        stringBuilder = new StringBuilder();
-                    }
-                } else {
-                    words.add(stringBuilder.toString());
-                    stringBuilder = new StringBuilder();
-                }
-                lastSplit = i;
-            }
-            i++;
-        }
-        if (lastSplit != string.length()) {
-            words.add(stringBuilder.toString());
-        }
-        return words.toArray(new String[0]);
-    }
-
-    private static String[] splitString(String string, String[] splitStrings, boolean ReviveSplitted, boolean addToLast) {
+    private static String[] splitString(String string, String[] splitStrings, boolean reviveSplitted, boolean addToLast) {
         char[] chars = string.toCharArray();
         if (chars.length == 0) {
             throw new StringException("No String");
@@ -328,7 +276,7 @@ public class Lexer {
                 stringBuilder.append(c);
             } else {
                 i += s.length() - 1;
-                if (ReviveSplitted) {
+                if (reviveSplitted) {
                     if (addToLast) {
                         words.add(stringBuilder.toString() + s);
                     } else {

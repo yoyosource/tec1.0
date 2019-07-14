@@ -190,7 +190,7 @@ public class Calculator {
                 st.append(c);
             } else {
 
-                objects = minusCheck(objects, st);
+                minusCheck(objects, st);
 
                 if (c == '(' && st.length() != 0) {
                     objects.add("*");
@@ -229,7 +229,7 @@ public class Calculator {
                 // (([\\-]?[0-9]*)([.][0-9]*)?)(([E]([\\-]?[0-9]*))?)
             }
         }
-        objects = minusCheck(objects, st);
+        minusCheck(objects, st);
         return objects;
     }
 

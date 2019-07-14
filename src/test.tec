@@ -48,11 +48,11 @@ var i = 0
 if (i == 0) {
     print "is zero"
     var b = false
+    print b
+    if (b) {
         print b
-        if (b) {
-            print b
-            var j = 0
-        }
+        var j = 0
+    }
     print j
 } else if (i == 1) {
     print "is one"
@@ -82,7 +82,11 @@ while (i > 0) {
     i = i - 1
 }*/
 
+/*
 test()
+test(1)
+test("Hello")
+test("Hello", "World")
 
 func test() {
     print "empty"
@@ -91,3 +95,27 @@ func test() {
 func test(*int i) {
     print "Number: " + i
 }
+
+func test(*string i) -> *string {
+    print "String: " + i
+    return "String: " + i
+}
+
+func test(*string i, *string j) {
+    print i + " " + j
+}*/
+
+/*
+help(3)
+
+func help(*int i) {
+    print "Current value: " + i
+    if (i > 0) {
+        help(i - 1)
+    }
+    print "end" + i
+}*/
+
+print "Hello"
+return
+print "World"

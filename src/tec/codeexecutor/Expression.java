@@ -78,14 +78,12 @@ public class Expression {
         expressionTime = System.currentTimeMillis();
         if (tokens.size() == 1) {
             tokens = replaceVars(tokens);
-            try {
+            if (!tokens.isEmpty()) {
                 type = tokens.get(0).getKey();
                 outputObject = tokens.get(0).getVal();
                 if (type.equals("bol")) {
                     outputBoolean = (boolean)tokens.get(0).getVal();
                 }
-            } catch (NullPointerException e) {
-
             }
         } else if (isLogic()) {
             booleanOutput();
@@ -127,7 +125,7 @@ public class Expression {
                         tokens.set(i, new Token(variableState.getVarType(tokens.get(i).getVal().toString()), variableState.getVarValue(tokens.get(i).getVal().toString())));
                     } else {
                         error = "It is not allowed to have Statements in Expressions or the Variable is not assigned";
-                        return null;
+                        return new ArrayList<>();
                     }
                 }
             }
@@ -137,11 +135,9 @@ public class Expression {
 
     private void booleanOutput() {
         type = "bol";
-        if (tokens.size() == 1) {
-            if (tokens.get(0).getKey().equals("bol")) {
-                outputBoolean = (boolean)tokens.get(0).getVal();
-                return;
-            }
+        if (tokens.size() == 1 && tokens.get(0).getKey().equals("bol")) {
+            outputBoolean = (boolean)tokens.get(0).getVal();
+            return;
         }
 
         tokens = replaceVars(tokens);
@@ -152,22 +148,27 @@ public class Expression {
         ArrayList<ArrayList<Token>> lineToken = new ArrayList<>();
 
         ArrayList<Token> nTokens = new ArrayList<>();
-        for (int i = 0; i < tokens.size(); i++) {
-            if (tokens.get(i).getKey().equals("LOb")) {
-                if (tokens.get(i).getVal().toString().equals(">>")) {
+
+        if (tokens == null) {
+            return;
+        }
+
+        for (Token token : tokens) {
+            if (token.getKey().equals("LOb")) {
+                if (token.getVal().toString().equals(">>")) {
                     p--;
-                } else if (tokens.get(i).getVal().toString().equals("<<")) {
+                } else if (token.getVal().toString().equals("<<")) {
                     p++;
                 }
                 continue;
             }
-            if (tokens.get(i).getKey().equals("LOG")) {
-                compareToken.add(tokens.get(i));
+            if (token.getKey().equals("LOG")) {
+                compareToken.add(token);
                 priority.add(p);
                 lineToken.add(nTokens);
                 nTokens = new ArrayList<>();
             } else {
-                nTokens.add(tokens.get(i));
+                nTokens.add(token);
             }
         }
 
@@ -187,10 +188,8 @@ public class Expression {
             return;
         }
 
-        if (compareToken.size() == 1 && booleans.size() == 1) {
-            if (compareToken.get(0).getVal().toString().equals("!!")) {
-                booleans.set(0, !booleans.get(0));
-            }
+        if (compareToken.size() == 1 && booleans.size() == 1 && compareToken.get(0).getVal().toString().equals("!!")) {
+            booleans.set(0, !booleans.get(0));
         }
         while (booleans.size() > 1) {
             int index = getTop(priority);
@@ -466,6 +465,15 @@ public class Expression {
         return false;
     }
 
+    private boolean isOnlyInt(ArrayList<Token> tokens) {
+	    for (Token token : tokens) {
+	        if (token.getKey().equals("num")) {
+	            return false;
+            }
+        }
+	    return true;
+    }
+
     private void stringOutput() {
 
         if (replaceVars(tokens) != null) {
@@ -476,8 +484,13 @@ public class Expression {
 
         if (isCalculation(tokens)) {
             float f = calculator.calc(tokens.stream().map(token -> token.getVal().toString()).collect(Collectors.joining()));
-            outputString = "" + f;
-            type = "num";
+            if (isOnlyInt(tokens)) {
+                type = "int";
+                outputString = "" + (int)f;
+            } else {
+                type = "num";
+                outputString = "" + f;
+            }
             return;
         }
 
@@ -490,7 +503,11 @@ public class Expression {
             if (isCalculation(tokens)) {
                 float f = calculator.calc(tokens.stream().map(token -> token.getVal().toString()).collect(Collectors.joining()));
                 tokens = removeToClosingBracket(this.tokens, start);
-                tokens.add(start, new Token("num", f));
+                if (isOnlyInt(tokens)) {
+                    tokens.add(start, new Token("int", (int)f));
+                } else {
+                    tokens.add(start, new Token("num", f));
+                }
             } else {
                 startIndex = start;
                 startIndex2 = start;
@@ -504,10 +521,8 @@ public class Expression {
             }
         }
 
-        for (int i = 0; i < tokens.size()-1; i++) {
-            if (tokens.get(i).isType() && tokens.get(i + 1).getKey().equals("OPE") && tokens.get(i + 1).getVal().equals("+")) {
-                i++;
-            } else {
+        for (int i = 0; i < tokens.size()-1; i += 2) {
+            if (!(tokens.get(i).isType() && tokens.get(i + 1).getKey().equals("OPE") && tokens.get(i + 1).getVal().equals("+"))) {
                 error = "To many or to few Operators";
                 return;
             }
@@ -663,7 +678,7 @@ public class Expression {
             }
         }
         if (tokens.size() == 1) {
-            if (tokens.get(1).getKey().equals("bol")) {
+            if (tokens.get(0).getKey().equals("bol")) {
                 return true;
             }
         }
