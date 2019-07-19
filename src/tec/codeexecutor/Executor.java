@@ -26,13 +26,27 @@ public class Executor {
 
     private ArrayList<Integer> jumpBackPointFunction = new ArrayList<>();
     private ArrayList<Integer> triggerJumpBackFunction = new ArrayList<>();
+    private ArrayList<String> currentReturnType = new ArrayList<>();
     private HashMap<String, Integer> funcPoints = new HashMap<>();
+    private HashMap<String, String> returnType = new HashMap<>();
 
-	public int getIndex() {
-		return index;
+    private Token returnSystem = null;
+
+    private String error = "";
+
+	public void setFuncReturn(Token returnSystem) {
+		this.returnSystem = returnSystem;
 	}
 
-	/**
+	public Token getFuncReturn() {
+		return returnSystem;
+	}
+
+	public void setError(String error) {
+        this.error = error;
+    }
+
+    /**
 	 * Instantiates a new Executor.
 	 *
 	 * @param tokens      the tokens
@@ -112,41 +126,55 @@ public class Executor {
 		}
 
 		for (int index : indicies) {
-			String s = getFuncHead(index).trim();
+			String[] strings = getFuncHead(index);
+			String s = strings[0].trim();
 			if (!s.isEmpty()) {
 				if (!funcPoints.containsKey(s)) {
 					funcPoints.put(s, getLineEnd(index));
+					if (strings.length == 2 && !strings[1].trim().isEmpty()) {
+						returnType.put(s, strings[1].trim());
+					} else {
+						returnType.put(s, "");
+					}
 				}
 			}
 		}
 	}
 
-	private String getFuncHead(int index) {
+	private String[] getFuncHead(int index) {
 		int[] ints = getBlockRange(index);
 
 		ArrayList<Token> head = getRange(index, ints[0] - 1);
 
 		if (!(head.get(0).getKey().equals("COD") && head.get(0).getVal().equals("func"))) {
-			return "";
+			return new String[0];
 		}
 		head.remove(0);
 
 		if (!(head.get(head.size() - 1).getKey().equals("BLb") && head.get(head.size() - 1).getVal().equals("{"))) {
-			return "";
+			return new String[0];
 		}
 		head.remove(head.size() - 1);
 
 		StringBuilder st = new StringBuilder();
 		if (!head.get(0).getKey().equals("COD")) {
-			return "";
+			return new String[0];
 		}
 		st.append(head.get(0).getVal().toString());
 		st.append(": ");
 		head.remove(0);
 
+		boolean b = false;
+		Token t = null;
+
 		for (Token token : head) {
-			if (token.getKey().equals("RET")) {
+			if (b) {
+				t = token;
 				break;
+			}
+			if (token.getKey().equals("RET")) {
+				b = true;
+				continue;
 			}
 			if (token.getKey().equals("typ")) {
 				st.append(token.getVal().toString());
@@ -154,7 +182,11 @@ public class Executor {
 			}
 		}
 
-		return st.toString();
+		if (t == null) {
+			return new String[]{st.toString()};
+		}
+
+		return new String[]{st.toString(), t.getVal().toString()};
 	}
 
 	/**
@@ -182,27 +214,50 @@ public class Executor {
 			index++;
 
 			if (index == triggerJumpBackFunction.get(triggerJumpBackFunction.size() - 1)) {
-				jumpBackFunc();
+				jumpBackFunc(null);
 			}
-			if (index == triggerVariableStackRemove.get(0)) {
-				triggerVariableStackRemove.remove(0);
+			if (index == triggerVariableStackRemove.get(triggerVariableStackRemove.size() - 1)) {
+				triggerVariableStackRemove.remove(triggerVariableStackRemove.size() - 1);
 				deleteLastVariableState();
 			}
-			if (index == triggerJumpBack.get(0)) {
-                triggerJumpBack.remove(0);
+			if (index == triggerJumpBack.get(triggerJumpBack.size() - 1)) {
+                triggerJumpBack.remove(triggerJumpBack.size() - 1);
                 jumpBackBlock();
                 jumpBackStatement();
             }
 		}
 	}
 
-	public void jumpBackFunc() {
+	public void jumpBackFunc(String type) {
+
 		if (triggerJumpBackFunction.size() == 1) {
+			System.out.println("running");
 			running = false;
 			return;
 		}
+
+		String t = currentReturnType.get(currentReturnType.size() - 1);
+
+		if (type == null && t.length() == 0) {
+
+		} else if (type != null && type.equals(t)) {
+
+		} else if (type != null && t.equals("any")) {
+
+		} else {
+			running = false;
+			return;
+		}
+
+		if (type == null) {
+			returnSystem = null;
+		} else {
+			returnSystem = new Token(t, type);
+		}
+
+		currentReturnType.remove(currentReturnType.size() - 1);
 		triggerJumpBackFunction.remove(triggerJumpBackFunction.size() - 1);
-		deleteLastVariableState();
+		deleteLastFunctionVariabelState();
 		index = jumpBackPointFunction.get(jumpBackPointFunction.size() - 1);
 		jumpBackPointFunction.remove(jumpBackPointFunction.size() - 1);
 	}
@@ -285,7 +340,6 @@ public class Executor {
      */
     public void addJumpBackTrigger(int triggerIndex) {
         triggerJumpBack.add(triggerIndex);
-        Collections.sort(triggerJumpBack);
     }
 
     /**
@@ -294,7 +348,6 @@ public class Executor {
      */
 	public void addVariableStateRemoveTrigger(int triggerIndex) {
 		triggerVariableStackRemove.add(triggerIndex);
-		Collections.sort(triggerVariableStackRemove);
 	}
 
 	/**
@@ -302,7 +355,7 @@ public class Executor {
 	 */
 	public void createVariableStateFromPrevious() {
 		ArrayList<Var> vars = variableStateStack.lastElement().getVars();
-		VariableState variableState = new VariableState();
+		VariableState variableState = new VariableState(true);
 		for (Var var : vars) {
 			variableState.addVar(var);
 		}
@@ -320,6 +373,15 @@ public class Executor {
 	 * Removes the last Variable State
 	 */
 	public void deleteLastVariableState() {
+		if (variableStateStack.size() > 1) {
+			variableStateStack.pop();
+		}
+	}
+
+	public void deleteLastFunctionVariabelState() {
+		while (variableStateStack.size() > 1 && variableStateStack.lastElement().isDerived()) {
+			variableStateStack.pop();
+		}
 		if (variableStateStack.size() > 1) {
 			variableStateStack.pop();
 		}
@@ -404,7 +466,7 @@ public class Executor {
 			index++;
 
 			ArrayList<Token> tokens = getTokensToNextLine();
-			Expression expression = new Expression(tokens, variableStateStack.lastElement());
+			Expression expression = new Expression(tokens, variableStateStack.lastElement(), this);
 			expression.build();
 
 			if (!runExpressionInfo(expression)) {
@@ -448,10 +510,11 @@ public class Executor {
 		return true;
 	}
 
-	private boolean runFunction() {
-		String funcName = tokens.get(index).getVal().toString();
+	public boolean runFunction() {
+		return runFunction(tokens.get(index).getVal().toString(), getTokensToNextLine());
+	}
 
-		ArrayList<Token> tokens = getTokensToNextLine();
+	public boolean runFunction(String funcName, ArrayList<Token> tokens) {
 		if (tokens.get(0).getKey().equals("STb") && tokens.get(tokens.size() - 1).getKey().equals("STb")) {
 			tokens.remove(0);
 			tokens.remove(tokens.size() - 1);
@@ -483,7 +546,7 @@ public class Executor {
 		ArrayList<String> type = new ArrayList<>();
 
 		for (ArrayList<Token> tokens1 : tokenExpressions) {
-			Expression expression = new Expression(tokens1, variableStateStack.lastElement());
+			Expression expression = new Expression(tokens1, variableStateStack.lastElement(), this);
 			expression.build();
 
 			if (!runExpressionInfo(expression)) {
@@ -507,6 +570,9 @@ public class Executor {
 
 		if (funcPoints.containsKey(s)) {
 			int nIndex = funcPoints.get(s);
+
+			String t = returnType.get(s);
+			currentReturnType.add(t);
 
 			jumpBackPointFunction.add(getLineEnd(index));
 			int[] ints = getBlockRange(nIndex - 1);
@@ -535,12 +601,51 @@ public class Executor {
 			}
 
 			index = nIndex;
+			directExecuteFunction();
 
 			return true;
 		}
 
 		return false;
 	}
+
+	private void directExecuteFunction() {
+	    int finish = variableStateStack.size() - 1;
+
+        running = true;
+
+        while (running && index < tokens.size()) {
+            if (isFunction()) {
+                runFunction();
+            } else if (isStatement()) {
+                runStatement();
+                jumpToLineEnd();
+            } else if (isVariable()) {
+                runVariable();
+                jumpToLineEnd();
+            }
+
+            index++;
+
+            if (index == triggerJumpBackFunction.get(triggerJumpBackFunction.size() - 1)) {
+                jumpBackFunc(null);
+            }
+            if (index == triggerVariableStackRemove.get(0)) {
+                triggerVariableStackRemove.remove(0);
+                deleteLastVariableState();
+            }
+            if (index == triggerJumpBack.get(0)) {
+                triggerJumpBack.remove(0);
+                jumpBackBlock();
+                jumpBackStatement();
+            }
+
+            if (variableStateStack.size() == finish) {
+                index--;
+                return;
+            }
+        }
+    }
 
 	private ArrayList<Token> getTokensToNextLine() {
 		ArrayList<Token> tokens = new ArrayList<>();

@@ -21,7 +21,7 @@ public class PrintStatement implements Statement {
 	@Override
 	public boolean execute(ArrayList<Token> tokens, VariableState variableState, Executor executor) {
 
-		Expression expression = new Expression(tokens, variableState);
+		Expression expression = new Expression(tokens, variableState, executor);
 		expression.build();
 
 		if (!executor.runExpressionInfo(expression)) {

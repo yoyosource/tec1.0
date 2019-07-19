@@ -33,7 +33,7 @@ public class VarStatement implements Statement {
 
         tokens.remove(0);
         tokens.remove(0);
-        Expression expression = new Expression(tokens, variableState);
+        Expression expression = new Expression(tokens, variableState, executor);
         expression.build();
 
         if (!executor.runExpressionInfo(expression)) {

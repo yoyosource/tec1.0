@@ -16,7 +16,12 @@ public class CommentScanner {
 	 *
 	 * @param s the s
 	 */
-	public void removeComments(String s) {
+	public void removeComments(String s, boolean tecc) {
+	    if (tecc) {
+	        code = s;
+	        return;
+        }
+
         String[] code = s.split("\n");
         ArrayList<String> newCode = new ArrayList<>();
         int inComment = 0;

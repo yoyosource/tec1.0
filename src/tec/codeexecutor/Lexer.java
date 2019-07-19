@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * The type Lexer.
  */
 public class Lexer {
-    
+
     private ArrayList<Token> tokens = new ArrayList<>();
     private StringBuilder s = new StringBuilder();
 
@@ -18,7 +18,32 @@ public class Lexer {
      *
      * @param codes the codes
      */
-    public void createTokens(String codes) {
+    public void createTokens(String codes, boolean tecc) {
+        if (tecc) {
+            codes = codes.substring(1);
+            String[] strings = codes.split("\n<");
+            Token token;
+            String s = "";
+            String t = "";
+            for (String string : strings) {
+                s = string.substring(4);
+                t = string.substring(0, 3);
+
+                if (t.equals("num")) {
+                    token = new Token(t, Float.parseFloat(s));
+                } else if (t.equals("int")) {
+                    token = new Token(t, Integer.parseInt(s));
+                } else if (t.equals("chr")) {
+                    token = new Token(t, s.toCharArray()[0]);
+                } else if (t.equals("str")) {
+                    token = new Token(t, s + "");
+                } else {
+                    token = new Token(t, s);
+                }
+                tokens.add(token);
+            }
+            return;
+        }
 
         char[] chars = codes.toCharArray();
         ArrayList<Token> cTokens = new ArrayList<>();
@@ -28,7 +53,6 @@ public class Lexer {
         boolean endLine = false;
 
         for (char c : chars) {
-
             if (endLine) {
                 cTokens.addAll(tokify(s.toString().trim()));
                 cTokens.add(new Token("NNN", ""));
@@ -65,7 +89,6 @@ public class Lexer {
                         case '}':
                         case '[':
                         case ']':
-                        case '.':
                         case ':':
                             cTokens.addAll(tokify(s.toString()));
                             s = new StringBuilder();
@@ -86,12 +109,6 @@ public class Lexer {
             cTokens.addAll(tokify(s.toString()));
         }
 
-        for (int i = cTokens.size() - 1; i >= 0; i--) {
-            if (cTokens.get(i).getKey().equals("nul")) {
-                cTokens.remove(i);
-            }
-        }
-
         tokens = cTokens;
 
     }
@@ -110,7 +127,6 @@ public class Lexer {
         ArrayList<Token> tokens = new ArrayList<>();
 
         if (s.length() == 0) {
-            tokens.add(new Token("nul", "null"));
             return tokens;
         }
 
@@ -127,7 +143,7 @@ public class Lexer {
             return tokens;
         }
         if (s.matches("-?(\\d+)(\\.(\\d+))")) {
-            tokens.add(new Token("num", Double.parseDouble(s)));
+            tokens.add(new Token("num", Float.parseFloat(s)));
             return tokens;
         }
         if (s.matches("-?(\\d+)")) {
@@ -196,7 +212,7 @@ public class Lexer {
             return tokens;
         }
 
-        if (s.equals("*char") || s.equals("*character")) {
+        if (s.equals("*char") || s.equals("*character") || s.equals("*chr")) {
             tokens.add(new Token("typ", "chr"));
             return tokens;
         }
@@ -212,12 +228,16 @@ public class Lexer {
             tokens.add(new Token("typ", "int"));
             return tokens;
         }
-        if (s.equals("*string")) {
+        if (s.equals("*string") || s.equals("*str")) {
             tokens.add(new Token("typ", "str"));
             return tokens;
         }
+        if (s.equals("*any")) {
+            tokens.add(new Token("typ", "any"));
+            return tokens;
+        }
 
-        String[] splitter = new String[]{"+", "-", "*", "/", "%", "#", "^", "!", "(", ")", "root", "sin", "cos", "tan", "asin", "acos", "atan", "sigmoid", "sig", "gauss", "ln", "log", ",", ".", ":"};
+        String[] splitter = new String[]{"+", "-", "*", "/", "%", "#", "^", "!", "(", ")", "root", "sin", "cos", "tan", "asin", "acos", "atan", "sigmoid", "sig", "gauss", "ln", "log", ",", ":"};
 
         int checks = 0;
         for (String check : splitter) {

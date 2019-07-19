@@ -18,20 +18,21 @@ public class ReturnStatement implements Statement {
     @Override
     public boolean execute(ArrayList<Token> tokens, VariableState variableState, Executor executor) {
         if (tokens.size() == 0) {
-            executor.jumpBackFunc();
+            executor.jumpBackFunc(null);
             return true;
         }
 
-        System.out.println(tokens);
-
-        Expression expression = new Expression(tokens, variableState);
+        Expression expression = new Expression(tokens, variableState, executor);
         expression.build();
 
         if (!executor.runExpressionInfo(expression)) {
             return false;
         }
 
-        executor.jumpBackFunc();
+        executor.jumpBackFunc(expression.getType());
+        if (executor.getFuncReturn() != null) {
+            executor.setFuncReturn(new Token(expression.getType(), expression.getObject()));
+        }
         return true;
     }
 }

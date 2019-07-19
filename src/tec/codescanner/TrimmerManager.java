@@ -12,7 +12,12 @@ public class TrimmerManager {
 	 *
 	 * @param s the s
 	 */
-	public void trim(String s) {
+	public void trim(String s, boolean tecc) {
+	    if (tecc) {
+	        text = s;
+	        return;
+        }
+
         String[] strings = s.split("\n");
 
         StringBuilder st = new StringBuilder();

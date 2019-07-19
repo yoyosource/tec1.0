@@ -1,6 +1,6 @@
 # tec
 '**tec**' is a new programming languge that is user friendly as you can just write your Code. You do not have to mess with any **main** functions if you do not want to. If you want to start with tec you do not need to have any knowledge of any programming languages what so ever.
-To change to a new language you can use this a ground basis to change to Java, Swift, Python, JavaScript, Go. If you have any knowledge in Java, Swift, Python, Go or JavaScript you should not have any trouble to write programms in **tec** if you know the basics.
+To change to a new language you can use this as a ground basis to change to Java, Swift, Python, JavaScript, Go. If you have any knowledge in Java, Swift, Python, Go or JavaScript you should not have any trouble with writing programs in **tec** as soon as you know the basics.
 
 ## Getting started
 Create a file with the suffix **.tec**. Open the file and now you can write your first code. Start with a 'Hello World' programm.
@@ -10,7 +10,7 @@ print "Hello World"
 If you execute this Program it will output Hello World.
 
 ## Comments
-One line Comments start with '//'. There are also Block comment which start with '/\*' at the start of a line and end with '\*/' at the end of a line.
+One line Comments start with '//'. There are also Block comments which start with '/\*' at the start of a line and end with '\*/' at the end of a line.
 ```
 // This prints "Hello World"
 print "Hello World"
@@ -24,18 +24,9 @@ print "Hello World"
 print ""
 ```
 
-## Datatypes
-There are 5 Datatypes. The Datatypes are chr for Character, bol for Boolean, num for Float, int for Integer and str for String.
-```
-*chr '<One Character here>'
-*bol <true/false>
-*num <Floating point number>
-*int <Non Floating point Number or Hex Number with #>
-*str "One or More Characters" or 'Many Character'
-```
-
 ## Variables
 There are 2 types of Variables, constant ones and dynamic ones. Dynamic variables are changeable and can be reassigned.
+The variable type will get evaluated and automatically set.
 ```
 // This Variable is an Integer Variable '0'
 var int = 0
@@ -55,7 +46,17 @@ var str = "Hello World"
 var str2 = 'Hello World'
 
 // To Create a Constant instead of using 'var' use 'let'
-let str = "HELP"
+let const = "HELP"
+```
+
+## Datatypes
+There are 5 Datatypes. The Datatypes are chr for Character, bol for Boolean, num for Float, int for Integer and str for String.
+```
+*chr '<One Character>'
+*bol <true/false>
+*num <Floating point number>
+*int <Non Floating point Number or Hex Number with #>
+*str "One or More Characters" or 'Many Characters'
 ```
 
 ## Advanced Printing
@@ -150,6 +151,8 @@ if (i == 0) {
     print "i is not zero or one"
 }
 ```
+You can also check if 2 Strings are equal ('equals'), are equalsIgnoreCase ('equalsIgnoreCase'), the one starts with the other ('startsWith'), the one ends with the other ('endsWith'), the one contains the other ('contains') and the one contains the other ignore case ('containsIgnoreCase').
+
 
 ## Repeating
 To Repeat something multiple times use the 'while' loop. This loop will check first before executing the Loop Part.
@@ -327,4 +330,36 @@ end0
 end1
 end2
 end3
+```
+
+#### Returning something from a Function
+You can also return something with the return Statement. If you want to return something you need to specify in the declaration of the function what type you want to return.
+```
+// Function Declaration with return type of *int
+func intReturn(*int i) -> *int {
+    return i^i
+}
+
+// Print the result for Input 2, 3, 4
+print intReturn(2)
+print intReturn(3)
+print intReturn(4)
+```
+You can also return an unspecific type with '*any'.
+```
+// This function return an unspecific type
+func anyReturn(*int i) -> *any {
+    if (i < 0) {
+        return i + ""
+    }
+    if (i < 10) {
+        return i + 0.0
+    }
+    return i
+}
+
+// Call the anyReturn function with values of -1, 5, 20
+print anyReturn(-1)
+print anyReturn(5)
+print anyReturn(20)
 ```

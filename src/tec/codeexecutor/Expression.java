@@ -19,6 +19,7 @@ public class Expression {
 
     private ArrayList<Token> tokens;
     private VariableState variableState;
+    private Executor executor;
 
 	/**
 	 * Instantiates a new expression.
@@ -26,9 +27,10 @@ public class Expression {
 	 * @param tokens        the tokens
 	 * @param variableState the variable state
 	 */
-	public Expression(ArrayList<Token> tokens, VariableState variableState) {
+	public Expression(ArrayList<Token> tokens, VariableState variableState, Executor executor) {
         this.tokens = tokens;
         this.variableState = variableState;
+        this.executor = executor;
     }
 
 	/**
@@ -77,7 +79,7 @@ public class Expression {
 	public void build() {
         expressionTime = System.currentTimeMillis();
         if (tokens.size() == 1) {
-            tokens = replaceVars(tokens);
+            tokens = replace(tokens);
             if (!tokens.isEmpty()) {
                 type = tokens.get(0).getKey();
                 outputObject = tokens.get(0).getVal();
@@ -93,10 +95,6 @@ public class Expression {
             if (type != null) {
                 if (type.equals("num")) {
                     outputObject = Float.parseFloat(outputString);
-
-                    if (outputString.endsWith(".0")) {
-                        outputObject = Integer.parseInt(outputString.substring(0, outputString.length() - 2));
-                    }
                 } else if (type.equals("int")) {
                     outputObject = Integer.parseInt(outputString);
                 } else {
@@ -117,7 +115,67 @@ public class Expression {
         Tec.expressions += 1;
     }
 
-    private ArrayList<Token> replaceVars(ArrayList<Token> tokens) {
+    private int getClosingBracket(int i) {
+	    if (!(tokens.get(i).getKey().equals("STb") && tokens.get(i).getVal().equals("("))) {
+	        return i;
+        }
+
+	    int bracket = 1;
+	    i++;
+	    for (int j = i; j < tokens.size(); j++) {
+            if (tokens.get(j).getKey().equals("STb") && tokens.get(j).getVal().equals("(")) {
+                bracket++;
+            }
+            if (tokens.get(j).getKey().equals("STb") && tokens.get(j).getVal().equals(")")) {
+                bracket--;
+            }
+            if (bracket == 0) {
+                i = j;
+                break;
+            }
+        }
+	    return i;
+    }
+
+    private ArrayList<Token> getRange(int start, int stop) {
+	    ArrayList<Token> newTokens = new ArrayList<>();
+	    for (int i = start; i <= stop; i++) {
+	        newTokens.add(tokens.get(i));
+        }
+	    return newTokens;
+    }
+
+    private ArrayList<Token> replace(ArrayList<Token> tokens) {
+	    if (executor != null) {
+            for (int i = 0; i < tokens.size(); i++) {
+                if (!tokens.get(i).getKey().equals("COD")) {
+                    continue;
+                }
+                int j = i + 1;
+                if (!(j < tokens.size())) {
+                    continue;
+                }
+
+                int c = getClosingBracket(j);
+
+                ArrayList<Token> func = getRange(i, c);
+
+                String funcName = func.get(0).getVal().toString();
+                func.remove(0);
+
+                boolean b = executor.runFunction(funcName, func);
+                Token t = executor.getFuncReturn();
+
+                if (b) {
+                    for (int k = c; k > i; k--) {
+                        tokens.remove(k);
+                    }
+                    tokens.set(i, t);
+                }
+
+            }
+        }
+
         if (variableState != null) {
             for (int i = 0; i < tokens.size(); i++) {
                 if (tokens.get(i).getKey().equals("COD")) {
@@ -130,6 +188,7 @@ public class Expression {
                 }
             }
         }
+
         return tokens;
     }
 
@@ -140,7 +199,7 @@ public class Expression {
             return;
         }
 
-        tokens = replaceVars(tokens);
+        tokens = replace(tokens);
 
         ArrayList<Token> compareToken = new ArrayList<>();
         ArrayList<Integer> priority = new ArrayList<>();
@@ -310,10 +369,10 @@ public class Expression {
             throw new NullPointerException();
         }
 
-        Expression expression1 = new Expression(tokens1, variableState);
+        Expression expression1 = new Expression(tokens1, variableState, executor);
         expression1.build();
 
-        Expression expression2 = new Expression(tokens2, variableState);
+        Expression expression2 = new Expression(tokens2, variableState, executor);
         expression2.build();
 
         plusTime += expression1.getExpressionTime();
@@ -341,6 +400,50 @@ public class Expression {
             }
         }
 
+        if ((t1.equals("str") && t2.equals("str")) || (t1.equals("str") && t2.equals("chr"))) {
+            if (compare.equals("equals")) {
+                if (s1.toString().equals(s2.toString())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals("equalsIgnoreCase")) {
+                if (s1.toString().equalsIgnoreCase(s2.toString())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals("startsWith")) {
+                if (s1.toString().startsWith(s2.toString())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals("endsWith")) {
+                if (s1.toString().endsWith(s2.toString())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals("contains")) {
+                if (s1.toString().contains(s2.toString())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (compare.equals("containsIgnoreCase")) {
+                if (s1.toString().toLowerCase().contains(s2.toString().toLowerCase())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
         if (t1.equals("num") && t2.equals("num")) {
             if (compare.equals(">")) {
                 if ((float)s1 > (float)s2) {
@@ -476,8 +579,8 @@ public class Expression {
 
     private void stringOutput() {
 
-        if (replaceVars(tokens) != null) {
-            tokens = replaceVars(tokens);
+        if (replace(tokens) != null) {
+            tokens = replace(tokens);
         } else {
             return;
         }
@@ -539,11 +642,7 @@ public class Expression {
                 continue;
             }
             if (token.getKey().equals("num")) {
-                if (token.getVal().toString().endsWith(".0")) {
-                    st.append(token.getVal().toString().substring(0, token.getVal().toString().length() - 2));
-                } else {
-                    st.append(token.getVal().toString());
-                }
+                st.append(token.getVal().toString());
                 continue;
             }
             st.append(token.getVal().toString());

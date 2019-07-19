@@ -31,7 +31,7 @@ public class WhileStatement implements Statement {
             tokens.remove(tokens.size() - 1);
         }
 
-        Expression expression = new Expression(tokens, variableState);
+        Expression expression = new Expression(tokens, variableState, executor);
         expression.build();
 
         if (!executor.runExpressionInfo(expression)) {

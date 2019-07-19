@@ -9,12 +9,18 @@ public class VariableState {
 
     private ArrayList<Var> vars = new ArrayList<>();
 
+    private boolean isDerived = false;
+
 	/**
 	 * Instantiates a new Variable state.
 	 */
 	public VariableState() {
 
     }
+
+	public VariableState(boolean isDerived) {
+		this.isDerived = isDerived;
+	}
 
 	/**
 	 * Contains boolean.
@@ -137,10 +143,20 @@ public class VariableState {
         return vars;
     }
 
+	/**
+	 * Derived.
+	 *
+	 * @return if this State is Derived of the above state
+	 */
+	public boolean isDerived() {
+		return isDerived;
+	}
+
 	@Override
 	public String toString() {
 		return "VariableState{" +
 				"vars=" + vars +
+				", derived=" + isDerived +
 				'}';
 	}
 }

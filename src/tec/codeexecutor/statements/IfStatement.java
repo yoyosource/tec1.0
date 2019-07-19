@@ -38,7 +38,7 @@ public class IfStatement implements Statement {
                 tokenArrayList.remove(tokenArrayList.size() - 1);
             }
 
-            Expression expression = new Expression(tokenArrayList, variableState);
+            Expression expression = new Expression(tokenArrayList, variableState, executor);
             expression.build();
 
             if (!executor.runExpressionInfo(expression)) {

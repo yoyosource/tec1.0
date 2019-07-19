@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="tec:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/tec_jar</output-path>
-    <root id="archive" name="tec.jar">
-      <element id="module-output" name="tec" />
-    </root>
-  </artifact>
-</component>
