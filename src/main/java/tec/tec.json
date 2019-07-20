@@ -1,0 +1,13 @@
+{
+  "//comments": [
+    "hi there"
+  ],
+  "version": "0.1.0-alpha",
+  "updates": [
+    "insert updates here"
+  ],
+  "authors": ["YoyoNow", "Technotype"],
+  "dependencies": [
+    "json-simple"
+  ]
+}

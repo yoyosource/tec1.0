@@ -25,12 +25,12 @@ print ""
 ```
 
 ## Variables
-There are 2 types of Variables, constant ones and dynamic ones. Dynamic variables are changeable and can be reassigned.
+There are 2 types of variables, constant ones and dynamic ones. Dynamic variables are changeable and can be reassigned.
 The variable type will get evaluated and automatically set.
 ```
 // This Variable is an Integer Variable '0'
 var int = 0
-var int2 = #1
+var int2 = ##1
 
 // This Variable is a Float Variable '0.0'
 var num = 0.0
@@ -50,17 +50,17 @@ let const = "HELP"
 ```
 
 ## Datatypes
-There are 5 Datatypes. The Datatypes are chr for Character, bol for Boolean, num for Float, int for Integer and str for String.
+There are 5 datatypes. The datatypes are chr for Character, bol for Boolean, num for Float, int for Integer and str for String.
 ```
 *chr '<One Character>'
 *bol <true/false>
 *num <Floating point number>
-*int <Non Floating point Number or Hex Number with #>
-*str "One or More Characters" or 'Many Characters'
+*int <Non Floating point Number or Hex Number with ##>
+*str "One or more Characters" or /*'Many Characters'*/
 ```
 
 ## Advanced Printing
-To print a Value of a Variable you can write the Variable name behind the print Statement. The print Statement can also Calculate stuff and you can add Calculations and variables together.
+To print a Value of a variable you can write the variable name behind the print statement. The print statement can also calculate stuff and you can add calculations and variables together.
 ```
 // This print will calculate the sum of the value of 'i' and 1
 var i = 1
@@ -73,7 +73,7 @@ print "c" + (i+1)
 var j = 3
 print j + i
 
-// To put String together you can also use +
+// To put strings together you can also use +
 let k = " World"
 print "Hello" + k 
 ```
@@ -90,10 +90,10 @@ print "Finished to Sleep"
 
 ## Conditional Statements
 
-#### Basic If Statements
-If you want to do choose what you do use 'if'.
+#### Basic 'If' statements
+If you want to choose what you do, use 'if'.
 ```
-// Use an Boolean Expression in the Brackets of the if Statement.
+// Use an Boolean Expression in the Brackets of the 'if' statement.
 if (true) {
 
 }
@@ -111,12 +111,12 @@ if (true || false) {
 }
 ```
 
-#### Intermediary If Statements 
-You can also use variables in Boolean Expressions. The easiest is a boolean variable because you do not need to compare it to anything else.
-To compare use '==' '!=' '>' '<' '>=' '<='. Also you have some basic and advanced Logic Operators as || (or) && (and) and !! (not). Just have in mind that you need to use '<<' '>>' or '«' '»' as Priority Definition in Boolean Expressions.
-Advanced Logic Operators are !& (nand), x| (xor), n| (nor) and xn (xnor).
-Have in mind that the Not Operator '!!' needs to be behind the Boolean value and not before it.
-You can also have a Boolean Expression after a print Statement.
+#### Intermediary 'If' statements 
+You can also use variables in Boolean expressions. The easiest is a boolean variable because you do not need to compare it to anything else.
+To compare use '==', '!=', '>', '<', '>=', '<='. Also you have some basic and advanced logic operators as || (or), && (and), and !! (not). Just have in mind that you need to use '<<', '>>' or '«', '»' as priority definition in Boolean expressions.
+Advanced logic operators are !& (nand), x| (xor), n| (nor) and xn (xnor).
+Have in mind that the not operator '!!' needs to be behind the Boolean value and not before it.
+You can also have a Boolean expression after a print statement.
 ```
 // All Logic Operators
 var b1 = true
@@ -138,8 +138,8 @@ if (i1 == 0) {
 }
 ```
 
-#### Advanced If Statements
-To do something if the if failed you use the 'else' statement. If you want to check if something is something do one thing and if something is something else another thing and if nothing matches do a third things use the 'else if'.
+#### Advanced 'If' statements
+When the 'if' failed you can use the 'else' statement. When you want to check if something is something, do one thing and if something is something else, do another thing, use the 'else if', and if nothing matches do a third things, use the 'else'.
 ```
 var i = 0
 
@@ -151,11 +151,11 @@ if (i == 0) {
     print "i is not zero or one"
 }
 ```
-You can also check if 2 Strings are equal ('equals'), are equalsIgnoreCase ('equalsIgnoreCase'), the one starts with the other ('startsWith'), the one ends with the other ('endsWith'), the one contains the other ('contains') and the one contains the other ignore case ('containsIgnoreCase').
+You can also check if 2 strings are equal, for that use 'equals'. If you want to have it not case sensitive, use 'equalsIgnoreCase'. When you want to check if the first string starts with the other string, use 'startsWith'. Use 'endsWith' provided you want to check if the first string ends with the second string. To check if the first string contains the second, use 'contains'. This can also be used non case sensitive, with 'containsIgnoreCase'.
 
 
 ## Repeating
-To Repeat something multiple times use the 'while' loop. This loop will check first before executing the Loop Part.
+To repeat something multiple times use the 'while' loop. This loop will check first before executing the 'Loop Part'.
 ```
 // Loop through the Numbers from zero to ten
 

@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
+}
+
+group 'Tec'
+version '3.8-ALPHA'
+
+mainClassName = 'tec.Tec'
+
+sourceCompatibility = 1.12
+targetCompatibility = 1.12
+
+repositories {
+    //mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    implementation 'com.github.cliftonlabs:json-simple:3.1.0'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': mainClassName
+        )
+    }
+}

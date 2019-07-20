@@ -1,0 +1,136 @@
+// Casting of Variable Type a to Type b
+
+func String() -> *str {
+    return ""
+}
+
+func String(*chr char) -> *str {
+    return char + ""
+}
+
+func String(*str string) -> *str {
+    return string
+}
+
+func String(*num number) -> *str {
+    return number + ""
+}
+
+func String(*int integer) -> *str {
+    return integer + ""
+}
+
+func String(*bol boolean) -> *str {
+    return boolean + ""
+}
+
+func Character() -> *chr {
+    return ''
+}
+
+func Character(*chr char) -> *chr {
+    return char
+}
+
+func Character(*str string) -> *chr {
+    cast *chr casted string
+    return casted
+}
+
+func Character(*num number) -> *chr {
+    cast *chr casted number
+    return casted
+}
+
+func Character(*int integer) -> *chr {
+    cast *chr casted integer
+    return casted
+}
+
+func Character(*bol boolean) -> *chr {
+    cast *chr casted boolean
+    return casted
+}
+
+func Number() -> *num {
+    return 0.0
+}
+
+func Number(*chr char) -> *num {
+    cast *num casted char
+    return casted
+}
+
+func Number(*str string) -> *num {
+    cast *num casted string
+    return casted
+}
+
+func Number(*num number) -> *num {
+    return number
+}
+
+func Number(*int integer) -> *num {
+    return integer + 0.0
+}
+
+func Number(*bol boolean) -> *num {
+    cast *num casted boolean
+    return casted
+}
+
+func Integer() -> *int {
+    return 0
+}
+
+func Integer(*chr char) -> *int {
+    cast *int casted char
+    return casted
+}
+
+func Integer(*str string) -> *int {
+    cast *int casted string
+    return casted
+}
+
+func Integer(*num number) -> *int {
+    cast *int casted number
+    return casted
+}
+
+func Integer(*int integer) -> *int {
+    return integer
+}
+
+func Integer(*bol boolean) -> *int {
+    cast *num casted boolean
+    return casted
+}
+
+func Boolean() -> *bol {
+    return false
+}
+
+func Boolean(*chr char) -> *bol {
+    cast *bol casted char
+    return casted
+}
+
+func Boolean(*str string) -> *bol {
+    cast *bol casted string
+    return casted
+}
+
+func Boolean(*num number) -> *bol {
+    cast *bol casted number
+    return casted
+}
+
+func Boolean(*int integer) -> *bol {
+    cast *bol casted integer
+    return casted
+}
+
+func Boolean(*bol boolean) -> *bol {
+    return boolean
+}

@@ -1,0 +1,68 @@
+// File Management
+
+func File(*str fileName) -> *str {
+	file file = fileName
+	return file
+}
+
+func File(*str fileName, *bol onlySub) -> *str {
+	if (onlySub) {
+		if (fileName startsWith "*") {
+			file file = fileName
+			return file
+		} else {
+			file file = "*" + fileName
+			return file
+		}
+	} else {
+		file file = fileName
+		return file
+	}
+}
+
+func createFile(*str fileName) {
+	file fileName create
+}
+
+func deleteFile(*str fileName) {
+	file fileName delete
+}
+
+func clearFile(*str fileName) {
+	file fileName delete
+	file fileName create
+}
+
+// Scanner
+
+func Scanner(*str file) -> *str {
+	if (file startsWith "FILE:") {
+		scanner scanner = file
+		return scanner
+	} else {
+		return ""
+	}
+}
+
+func Scanner() -> *str {
+	scanner scanner = "console"
+	return scanner
+}
+
+// Writer
+
+func Writer(*str fileName, *str toWrite) {
+	printWriter fileName true toWrite
+}
+
+func Writer(*str fileName, *str toWrite, *bol append) {
+	printWriter fileName append toWrite
+}
+
+func Writer(*str toWrite) {
+	printWriter "console" false toWrite
+}
+
+func Writer(*str toWrite, *bol newLine) {
+	printWriter "console" newLine toWrite
+}

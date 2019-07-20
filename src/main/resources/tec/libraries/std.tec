@@ -1,0 +1,30 @@
+import std:Math
+import std:Casting
+import std:Security
+import std:IO
+
+// Length methods
+
+func length(*str string) -> *int {
+	return string:length
+}
+
+func length(*int int) -> *int {
+	return String(int):length
+}
+
+func length(*num num) -> *int {
+	return String(num):length
+}
+
+func len(*str string) -> *int {
+	return string:length
+}
+
+func len(*int int) -> *int {
+	return String(int):length
+}
+
+func len(*num num) -> *int {
+	return String(num):length
+}

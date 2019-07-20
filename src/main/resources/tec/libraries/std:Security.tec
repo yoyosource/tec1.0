@@ -1,0 +1,125 @@
+// MD5 Hashes
+
+func hashMD5(*str toHash) -> *str {
+    hash MD5 hashed toHash
+    return hashed
+}
+
+func hashMD5(*num toHash) -> *str {
+    hash MD5 hashed toHash
+    return hashed
+}
+
+func hashMD5(*int toHash) -> *str {
+    hash MD5 hashed toHash
+    return hashed
+}
+
+func hashMD5(*bol toHash) -> *str {
+    hash MD5 hashed toHash
+    return hashed
+}
+
+func hashMD5(*chr toHash) -> *str {
+    hash MD5 hashed toHash
+    return hashed
+}
+
+// SHA1 Hashes
+
+func hashSHA1(*str toHash) -> *str {
+    hash SHA1 hashed toHash
+    return hashed
+}
+
+func hashSHA1(*num toHash) -> *str {
+    hash SHA1 hashed toHash
+    return hashed
+}
+
+func hashSHA1(*int toHash) -> *str {
+    hash SHA1 hashed toHash
+    return hashed
+}
+
+func hashSHA1(*bol toHash) -> *str {
+    hash SHA1 hashed toHash
+    return hashed
+}
+
+func hashSHA1(*chr toHash) -> *str {
+    hash SHA1 hashed toHash
+    return hashed
+}
+
+// SHA256 Hashes
+
+func hash(*str toHash) -> *str {
+	hash SHA256 hashed toHash
+    return hashed
+}
+
+func hash(*num toHash) -> *str {
+	hash SHA256 hashed toHash
+    return hashed
+}
+
+func hash(*int toHash) -> *str {
+	hash SHA256 hashed toHash
+    return hashed
+}
+
+func hash(*bol toHash) -> *str {
+	hash SHA256 hashed toHash
+    return hashed
+}
+
+func hash(*chr toHash) -> *str {
+	hash SHA256 hashed toHash
+    return hashed
+}
+
+func hashSHA256(*str toHash) -> *str {
+    hash SHA256 hashed toHash
+    return hashed
+}
+
+func hashSHA256(*num toHash) -> *str {
+    hash SHA256 hashed toHash
+    return hashed
+}
+
+func hashSHA256(*int toHash) -> *str {
+    hash SHA256 hashed toHash
+    return hashed
+}
+
+func hashSHA256(*bol toHash) -> *str {
+    hash SHA256 hashed toHash
+    return hashed
+}
+
+func hashSHA256(*chr toHash) -> *str {
+    hash SHA256 hashed toHash
+    return hashed
+}
+
+// Base 64 Encoding / Decoding
+
+func encode() -> *str {
+	return ""
+}
+
+func encode(*str toEncode) -> *str {
+	base64 encode encoded toEncode
+	return encoded
+}
+
+func decode() -> *str {
+	return ""
+}
+
+func decode(*str toDecode) -> *str {
+	base64 decode decoded toDecode
+	return decoded
+}
