@@ -203,7 +203,7 @@ public class ImportManager {
             }
             InputStream inputStream;
             if (s.startsWith("std")) {
-                inputStream = Tec.class.getResourceAsStream("/tec/libraries/" + s + ".tec");
+                inputStream = Tec.class.getResourceAsStream("/tec/libraries/" + s.replaceAll(":", "-") + ".tec");
             } else {
                 try {
                     inputStream = new FileInputStream(groundPath + s + ".tec");
