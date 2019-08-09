@@ -4,7 +4,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.0.0'
 }
 
-group 'Tec'
+group 'tec'
 version '3.8-ALPHA'
 
 mainClassName = 'tec.Tec'
@@ -21,6 +21,17 @@ dependencies {
     implementation 'com.github.cliftonlabs:json-simple:3.1.0'
 }
 
+allprojects {
+
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked"
+        }
+    }
+
+    // ...
+}
+
 jar {
     manifest {
         attributes(
@@ -28,3 +39,32 @@ jar {
         )
     }
 }
+
+task compileTecl {
+    description 'Compiles stdlib to tecl files'
+    group "tec"
+
+    mustRunAfter classes
+
+    doLast {
+        def command = "java -classpath ${buildDir}/classes/java/main tec.BuildTeclLibs /Users/jojo/IdeaProjects/tec/src/main/resources/tec/libraries/std.tec"
+        def retval = command.execute().text.trim()
+
+        command = "java -classpath ${buildDir}/classes/java/main tec.BuildTeclLibs /Users/jojo/IdeaProjects/tec/src/main/resources/tec/libraries/std-Casting.tec"
+        retval = command.execute().text.trim()
+
+        command = "java -classpath ${buildDir}/classes/java/main tec.BuildTeclLibs /Users/jojo/IdeaProjects/tec/src/main/resources/tec/libraries/std-IO.tec"
+        retval = command.execute().text.trim()
+
+        command = "java -classpath ${buildDir}/classes/java/main tec.BuildTeclLibs /Users/jojo/IdeaProjects/tec/src/main/resources/tec/libraries/std-Math.tec"
+        retval = command.execute().text.trim()
+
+        command = "java -classpath ${buildDir}/classes/java/main tec.BuildTeclLibs /Users/jojo/IdeaProjects/tec/src/main/resources/tec/libraries/std-Security.tec"
+        retval = command.execute().text.trim()
+
+        command = "java -classpath ${buildDir}/classes/java/main tec.BuildTeclLibs /Users/jojo/IdeaProjects/tec/src/main/resources/tec/libraries/std-String.tec"
+        retval = command.execute().text.trim()
+    }
+}
+
+shadowJar.dependsOn compileTecl

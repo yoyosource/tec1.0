@@ -98,7 +98,7 @@ public class Expression {
             stringOutput();
             if (type != null) {
                 if (type.equals("num")) {
-                    outputObject = Float.parseFloat(outputString);
+                    outputObject = Double.parseDouble(outputString);
                 } else if (type.equals("int")) {
                     outputObject = Integer.parseInt(outputString);
                 } else {
@@ -153,6 +153,9 @@ public class Expression {
 	    if (executor != null) {
             for (int i = 0; i < tokens.size(); i++) {
                 if (!tokens.get(i).getKey().equals("COD")) {
+                    continue;
+                }
+                if (i < tokens.size() - 1 && !(tokens.get(i + 1).getKey().equals("STb") && tokens.get(i + 1).getVal().equals("("))) {
                     continue;
                 }
                 int j = i + 1;
@@ -392,6 +395,54 @@ public class Expression {
 
         String compare = compareToken.getVal().toString();
 
+        if (t2.equals("typ") && compare.equals("typeof")) {
+            if (t1.equals(tokens2.get(0).getVal().toString())) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        if (t2.equals("typ") && compare.equals("canbe")) {
+            String typeTo = tokens2.get(0).getVal().toString();
+            if (typeTo.equals("str")) {
+                return true;
+            }
+            if (typeTo.equals("int")) {
+                try {
+                    Integer.parseInt(s1.toString());
+                    return true;
+                } catch (Exception e) {
+
+                }
+                try {
+                    if (s1.toString().startsWith("##")) {
+                        Integer.parseInt(s1.toString().substring(2), 16);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (Exception e2) {
+
+                }
+                return false;
+            }
+            if (typeTo.equals("num")) {
+                try {
+                    Double.parseDouble(s1.toString());
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            if (typeTo.equals("bol")) {
+                return true;
+            }
+            if (typeTo.equals("chr")) {
+                return true;
+            }
+        }
+
         if (compare.equals("==")) {
             if (s1.equals(s2) && t1.equals(t2)) {
                 return true;
@@ -453,28 +504,28 @@ public class Expression {
         }
         if (t1.equals("num") && t2.equals("num")) {
             if (compare.equals(">")) {
-                if ((float)s1 > (float)s2) {
+                if ((double)s1 > (double)s2) {
                     return true;
                 } else {
                     return false;
                 }
             }
             if (compare.equals("<")) {
-                if ((float)s1 < (float)s2) {
+                if ((double)s1 < (double)s2) {
                     return true;
                 } else {
                     return false;
                 }
             }
             if (compare.equals(">=")) {
-                if ((float)s1 >= (float)s2) {
+                if ((double)s1 >= (double)s2) {
                     return true;
                 } else {
                     return false;
                 }
             }
             if (compare.equals("<=")) {
-                if ((float)s1 <= (float)s2) {
+                if ((double)s1 <= (double)s2) {
                     return true;
                 } else {
                     return false;
@@ -483,28 +534,28 @@ public class Expression {
         }
         if (t1.equals("int") && t2.equals("num")) {
             if (compare.equals(">")) {
-                if ((int)s1 > (float)s2) {
+                if ((int)s1 > (double)s2) {
                     return true;
                 } else {
                     return false;
                 }
             }
             if (compare.equals("<")) {
-                if ((int)s1 < (float)s2) {
+                if ((int)s1 < (double)s2) {
                     return true;
                 } else {
                     return false;
                 }
             }
             if (compare.equals(">=")) {
-                if ((int)s1 >= (float)s2) {
+                if ((int)s1 >= (double)s2) {
                     return true;
                 } else {
                     return false;
                 }
             }
             if (compare.equals("<=")) {
-                if ((int)s1 <= (float)s2) {
+                if ((int)s1 <= (double)s2) {
                     return true;
                 } else {
                     return false;
@@ -543,28 +594,28 @@ public class Expression {
         }
         if (t1.equals("num") && t2.equals("int")) {
             if (compare.equals(">")) {
-                if ((float)s1 > (int)s2) {
+                if ((double)s1 > (int)s2) {
                     return true;
                 } else {
                     return false;
                 }
             }
             if (compare.equals("<")) {
-                if ((float)s1 < (int)s2) {
+                if ((double)s1 < (int)s2) {
                     return true;
                 } else {
                     return false;
                 }
             }
             if (compare.equals(">=")) {
-                if ((float)s1 >= (int)s2) {
+                if ((double)s1 >= (int)s2) {
                     return true;
                 } else {
                     return false;
                 }
             }
             if (compare.equals("<=")) {
-                if ((float)s1 <= (int)s2) {
+                if ((double)s1 <= (int)s2) {
                     return true;
                 } else {
                     return false;
@@ -584,6 +635,46 @@ public class Expression {
 	    return true;
     }
 
+    private void stringFunctions() {
+        for (int i = 0; i < tokens.size() - 2; i++) {
+            Token tok1 = tokens.get(i);
+            Token tok2 = tokens.get(i + 1);
+            Token tok3 = tokens.get(i + 2);
+
+            if (!tok1.getKey().equals("str") || !tok2.getKey().equals("SEP") || !tok2.getVal().toString().equals(":") || !tok3.getKey().equals("COD")) {
+                continue;
+            }
+
+            if (tok3.getVal().toString().equals("length")) {
+                int lenght = tok1.getVal().toString().length();
+                tokens.set(i, new Token("int", lenght));
+                tokens.remove(i + 1);
+                tokens.remove(i + 1);
+            }
+
+            if (tok3.getVal().toString().equals("trim")) {
+                String trim = tok1.getVal().toString().trim();
+                tokens.set(i, new Token("str", trim));
+                tokens.remove(i + 1);
+                tokens.remove(i + 1);
+            }
+
+            if (tok3.getVal().toString().equals("toUpperCase")) {
+                String toUpperCase = tok1.getVal().toString().toUpperCase();
+                tokens.set(i, new Token("str", toUpperCase));
+                tokens.remove(i + 1);
+                tokens.remove(i + 1);
+            }
+
+            if (tok3.getVal().toString().equals("toLowerCase")) {
+                String toLowerCase = tok1.getVal().toString().toLowerCase();
+                tokens.set(i, new Token("str", toLowerCase));
+                tokens.remove(i + 1);
+                tokens.remove(i + 1);
+            }
+        }
+    }
+
     private void stringOutput() {
 
 	    tokens = replace(tokens);
@@ -591,8 +682,10 @@ public class Expression {
 	        return;
         }
 
+	    stringFunctions();
+
         if (isCalculation(tokens)) {
-            float f = calculator.calc(tokens.stream().map(token -> token.getVal().toString()).collect(Collectors.joining()));
+            double f = calculator.calc(tokens.stream().map(token -> token.getVal().toString()).collect(Collectors.joining()));
             if (isOnlyInt(tokens)) {
                 type = "int";
                 outputString = "" + (int)f;
@@ -610,7 +703,7 @@ public class Expression {
             int start = getOpentBracket(startIndex, tokens);
             ArrayList<Token> tokens = getTokensToClosingBracket(this.tokens, start);
             if (isCalculation(tokens)) {
-                float f = calculator.calc(tokens.stream().map(token -> token.getVal().toString()).collect(Collectors.joining()));
+                double f = calculator.calc(tokens.stream().map(token -> token.getVal().toString()).collect(Collectors.joining()));
                 tokens = removeToClosingBracket(this.tokens, start);
                 if (isOnlyInt(tokens)) {
                     tokens.add(start, new Token("int", (int)f));
@@ -624,22 +717,7 @@ public class Expression {
             }
         }
 
-        for (int i = 0; i < tokens.size() - 2; i++) {
-            Token tok1 = tokens.get(i);
-            Token tok2 = tokens.get(i + 1);
-            Token tok3 = tokens.get(i + 2);
-
-            if (!tok1.getKey().equals("str") || !tok2.getKey().equals("SEP") || !tok2.getVal().toString().equals(":") || !tok3.getKey().equals("COD")) {
-                continue;
-            }
-
-            if (tok3.getVal().toString().equals("length")) {
-                int lenght = tok1.getVal().toString().length();
-                tokens.set(i, new Token("int", lenght));
-                tokens.remove(i + 1);
-                tokens.remove(i + 1);
-            }
-        }
+        stringFunctions();
 
         for (int i = tokens.size() - 1; i >= 0; i--) {
             if (tokens.get(i).getKey().equals("STb")) {
@@ -654,7 +732,7 @@ public class Expression {
             }
         }
 
-        type = "str";
+        type = tokens.get(0).getKey();
         outputString = toStringOutput();
     }
 

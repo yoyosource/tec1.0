@@ -17,7 +17,6 @@ public class Calculator {
     private ArrayList<Integer> priorities;
 
     private long calcTime1 = 0;
-    private long calcTime2 = 0;
 
 	/**
 	 * Instantiates a new Calculator.
@@ -60,8 +59,6 @@ public class Calculator {
 	public long getCalcTime(String mode) {
         if (mode.equals("ms")) {
             return calcTime1;
-        } else if (mode.equals("ns")) {
-            return calcTime2;
         } else if (mode.equals("s")) {
             return calcTime1 / 1000;
         }
@@ -79,9 +76,7 @@ public class Calculator {
 
     private void time() {
         calcTime1 -= System.currentTimeMillis();
-        calcTime2 -= System.nanoTime();
         calcTime1 *= -1;
-        calcTime2 *= -1;
     }
 
 	/**
@@ -92,36 +87,6 @@ public class Calculator {
 	 */
 	public float calc(String s) {
         calcTime1 = System.currentTimeMillis();
-        calcTime2 = System.nanoTime();
-
-        /*
-        if (s.equals("?")) {
-            System.out.println("");
-            System.out.println("calculator.Calculator:");
-            System.out.println("- Priority 1:");
-            System.out.println("-- + -");
-            System.out.println("- Priority 2:");
-            System.out.println("-- * / % !");
-            System.out.println("- Priority 3:");
-            System.out.println("-- ^ root");
-            System.out.println("- Priority 4:");
-            System.out.println("-- ( ) |");
-            System.out.println("");
-            System.out.println("calculator.History:");
-            calculations.PrintStatement();
-            System.out.println("");
-            time();
-            return 0;
-        }
-        if (s.toLowerCase().equals("history")) {
-            System.out.println("");
-            System.out.println("calculator.History:");
-            System.out.println(calculations.toString());
-            System.out.println("");
-            time();
-            return 0;
-        }
-        */
 
         if (s.equals("=")) {
             if (lastCalculation.length() != 0) {

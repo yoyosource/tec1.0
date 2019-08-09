@@ -81,12 +81,29 @@ public class Tec {
         }
         */
 
+        String url = "";
+
+        boolean skip = false;
+
+        if (args.length == 1) {
+            String s = args[0];
+            if (new File(s).exists()) {
+                skip = true;
+                url = args[0];
+            }
+        }
+
+        if (args.length == 2) {
+            if (new File(args[1]).exists()) {
+                skip = true;
+                url = args[0] + args[1];
+            }
+        }
+
         debug = DebugLevel.NONE;
 
-        String url;
+        if (skip) {
 
-        if (false) {
-            url = "/Users/jojo/IdeaProjects/tec/src/test.tec";
         } else {
             InputStreamReader inputStreamReader = new InputStreamReader(System.in);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -114,7 +131,7 @@ public class Tec {
             if (token.getKey().equals("NNN")) {
                 stringBuilder.append("<" + i + ": NNN>" + "NNN \n");
             } else {
-                stringBuilder.append("<" + i + ": " + token.getKey() + ">" + token.getVal() + " ");
+                stringBuilder.append("<" + i + ": " + token.getKey() + ">" + token.getVal().toString().replaceAll("\n", "\\\\n") + " ");
             }
             i++;
         }
@@ -131,7 +148,7 @@ public class Tec {
 
         implementor.add(new FileStatement());
         implementor.add(new ScannerStatement());
-        //implementor.add(new WriterStatement());
+        implementor.add(new WriterStatement());
 
         implementor.add(new SleepStatement());
 

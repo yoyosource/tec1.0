@@ -1,10 +1,14 @@
 package tec.codeexecutor;
 
+import tec.exceptions.AccessException;
+
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
  * The type Var.
  */
+@SuppressWarnings("unchecked")
 public class Var {
 
     private String name;
@@ -12,6 +16,8 @@ public class Var {
     private String type;
 
     private boolean constant = false;
+
+    private boolean array = false;
 
 	/**
 	 * Instantiates a new Var.
@@ -30,6 +36,8 @@ public class Var {
 	    constant = true;
     }
 
+    public void setArray() { array = true; }
+
 	/**
 	 * Gets name.
 	 *
@@ -46,6 +54,16 @@ public class Var {
 	 */
 	public Object getValue() {
         return value;
+    }
+
+    public Object getValue(int index) {
+	    if (!array) {
+	        throw new AccessException("This variable is not an array");
+        }
+	    if (!(value instanceof ArrayList)) {
+	        throw new AccessException("This variable is not of type Array but was changed to array beforehand");
+        }
+        return ((ArrayList)value).get(index);
     }
 
 	/**
@@ -74,6 +92,53 @@ public class Var {
         if (this.type.equals("int") && type.equals("num")) {
             this.value = (Integer)value;
         }
+    }
+
+    public void addValue(Object value, String type) {
+        if (constant) {
+            return;
+        }
+
+        if (!array) {
+            return;
+        }
+
+        if (this.type.equals(type) || (this.type.equals("num") && type.equals("int"))) {
+            if (!(this.value instanceof ArrayList)) {
+                throw new AccessException("This variable is not of type Array but was changed to array beforehand");
+            }
+            if (value instanceof ArrayList) {
+                throw new AccessException("You cannot add an Array to and Array");
+            }
+            ((ArrayList)this.value).add(value);
+        }
+        if (this.type.equals("int") && type.equals("num")) {
+            if (!(this.value instanceof ArrayList)) {
+                throw new AccessException("This variable is not of type Array but was changed to array beforehand");
+            }
+            if (value instanceof ArrayList) {
+                throw new AccessException("You cannot add an Array to and Array");
+            }
+            ((ArrayList)this.value).add(value);
+        }
+    }
+
+    public void setValue(Object value, String type, int index) {
+
+    }
+
+    public void removeValue(int index) {
+
+    }
+
+    public void clear() {
+	    if (!array) {
+	        throw new AccessException("This variable is not of type Array");
+        }
+	    if (!(value instanceof ArrayList)) {
+	        throw new AccessException("You cannot clear a not Array variable");
+        }
+        ((ArrayList)value).clear();
     }
 
     @Override

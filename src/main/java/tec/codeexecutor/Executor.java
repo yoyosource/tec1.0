@@ -225,6 +225,7 @@ public class Executor {
 
 			if (index == triggerJumpBackFunction.get(triggerJumpBackFunction.size() - 1)) {
 				jumpBackFunc(null);
+				jumpToLineEnd();
 			}
 			if (index == triggerVariableStackRemove.get(triggerVariableStackRemove.size() - 1)) {
 				triggerVariableStackRemove.remove(triggerVariableStackRemove.size() - 1);
@@ -257,6 +258,8 @@ public class Executor {
 			running = false;
 			return;
 		}
+
+		running = true;
 
 		if (type == null) {
 			returnSystem = null;
@@ -375,7 +378,14 @@ public class Executor {
 	 * Create new Variable State without previous Variables
 	 */
 	public void createNewVariableState() {
-		variableStateStack.add(new VariableState());
+		VariableState variableState = new VariableState();
+		for (Var var : variableStateStack.firstElement().getVars()) {
+			String varName = var.getName();
+			if (varName.matches("[A-Z][A-Z_\\-]+")) {
+				variableState.addVar(var);
+			}
+		}
+		variableStateStack.add(variableState);
 	}
 
 	/**
@@ -469,6 +479,247 @@ public class Executor {
 	}
 
 	private boolean runVariable() {
+		if (tokens.get(index + 1).getKey().equals("OPE")) {
+			if (tokens.get(index + 2).getKey().equals("OPE") && tokens.get(index + 1).getVal().equals("+") && tokens.get(index + 2).getVal().equals("+")) {
+				String name = tokens.get(index).getVal().toString();
+
+				if (!variableStateStack.lastElement().getVarType(name).equals("int") && !variableStateStack.lastElement().getVarType(name).equals("num")) {
+					return false;
+				}
+
+				VariableState variableState = variableStateStack.lastElement();
+
+				if (variableState.getVarType(name).equals("int")) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) + 1, variableState.getVarType(name)))) {
+						return true;
+					}
+				} else {
+					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) + 1, variableState.getVarType(name)))) {
+						return true;
+					}
+				}
+				return false;
+			}
+			if (tokens.get(index + 2).getKey().equals("OPE") && tokens.get(index + 1).getVal().equals("-") && tokens.get(index + 2).getVal().equals("-")) {
+				String name = tokens.get(index).getVal().toString();
+
+				if (!variableStateStack.lastElement().getVarType(name).equals("int") && !variableStateStack.lastElement().getVarType(name).equals("num")) {
+					return false;
+				}
+
+				VariableState variableState = variableStateStack.lastElement();
+
+				if (variableState.getVarType(name).equals("int")) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) - 1, variableState.getVarType(name)))) {
+						return true;
+					}
+				} else {
+					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) - 1, variableState.getVarType(name)))) {
+						return true;
+					}
+				}
+				return false;
+			}
+			if (tokens.get(index + 2).getKey().equals("ASG") && tokens.get(index + 1).getVal().equals("+")) {
+				String name = tokens.get(index).getVal().toString();
+				index += 2;
+
+				ArrayList<Token> tokens = getTokensToNextLine();
+				Expression expression = new Expression(tokens, variableStateStack.lastElement(), this);
+				expression.build();
+
+				if (!runExpressionInfo(expression)) {
+					return false;
+				}
+
+				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+					return false;
+				}
+
+				if (!variableStateStack.lastElement().getVarType(name).equals("int") && !variableStateStack.lastElement().getVarType(name).equals("num")) {
+					return false;
+				}
+
+				VariableState variableState = variableStateStack.lastElement();
+
+				if (variableState.getVarType(name).equals("int")) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) + (int)expression.getObject(), variableState.getVarType(name)))) {
+						return true;
+					}
+				} else {
+					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) + (float)expression.getObject(), variableState.getVarType(name)))) {
+						return true;
+					}
+				}
+				return false;
+			}
+			if (tokens.get(index + 2).getKey().equals("ASG") && tokens.get(index + 1).getVal().equals("-")) {
+				String name = tokens.get(index).getVal().toString();
+				index += 2;
+
+				ArrayList<Token> tokens = getTokensToNextLine();
+				Expression expression = new Expression(tokens, variableStateStack.lastElement(), this);
+				expression.build();
+
+				if (!runExpressionInfo(expression)) {
+					return false;
+				}
+
+				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+					return false;
+				}
+
+				if (!variableStateStack.lastElement().getVarType(name).equals("int") && !variableStateStack.lastElement().getVarType(name).equals("num")) {
+					return false;
+				}
+
+				VariableState variableState = variableStateStack.lastElement();
+
+				if (variableState.getVarType(name).equals("int")) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) - (int)expression.getObject(), variableState.getVarType(name)))) {
+						return true;
+					}
+				} else {
+					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) - (float)expression.getObject(), variableState.getVarType(name)))) {
+						return true;
+					}
+				}
+				return false;
+			}
+			if (tokens.get(index + 2).getKey().equals("ASG") && tokens.get(index + 1).getVal().equals("*")) {
+				String name = tokens.get(index).getVal().toString();
+				index += 2;
+
+				ArrayList<Token> tokens = getTokensToNextLine();
+				Expression expression = new Expression(tokens, variableStateStack.lastElement(), this);
+				expression.build();
+
+				if (!runExpressionInfo(expression)) {
+					return false;
+				}
+
+				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+					return false;
+				}
+
+				if (!variableStateStack.lastElement().getVarType(name).equals("int") && !variableStateStack.lastElement().getVarType(name).equals("num")) {
+					return false;
+				}
+
+				VariableState variableState = variableStateStack.lastElement();
+
+				if (variableState.getVarType(name).equals("int")) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) * (int)expression.getObject(), variableState.getVarType(name)))) {
+						return true;
+					}
+				} else {
+					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) * (float)expression.getObject(), variableState.getVarType(name)))) {
+						return true;
+					}
+				}
+				return false;
+			}
+			if (tokens.get(index + 2).getKey().equals("ASG") && tokens.get(index + 1).getVal().equals("/")) {
+				String name = tokens.get(index).getVal().toString();
+				index += 2;
+
+				ArrayList<Token> tokens = getTokensToNextLine();
+				Expression expression = new Expression(tokens, variableStateStack.lastElement(), this);
+				expression.build();
+
+				if (!runExpressionInfo(expression)) {
+					return false;
+				}
+
+				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+					return false;
+				}
+
+				if (!variableStateStack.lastElement().getVarType(name).equals("int") && !variableStateStack.lastElement().getVarType(name).equals("num")) {
+					return false;
+				}
+
+				VariableState variableState = variableStateStack.lastElement();
+
+				if (variableState.getVarType(name).equals("int")) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) / (int)expression.getObject(), variableState.getVarType(name)))) {
+						return true;
+					}
+				} else {
+					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) / (float)expression.getObject(), variableState.getVarType(name)))) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			if (tokens.get(index + 2).getKey().equals("ASG") && tokens.get(index + 1).getVal().equals("^")) {
+				String name = tokens.get(index).getVal().toString();
+				index += 2;
+
+				ArrayList<Token> tokens = getTokensToNextLine();
+				Expression expression = new Expression(tokens, variableStateStack.lastElement(), this);
+				expression.build();
+
+				if (!runExpressionInfo(expression)) {
+					return false;
+				}
+
+				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+					return false;
+				}
+
+				if (!variableStateStack.lastElement().getVarType(name).equals("int") && !variableStateStack.lastElement().getVarType(name).equals("num")) {
+					return false;
+				}
+
+				VariableState variableState = variableStateStack.lastElement();
+
+				if (variableState.getVarType(name).equals("int")) {
+					if (variableState.setVar(name, new Var(name, (int)Math.pow((int)variableState.getVarValue(name), (int)expression.getObject()), variableState.getVarType(name)))) {
+						return true;
+					}
+				} else {
+					if (variableState.setVar(name, new Var(name, (float)Math.pow((float)variableState.getVarValue(name), (float)expression.getObject()), variableState.getVarType(name)))) {
+						return true;
+					}
+				}
+				return false;
+			}
+			if (tokens.get(index + 2).getKey().equals("ASG") && tokens.get(index + 1).getVal().equals("%")) {
+				String name = tokens.get(index).getVal().toString();
+				index += 2;
+
+				ArrayList<Token> tokens = getTokensToNextLine();
+				Expression expression = new Expression(tokens, variableStateStack.lastElement(), this);
+				expression.build();
+
+				if (!runExpressionInfo(expression)) {
+					return false;
+				}
+
+				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+					return false;
+				}
+
+				if (!variableStateStack.lastElement().getVarType(name).equals("int") && !variableStateStack.lastElement().getVarType(name).equals("num")) {
+					return false;
+				}
+
+				VariableState variableState = variableStateStack.lastElement();
+
+				if (variableState.getVarType(name).equals("int")) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) % (int)expression.getObject(), variableState.getVarType(name)))) {
+						return true;
+					}
+				} else {
+					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) % (float)expression.getObject(), variableState.getVarType(name)))) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}
 		if (tokens.get(index + 1).getKey().equals("ASG")) {
 
 			String name = tokens.get(index).getVal().toString();
@@ -638,6 +889,7 @@ public class Executor {
 
             if (index == triggerJumpBackFunction.get(triggerJumpBackFunction.size() - 1)) {
                 jumpBackFunc(null);
+                jumpToLineEnd();
             }
             if (index == triggerVariableStackRemove.get(0)) {
                 triggerVariableStackRemove.remove(0);
@@ -720,9 +972,6 @@ public class Executor {
 			int[] ints = getBlockRange(in);
 			if (ints[1] != tokens.size() - 1) {
 				ints[1] = ints[1] + 1;
-			} else {
-				in = getBlockRange(in)[1];
-				break;
 			}
 
 			if (gotElse) {

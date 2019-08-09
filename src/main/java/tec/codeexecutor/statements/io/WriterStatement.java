@@ -6,6 +6,9 @@ import tec.codeexecutor.VariableState;
 import tec.interfaces.Statement;
 import tec.utils.Token;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class WriterStatement implements Statement {
@@ -51,8 +54,25 @@ public class WriterStatement implements Statement {
             return false;
         }
 
-        //System.out.println(expression1.getObject() + " " + expression2.getObject() + " " + expression3.getObject());
+        if (expression1.getObject().equals("console")) {
+            if ((boolean) expression2.getObject()) {
+                System.out.println(expression3.getObject());
+            } else {
+                System.out.print(expression3.getObject());
+            }
+            return true;
+        } else if (expression1.getObject().toString().startsWith("FILE:")) {
+            try {
+                File file = new File(expression1.getObject().toString().substring("FILE:".length()));
+                FileWriter fr = new FileWriter(file, (boolean)expression2.getObject());
+                fr.write(expression3.getObject().toString());
+                fr.close();
+            } catch (IOException e) {
+                return false;
+            }
+            return true;
+        }
 
-        return true;
+        return false;
     }
 }

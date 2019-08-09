@@ -29,10 +29,13 @@ public class SleepStatement implements Statement {
             return false;
         }
 
-        try {
-            Thread.sleep((int)expression.getObject());
-        } catch (Exception e) {
+        if (!expression.getType().equals("int")) {
             return false;
+        }
+
+        long t = System.currentTimeMillis();
+        while (System.currentTimeMillis() - t < (int)expression.getObject()) {
+
         }
 
         return true;

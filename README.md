@@ -10,7 +10,7 @@ print "Hello World"
 If you execute this Program it will output Hello World.
 
 ## Comments
-One line Comments start with '//'. There are also Block comments which start with '/\*' at the start of a line and end with '\*/' at the end of a line.
+One line Comments start with '//'. There are also Block comments which start with '\*' at the start of a line and end with '*/' at the end of a line.
 ```
 // This prints "Hello World"
 print "Hello World"
@@ -25,6 +25,7 @@ print ""
 ```
 
 ## Variables
+#### Creating
 There are 2 types of variables, constant ones and dynamic ones. Dynamic variables are changeable and can be reassigned.
 The variable type will get evaluated and automatically set.
 ```
@@ -47,6 +48,43 @@ var str2 = 'Hello World'
 
 // To Create a Constant instead of using 'var' use 'let'
 let const = "HELP"
+```
+
+#### Reassigning
+You can reassign a dynamic variable by writing its name and the Assign operator '=' behind it. After the Operator there is the new Value the variable should hold.
+If you only want to increment a Integer or Number variable by 1 or decrement it by 1 use '++' and '--'. You can also use '+=' followed by the increment value. Instead of the '+=' to increment you can also use '-=' to decrement the variable by a specific value.
+If you want to multiply a variable by a specific value use '*=' and reverse it with '/='. You can also calculate the Power of a variable with '^='. To direct access the modulo function use '%='.
+```
+var i = 0
+print i
+i++
+print i
+i--
+print i
+i += 10
+print i
+i -= 5
+print i
+i *= 6
+print i
+i /= 3
+print i
+i ^= 2
+print i
+i %= 2
+print i
+```
+The output of the Code above is as follows.
+```
+0
+1
+0
+10
+5
+30
+10
+100
+0
 ```
 
 ## Datatypes
@@ -152,6 +190,7 @@ if (i == 0) {
 }
 ```
 You can also check if 2 strings are equal, for that use 'equals'. If you want to have it not case sensitive, use 'equalsIgnoreCase'. When you want to check if the first string starts with the other string, use 'startsWith'. Use 'endsWith' provided you want to check if the first string ends with the second string. To check if the first string contains the second, use 'contains'. This can also be used non case sensitive, with 'containsIgnoreCase'.
+If you want to check if a variable is of type x you can use the 'typeof' keyword. To check if something can be some other type use the 'canbe' keyword. Both keywords needs a type following!
 
 
 ## Repeating
@@ -169,7 +208,7 @@ while (i < 10) {
 ## Functions
 
 #### Definition
-Functions are used to declare one Code Snippet that you want to use multiple times throughout your project. The 'func' key will get used. After that there is the name of your function followed by an opening and closing Bracket.
+Functions are used to declare one code snippet that you want to use multiple times throughout your project. The 'func' key will get used. After that there is the name of your function followed by an opening and closing bracket.
 ```
 // This is a valid function
 func example() {
@@ -200,7 +239,7 @@ example()
 ```
 
 #### Parameter
-A function can have Parameters. These parameters are having a type and a name. To add a Parameter to a function the Parameter type followed by the name needs to be put into the '()' brackets. To have multiple Parameters you need to seperate each one by a colon ','.
+A function can have Parameters. These parameters are having a type and a name. To add a Parameter to a function the parameter type followed by the name needs to be put into the '()' brackets. To have multiple Parameters you need to separate each one by a colon ','.
 ```
 // Function with one Parameter
 func oneParameter(*int i) {
@@ -212,7 +251,7 @@ func twoParameters(*int i, *str s) {
 
 }
 ```
-To call a function with Parameters as Input write your input in the call Brackets. The parameter needs to have the same type as the parameter of the function you want to call.
+To call a function with Parameters as Input write your input in the call brackets. The parameter needs to have the same type as the parameter of the function you want to call.
 ```
 // Function with one Parameter
 func oneParameter(*int i) {
@@ -232,7 +271,7 @@ twoParameters(1, "Hello")
 ```
 
 #### Function Overloading
-You can also define the same Function multiple times with different Parameters. It is not allowed to have the same function twice. So with the same parameter types in the same order.
+You can also define the same function multiple times with different Parameters. It is not allowed to have the same function twice. So with the same parameter types in the same order.
 ```
 // This defines the function 'overloaded' with a Parameter i of type int
 func overloaded(*int i) {
@@ -244,7 +283,7 @@ func overloaded(*str i) {
 
 }
 ```
-The Executor automatically calls the correct function to your parameters. At least if you have a Function with that kind of parameter configuration.
+The Executor automatically calls the correct function to your parameters. At least if you have a function with that kind of parameter configuration.
 ```
 // This defines the function 'overloaded' with a Parameter i of type int
 func overloaded(*int i) {
@@ -264,7 +303,7 @@ overloaded("1")
 ```
 
 #### Parameter Expressions
-You can also use a Parameter with Variables as well as an Expression as parameter.
+You can also use a Parameter with variables as well as an expression as parameter.
 ```
 // The Function Declaration
 func parameterExpressions(*int i) {
@@ -279,8 +318,8 @@ parameterExpressions(i+1)
 ```
 
 #### Return Statement
-The return statement can be used to exit a function before the real Block Exit of the function. But it can also return some value. To return something with a specific value write an Expression behind it and see what happends.
-If you return from the Main Thread it gets discontinued.
+The return statement can be used to exit a function before the real block exit of the function. But it can also return some value. To return something with a specific value write an expression behind it and see what happens.
+If you return from the Main thread it gets discontinued.
 ```
 // This will give the Output '1'
 testReturn(1)
@@ -303,7 +342,7 @@ func testReturn(*int i) {
 ``` 
 
 #### Recursion
-You can also call the same function within itself. This will create a Recursive Loop.
+You can also call the same function within itself. This will create a recursive loop.
 ```
 // Call the Method recursion with parameter 3
 recursion(3)
@@ -320,7 +359,7 @@ func recursion(*int i) {
     print "end" + i
 }
 ```
-The output of the Code above is as follows.
+The output of the code above is as follows.
 ```
 Current value: 3
 Current value: 2
@@ -333,7 +372,7 @@ end3
 ```
 
 #### Returning something from a Function
-You can also return something with the return Statement. If you want to return something you need to specify in the declaration of the function what type you want to return.
+You can also return something with the return statement. If you want to return something you need to specify in the declaration of the function what type you want to return.
 ```
 // Function Declaration with return type of *int
 func intReturn(*int i) -> *int {
@@ -362,4 +401,121 @@ func anyReturn(*int i) -> *any {
 print anyReturn(-1)
 print anyReturn(5)
 print anyReturn(20)
+```
+
+## Import
+You can also import other code snippets from other sources or files. These import statements are evaluated before the actual code executor and are only allowed to be written before the actual code. After the first code statement every import will get ignored.
+```
+import std
+// This 'import std' statement imports the std file.
+
+print "Hello World!"
+``` 
+The std file is a standard library which handles some stuff you want regularly.
+```
+import std
+
+print "Hello world"
+```
+You can also just import one sub file of the std library by adding a double point ':' after std and adding the sub name after it.
+```
+import std:Math
+// This just imports the Math sub file of the std library.
+``` 
+Current std features.
+```
+std
+  - length(*int) -> *int
+  - len(*int) -> *int
+  - length(*num) -> *int
+  - len(*num) -> *int
+
+  std:Casting
+    - String(*any) -> *str
+    - Character(*any) -> *chr
+    - Number(*any) -> *num
+    - Integer(*any) -> *int
+    - Boolean(*any) -> *bol
+    
+  std:IO
+    - File(*str) -> *str
+    - File(*str *bol) -> *str
+    - createFile(*str)
+    - deleteFile(*str)
+    - clearFile(*str)
+    - Scanner(*str) -> *str
+    - Scanner() -> *str
+    
+  std:Math
+    > PI -> 3.14159265358979323846
+    > E -> 2.7182818284590452354
+    > DEGREES_TO_RADIANS -> 0.017453292519943295
+    > RADIANS_TO_DEGREES -> 57.29577951308232
+    > INTEGER_MAX_VALUE ->  2147483647
+    > INTEGER_MIN_VALUE -> -2147483647
+    
+    - round(*num *int) -> *num
+    - round(*num *num) -> *num
+    - floor(*num) -> *num
+    - floor(*num *int) -> *num
+    - floor(*num *num) -> *num
+    - ceil(*num) -> *num
+    - ceil(*num *int) -> *num
+    - ceil(*num *num) -> *num
+    - multiple(*int *int) -> *int
+    - multiple(*num *int) -> *num
+    - multiple(*int *num) -> *num
+    - multiple(*num *num) -> *num
+    - pythagoras(*int *int *int *int) -> *int
+    - pythagoras(*num *num *num *num) -> *num
+    - toRadians(*num) -> *num
+    - toDegree(*num) -> *num
+    - max(*int *int) -> *int
+    - max(*num *int) -> *num
+    - max(*int *num) -> *num
+    - max(*num *num) -> *num
+    - min(*int *int) -> *int
+    - min(*num *int) -> *num
+    - min(*int *num) -> *num
+    - min(*num *num) -> *num
+    - sign(*int) -> *int
+    - sign(*num) -> *int
+    - clamp(*int *int *int) -> *int
+    - clamp(*num *num *num) -> *num
+    - isPrime(*int) -> *bol
+    
+  std:Security
+    - hashMD5(*any) -> *str
+    - hashSHA1(*any) -> *str
+    - hashSHA256(*any) -> *str
+    - hash(*any) -> *str
+    - encode(*str) -> *str
+    - decode(*str) -> *str
+    
+  std:String
+    - length(*str) -> *int
+    - len(*str) -> *int
+    - toUpperCase(*str) -> *str
+    - upperCase(*str) -> *str
+    - toLowerCase(*str) -> *str
+    - LowerCase(*str) -> *str
+    - trim(*str) -> *str
+```
+
+## Strings
+There are some special Operations on strings you can use. To execute them use the ':' after the string or the string variable to access them.
+To get the length of the String use ':length'. You can also trim the String with ':trim' to remove any excess spaces on each end of the String.
+You can also Change a String to all Uppercase and or Lowercase. For this use ':toUpperCase' and 'toLowerCase'.
+```
+var length = "hello":length
+var trim = "    hello    ":trim
+
+var toLowerCase = "Hello":toLowerCase
+var toUpperCase = "Hello":toUpperCase
+
+print length
+print trim
+
+print toLowerCase
+print toUpperCase
 ```

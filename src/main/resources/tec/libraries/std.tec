@@ -2,12 +2,9 @@ import std:Math
 import std:Casting
 import std:Security
 import std:IO
+import std:String
 
-// Length methods
-
-func length(*str string) -> *int {
-	return string:length
-}
+// Length Functions
 
 func length(*int int) -> *int {
 	return String(int):length
@@ -15,10 +12,6 @@ func length(*int int) -> *int {
 
 func length(*num num) -> *int {
 	return String(num):length
-}
-
-func len(*str string) -> *int {
-	return string:length
 }
 
 func len(*int int) -> *int {

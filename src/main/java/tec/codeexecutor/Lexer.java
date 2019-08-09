@@ -30,16 +30,18 @@ public class Lexer {
                 t = string.substring(0, 3);
 
                 if (t.equals("num")) {
-                    token = new Token(t, Float.parseFloat(s));
+                    token = new Token(t, Double.parseDouble(s));
                 } else if (t.equals("int")) {
                     token = new Token(t, Integer.parseInt(s));
                 } else if (t.equals("chr")) {
                     token = new Token(t, s.toCharArray()[0]);
                 } else if (t.equals("str")) {
+                    s = s.replaceAll("\\\\n", "\n");
                     token = new Token(t, s + "");
                 } else {
                     token = new Token(t, s);
                 }
+
                 tokens.add(token);
             }
             return;
@@ -99,8 +101,12 @@ public class Lexer {
                             break;
                     }
                 } else {
+                    if (c == 'n' && backspace) {
+                        s.append("\\");
+                    }
                     s.append(c);
                 }
+                backspace = false;
             }
 
         }
@@ -130,7 +136,10 @@ public class Lexer {
             return tokens;
         }
 
+        s = s.trim();
+
         if (s.startsWith("'") && s.endsWith("'")) {
+            s = s.replaceAll("\\\\n", "\n");
             if (s.substring(1, s.length() - 1).length() == 1) {
                 tokens.add(new Token("chr", s.substring(1, s.length() - 1)));
                 return tokens;
@@ -139,16 +148,17 @@ public class Lexer {
             return tokens;
         }
         if (s.startsWith("\"") && s.endsWith("\"")) {
+            s = s.replaceAll("\\\\n", "\n");
             tokens.add(new Token("str", s.substring(1, s.length() - 1)));
             return tokens;
         }
         if (s.matches("-?(\\d+)(\\.(\\d+))")) {
-            tokens.add(new Token("num", Float.parseFloat(s)));
+            tokens.add(new Token("num", Double.parseDouble(s)));
             return tokens;
         }
         if (s.matches("-?(\\d+)")) {
             long l = Long.parseLong(s);
-            if (l > -2147483647 && l < 2147483647) {
+            if (l >= -2147483647 && l <= 2147483647) {
                 tokens.add(new Token("int", (int)l));
             } else {
                 tokens.add(new Token("lon", l));
@@ -158,7 +168,7 @@ public class Lexer {
         if (s.matches("##[0-9a-f]+")) {
             s = s.substring(2);
             long l = Long.parseLong(s, 16);
-            if (l > -2147483647 && l < 2147483647) {
+            if (l >= -2147483647 && l <= 2147483647) {
                 tokens.add(new Token("int", (int)l));
             } else {
                 tokens.add(new Token("lon", l));
@@ -175,11 +185,15 @@ public class Lexer {
             }
         }
 
+        if (s.matches("[|]")) {
+            tokens.add(new Token("MAT", s));
+            return tokens;
+        }
         if (s.matches("[+\\-*/%^]|(root)|(sin|cos|tan|asin|acos|atan)|(simoid|gauss|sig)|(ln|log)")) {
             tokens.add(new Token("OPE", s));
             return tokens;
         }
-        if (s.matches("(==)|((<|>)[=]?)|(!=)|(equals|equalsIgnoreCase|contains|containsIgnoreCase|startsWith|endsWith)")) {
+        if (s.matches("(==)|((<|>)[=]?)|(!=)|(equals|equalsIgnoreCase|contains|containsIgnoreCase|startsWith|endsWith)|(typeof|canbe)")) {
             tokens.add(new Token("COM", s));
             return tokens;
         }
@@ -252,7 +266,7 @@ public class Lexer {
             return tokens;
         }
 
-        String[] splitter = new String[]{"+", "-", "*", "/", "%", "^", "!", "(", ")", "root", "sin", "cos", "tan", "asin", "acos", "atan", "sigmoid", "gauss", "ln", "log", ",", ":"};
+        String[] splitter = new String[]{"+", "-", "*", "/", "%", "^", "!", "|", "(", ")", "root", "sin", "cos", "tan", "asin", "acos", "atan", "sigmoid", "gauss", "ln", "log", ",", ":"};
         int checks = 0;
         for (String check : splitter) {
             if (s.contains(check)) {

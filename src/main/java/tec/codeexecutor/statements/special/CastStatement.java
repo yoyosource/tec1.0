@@ -69,10 +69,14 @@ public class CastStatement implements Statement {
                 }
             }
             if (typeTo.equals("int")) {
+                if (expression.getObject().toString().startsWith("##")) {
+                    variableState.addVar(new Var(varName, Integer.parseInt(expression.getObject().toString().substring(2), 16), typeTo));
+                    return true;
+                }
                 variableState.addVar(new Var(varName, Integer.parseInt(expression.getObject() + ""), typeTo));
             }
             if (typeTo.equals("num")) {
-                variableState.addVar(new Var(varName, Float.parseFloat(expression.getObject() + ""), typeTo));
+                variableState.addVar(new Var(varName, Double.parseDouble(expression.getObject() + ""), typeTo));
             }
             return true;
         }
