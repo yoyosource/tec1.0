@@ -734,7 +734,7 @@ public class Expression {
             }
         }
 
-        type = tokens.get(0).getKey();
+        type = "str";
         outputString = toStringOutput();
     }
 

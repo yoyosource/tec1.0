@@ -3,6 +3,7 @@ import std:Casting
 import std:Security
 import std:IO
 import std:String
+import std:Benchmark
 
 // Length Functions
 

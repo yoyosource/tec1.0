@@ -266,7 +266,7 @@ public class Lexer {
             return tokens;
         }
 
-        String[] splitter = new String[]{"+", "-", "*", "/", "%", "^", "!", "|", "(", ")", "root", "sin", "cos", "tan", "asin", "acos", "atan", "sigmoid", "gauss", "ln", "log", ",", ":"};
+        String[] splitter = new String[]{"+", "-", "*", "/", "%", "^", "|", "(", ")", "root", "sin", "cos", "tan", "asin", "acos", "atan", "sigmoid", "gauss", "ln", "log", ",", ":"};
         int checks = 0;
         for (String check : splitter) {
             if (s.contains(check)) {
@@ -275,6 +275,7 @@ public class Lexer {
         }
 
         if (checks > 0) {
+            System.out.println(s);
             String[] strings = splitString(s, splitter, true, false);
             for (String s1 : strings) {
                 tokens.addAll(tokify(s1));

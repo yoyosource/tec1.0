@@ -1,11 +1,59 @@
-var time = TIMESTAMP
+import std:IO
+
+var TIME = TIMESTAMP
 
 func startBenchmark() {
     time = TIMESTAMP
 }
 
 func stopBenchmark() {
-    var t = TIMESTAMP - time
-    print "--== Benchmark ==--<"
-    print "Elapsed Time: " + t
+    var t = TIMESTAMP - TIME
+    print "Elapsed Time: " + t + "ms"
+}
+
+func benchmarkRecursion() {
+    startBenchmark()
+    recursive(100)
+    print "Benchmark: Recursive Loop"
+    stopBenchmark()
+    print "Iterations: " + 100
+    print ""
+
+    startBenchmark() {
+    recursive(500)
+    print "Benchmark: Recursive Loop"
+    stopBenchmark()
+    print "Iterations: " + 500
+    print ""
+    return
+}
+
+func recursive(*int i) {
+    if (i > 0) {
+        recursive(i - 1)
+    }
+    return
+}
+
+func benchmarkLoop() {
+    startBenchmark()
+    var i = 0
+    while (i < 100) {
+        i++
+    }
+    print "Benchmark: Loop"
+    stopBenchmark()
+    print "Iterations: " + 100
+    print ""
+
+    startBenchmark()
+    i = 0
+    while (i < 500) {
+        i++
+    }
+    print "Benchmark: Loop"
+    stopBenchmark()
+    print "Iterations: " + 500
+    print ""
+    return
 }

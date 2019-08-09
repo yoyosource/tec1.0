@@ -251,3 +251,14 @@ func isPrime(*int i) -> *bol {
     }
     return true
 }
+
+// Factorial
+
+func factorial(*int i) -> *int {
+    var j = i
+    while (i > 0) {
+        i--
+        j *= i
+    }
+    return j
+}
