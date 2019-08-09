@@ -19,9 +19,9 @@ public class Calculator {
         this.tokens = tok;
     }
 
-    public void calculate() {
+    public Object calculate() {
         if (!checkIfCalculation()) {
-            return;
+            return null;
         }
         replace();
 
@@ -32,7 +32,7 @@ public class Calculator {
 
         calc(priorityArray());
 
-        System.out.println(tokens.get(0).getVal());
+        return tokens.get(0).getVal();
     }
 
     private boolean checkIfCalculation() {

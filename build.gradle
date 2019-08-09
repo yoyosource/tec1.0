@@ -64,6 +64,9 @@ task compileTecl {
 
         command = "java -classpath ${buildDir}/classes/java/main tec.BuildTeclLibs /Users/jojo/IdeaProjects/tec/src/main/resources/tec/libraries/std-String.tec"
         retval = command.execute().text.trim()
+
+        command = "java -classpath ${buildDir}/classes/java/main tec.BuildTeclLibs /Users/jojo/IdeaProjects/tec/src/main/resources/tec/libraries/std-Benchmark.tec"
+        retval = command.execute().text.trim()
     }
 }
 

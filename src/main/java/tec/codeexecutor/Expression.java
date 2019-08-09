@@ -1,7 +1,6 @@
 package tec.codeexecutor;
 
 import tec.Tec;
-import tec.calculator.Calculator;
 import tec.utils.DebugHandler;
 import tec.utils.DebugLevel;
 import tec.utils.Token;
@@ -14,8 +13,6 @@ import java.util.stream.Collectors;
  * This is the core for handling statements.
  */
 public class Expression {
-
-    private Calculator calculator = new Calculator();
 
     private ArrayList<Token> tokens;
     private VariableState variableState;
@@ -685,13 +682,15 @@ public class Expression {
 	    stringFunctions();
 
         if (isCalculation(tokens)) {
-            double f = calculator.calc(tokens.stream().map(token -> token.getVal().toString()).collect(Collectors.joining()));
-            if (isOnlyInt(tokens)) {
+            Calculator calculator = new Calculator(tokens);
+            Object b = calculator.calculate();
+            outputString = b.toString();
+            if (b instanceof Integer) {
                 type = "int";
-                outputString = "" + (int)f;
-            } else {
+            } else if (b instanceof Double) {
                 type = "num";
-                outputString = "" + f;
+            } else if (b instanceof Long) {
+                type = "lon";
             }
             return;
         }
@@ -703,12 +702,15 @@ public class Expression {
             int start = getOpentBracket(startIndex, tokens);
             ArrayList<Token> tokens = getTokensToClosingBracket(this.tokens, start);
             if (isCalculation(tokens)) {
-                double f = calculator.calc(tokens.stream().map(token -> token.getVal().toString()).collect(Collectors.joining()));
-                tokens = removeToClosingBracket(this.tokens, start);
-                if (isOnlyInt(tokens)) {
-                    tokens.add(start, new Token("int", (int)f));
-                } else {
-                    tokens.add(start, new Token("num", f));
+                Calculator calculator = new Calculator(tokens);
+                Object b = calculator.calculate();
+                outputString = b.toString();
+                if (b instanceof Integer) {
+                    type = "int";
+                } else if (b instanceof Double) {
+                    type = "num";
+                } else if (b instanceof Long) {
+                    type = "lon";
                 }
             } else {
                 startIndex = start;

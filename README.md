@@ -500,6 +500,11 @@ std
     - toLowerCase(*str) -> *str
     - LowerCase(*str) -> *str
     - trim(*str) -> *str
+    
+  std:Benchmark
+    > time
+    - startBenchmark
+    - stopBenchmark
 ```
 
 ## Strings

@@ -1,0 +1,11 @@
+var time = TIMESTAMP
+
+func startBenchmark() {
+    time = TIMESTAMP
+}
+
+func stopBenchmark() {
+    var t = TIMESTAMP - time
+    print "--== Benchmark ==--<"
+    print "Elapsed Time: " + t
+}
