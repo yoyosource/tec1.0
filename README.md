@@ -153,7 +153,7 @@ if (true || false) {
 You can also use variables in Boolean expressions. The easiest is a boolean variable because you do not need to compare it to anything else.
 To compare use '==', '!=', '>', '<', '>=', '<='. Also you have some basic and advanced logic operators as || (or), && (and), and !! (not). Just have in mind that you need to use '<<', '>>' or '«', '»' as priority definition in Boolean expressions.
 Advanced logic operators are !& (nand), x| (xor), n| (nor) and xn (xnor).
-Have in mind that the not operator '!!' needs to be behind the Boolean value and not before it.
+Have in mind that the not operator '!!' needs to be before the Boolean value.
 You can also have a Boolean expression after a print statement.
 ```
 // All Logic Operators
@@ -162,7 +162,7 @@ var b2 = false
 
 print b1 || b2
 print b1 && b2
-print b1 !!
+print !! b1
 print b1 !& b2
 print b1 x| b2
 print b1 n| b2
@@ -508,15 +508,15 @@ std
 ```
 
 ## Strings
-There are some special Operations on strings you can use. To execute them use the ':' after the string or the string variable to access them.
-To get the length of the String use ':length'. You can also trim the String with ':trim' to remove any excess spaces on each end of the String.
-You can also Change a String to all Uppercase and or Lowercase. For this use ':toUpperCase' and 'toLowerCase'.
+There are some special Operations on strings you can use. To execute them use the '.' after the string or the string variable to access them.
+To get the length of the String use '.length()'. You can also trim the String with '.trim()' to remove any excess spaces on each end of the String.
+You can also Change a String to all Uppercase and or Lowercase. For this use '.toUpperCase()' and 'toLowerCase.()'.
 ```
-var length = "hello":length
-var trim = "    hello    ":trim
+var length = "hello".length()
+var trim = "    hello    ".trim()
 
-var toLowerCase = "Hello":toLowerCase
-var toUpperCase = "Hello":toUpperCase
+var toLowerCase = "Hello".toLowerCase()
+var toUpperCase = "Hello".toUpperCase()
 
 print length
 print trim

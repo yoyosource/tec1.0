@@ -25,15 +25,15 @@ public class SleepStatement implements Statement {
             return false;
         }
 
-        if (!expression.getType().equals("lon") && !expression.getType().equals("int")) {
+        if (!expression.getResult().getResult().getKey().equals("lon") && !expression.getResult().getResult().getKey().equals("int")) {
             return false;
         }
 
         try {
-            if (expression.getObject() instanceof Integer) {
-                Thread.sleep((long)(int) expression.getObject());
+            if (expression.getResult().getResult().getVal() instanceof Integer) {
+                Thread.sleep((long)(int) expression.getResult().getResult().getVal());
             } else {
-                Thread.sleep((long) expression.getObject());
+                Thread.sleep((long) expression.getResult().getResult().getVal());
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

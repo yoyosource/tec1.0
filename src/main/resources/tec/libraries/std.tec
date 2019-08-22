@@ -8,17 +8,17 @@ import std:Benchmark
 // Length Functions
 
 func length(*int int) -> *int {
-	return String(int):length
+	return String(int).length()
 }
 
 func length(*num num) -> *int {
-	return String(num):length
+	return String(num).length()
 }
 
 func len(*int int) -> *int {
-	return String(int):length
+	return String(int).length()
 }
 
 func len(*num num) -> *int {
-	return String(num):length
+	return String(num).length()
 }

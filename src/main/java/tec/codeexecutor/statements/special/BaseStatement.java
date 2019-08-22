@@ -43,7 +43,7 @@ public class BaseStatement implements Statement {
 
         if (type.equals("encode")) {
             try {
-                byte[] bytes = Base64.getEncoder().encode((expression.getObject() + "").getBytes());
+                byte[] bytes = Base64.getEncoder().encode((expression.getResult().getResult().getVal() + "").getBytes());
                 String s = new String(bytes);
                 variableState.addVar(new Var(varName, s, "str"));
             } catch (IllegalArgumentException e) {
@@ -51,7 +51,7 @@ public class BaseStatement implements Statement {
             }
         } else if (type.equals("decode")) {
             try {
-                byte[] bytes = Base64.getDecoder().decode((expression.getObject() + "").getBytes());
+                byte[] bytes = Base64.getDecoder().decode((expression.getResult().getResult().getVal() + "").getBytes());
                 String s = new String(bytes);
                 variableState.addVar(new Var(varName, s, "str"));
             } catch (IllegalArgumentException e) {

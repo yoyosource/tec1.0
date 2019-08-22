@@ -1,6 +1,5 @@
 package tec.codeexecutor.statements.special;
 
-import tec.Tec;
 import tec.codeexecutor.Executor;
 import tec.codeexecutor.Expression;
 import tec.codeexecutor.Var;
@@ -8,10 +7,7 @@ import tec.codeexecutor.VariableState;
 import tec.interfaces.Statement;
 import tec.utils.Token;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -58,7 +54,7 @@ public class HashStatement implements Statement {
                 return false;
             }
             MessageDigest digest = MessageDigest.getInstance(type);
-            byte[] hash = digest.digest((expression.getObject() + "").getBytes("UTF-8"));
+            byte[] hash = digest.digest((expression.getResult().getResult().getVal() + "").getBytes("UTF-8"));
             String hex = toHex(hash).toLowerCase();
             variableState.addVar(new Var(varName, hex, "str"));
         } catch (NoSuchAlgorithmException | IOException e) {

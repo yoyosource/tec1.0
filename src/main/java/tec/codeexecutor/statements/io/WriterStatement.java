@@ -54,18 +54,18 @@ public class WriterStatement implements Statement {
             return false;
         }
 
-        if (expression1.getObject().equals("console")) {
-            if ((boolean) expression2.getObject()) {
-                System.out.println(expression3.getObject());
+        if (expression1.getResult().getResult().getVal().equals("console")) {
+            if ((boolean) expression2.getResult().getResult().getVal()) {
+                System.out.println(expression3.getResult().getResult().getVal());
             } else {
-                System.out.print(expression3.getObject());
+                System.out.print(expression3.getResult().getResult().getVal());
             }
             return true;
-        } else if (expression1.getObject().toString().startsWith("FILE:")) {
+        } else if (expression1.getResult().getResult().getVal().toString().startsWith("FILE:")) {
             try {
-                File file = new File(expression1.getObject().toString().substring("FILE:".length()));
-                FileWriter fr = new FileWriter(file, (boolean)expression2.getObject());
-                fr.write(expression3.getObject().toString());
+                File file = new File(expression1.getResult().getResult().getVal().toString().substring("FILE:".length()));
+                FileWriter fr = new FileWriter(file, (boolean)expression2.getResult().getResult().getVal());
+                fr.write(expression3.getResult().getResult().getVal().toString());
                 fr.close();
             } catch (IOException e) {
                 return false;

@@ -40,7 +40,7 @@ public class ScannerStatement implements Statement {
             return false;
         }
 
-        String object = expression.getObject() + "";
+        String object = expression.getResult().getResult().getVal().toString();
 
         if (object.startsWith("FILE:")) {
             try {

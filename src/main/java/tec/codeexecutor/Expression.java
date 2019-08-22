@@ -1,118 +1,394 @@
 package tec.codeexecutor;
 
-import tec.Tec;
-import tec.utils.DebugHandler;
-import tec.utils.DebugLevel;
 import tec.utils.Token;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-/**
- * The expression class.
- * This is the core for handling statements.
- */
 public class Expression {
 
-    private ArrayList<Token> tokens;
+    private List<Token> tokens;
     private VariableState variableState;
     private Executor executor;
 
-	/**
-	 * Instantiates a new expression.
-	 *
-	 * @param tokens        the tokens
-	 * @param variableState the variable state
-	 */
-	public Expression(ArrayList<Token> tokens, VariableState variableState, Executor executor) {
+    private ExpressionState expressionState;
+
+    /**
+     * Instantiates a new expression.
+     *
+     * @param tokens The tokens associated with this ExpressionOld.
+     * @param variableState The tokens associated with this ExpressionOld.
+     * @param executor The executor to execute functions.
+     */
+    public Expression(List<Token> tokens, VariableState variableState, Executor executor) {
         this.tokens = tokens;
         this.variableState = variableState;
         this.executor = executor;
+
+        this.expressionState = new ExpressionState();
     }
 
     /**
-     * The Output string (if the output was equal to a string value)
+     * Instantiates a new expression.
+     *
+     * @param tokens The tokens associated with this ExpressionOld.
+     * @param variableState The tokens associated with this ExpressionOld.
      */
-    private String outputString;
-    /**
-     * The Output boolean (if the output was equal to a boolean value)
-     */
-    private Boolean outputBoolean;
-    /**
-     * The Output object (if the output was equal to a boolean value)
-     */
-    private Object outputObject;
+    public Expression(List<Token> tokens, VariableState variableState) {
+        this.tokens = tokens;
+        this.variableState = variableState;
+        this.executor = null;
+
+        this.expressionState = new ExpressionState();
+    }
 
     /**
-     * The Expression time in milliseconds.
+     * Instantiates a new expression.
+     *
+     * @param tokens The tokens associated with this ExpressionOld.
+     * @param executor The executor to execute functions.
      */
-    private long expressionTime;
-    /**
-     * The Plus time.
-     */
-    private long plusTime;
-    /**
-     * The Type.
-     */
-    private String type;
-    /**
-     * The Error.
-     */
-    private String error;
+    public Expression(List<Token> tokens, Executor executor) {
+        this.tokens = tokens;
+        this.variableState = null;
+        this.executor = executor;
 
-	/**
-	 * Build the expression.
-	 */
-	public void build() {
-        expressionTime = System.currentTimeMillis();
+        this.expressionState = new ExpressionState();
+    }
+
+    /**
+     * Instantiates a new expression.
+     *
+     * @param tokens The tokens associated with this ExpressionOld.
+     */
+    public Expression(List<Token> tokens) {
+        this.tokens = tokens;
+        this.variableState = null;
+        this.executor = null;
+
+        this.expressionState = new ExpressionState();
+    }
+
+    /**
+     * Evaluate the expression to a single value.
+     */
+    public void build() {
+        long time = System.currentTimeMillis();
+
+        ExpressionUtils.removeBrackets(tokens);
+
+        replaceFunctions();
+        replaceVariables();
+
+        specialFunctions();
+
+        ExpressionUtils.removeBrackets(tokens);
+
+        if (ExpressionUtils.isCalculation(tokens)) {
+            Calculator calculator = new Calculator(tokens);
+            Object output = calculator.calculate();
+
+            Token t = ExpressionUtils.getToken(output);
+
+            expressionState.setResult(t);
+            expressionState.addTime(System.currentTimeMillis() - time);
+            return;
+        }
+
         if (tokens.size() == 1) {
-            tokens = replace(tokens);
-            if (!tokens.isEmpty()) {
-                type = tokens.get(0).getKey();
-                outputObject = tokens.get(0).getVal();
-                if (type.equals("bol")) {
-                    if (tokens.get(0).getVal().toString().equals("true")) {
-                        outputBoolean = true;
-                    } else {
-                        outputBoolean = false;
-                    }
-                }
-            }
-        } else if (isLogic()) {
-            booleanOutput();
-            outputObject = outputBoolean;
-        } else {
-            stringOutput();
-            if (type != null) {
-                if (type.equals("num")) {
-                    outputObject = Double.parseDouble(outputString);
-                } else if (type.equals("int")) {
-                    outputObject = Integer.parseInt(outputString);
-                } else {
-                    outputObject = outputString;
-                }
-            } else {
-                outputObject = outputString;
-            }
+            expressionState.setResult(tokens.get(0));
+            expressionState.addTime(System.currentTimeMillis() - time);
+            return;
         }
-        expressionTime -= System.currentTimeMillis();
-        expressionTime *= -1;
-		DebugHandler debug = new DebugHandler(DebugLevel.NONE, "Expression " + Tec.expressions + " built.", (int) expressionTime);
-		debug.send();
-		debug = new DebugHandler(DebugLevel.NORMAL, "Expression " + Tec.expressions + " built.\nErrors detected while compiling: " + error + "\nExpression as string: " + this.toString());
-		debug.send();
-		debug = new DebugHandler(DebugLevel.ADVANCED, "Expression " + Tec.expressions + " built.\nErrors detected while compiling: " + error + "\nExpression as string: " + this.toString() + "Expression advanced info: " + this.advancedInfo().toString(), (int) expressionTime);
-		debug.send();
-        Tec.expressions += 1;
+
+        ExpressionUtils.removeBrackets(tokens);
+
+        try {
+            buildOther();
+        } catch (Exception e) {
+            expressionState.addError("An unexpected Error occurred.");
+        }
+        expressionState.addTime(System.currentTimeMillis() - time);
     }
 
-    private int getClosingBracket(int i) {
-	    if (!(tokens.get(i).getKey().equals("STb") && tokens.get(i).getVal().equals("("))) {
-	        return i;
+    /**
+     * Get the Result of the expression.
+     */
+    public ExpressionState getResult() {
+        return expressionState;
+    }
+
+    private void replaceFunctions() {
+        if (executor == null) {
+            return;
         }
 
-	    int bracket = 1;
-	    i++;
-	    for (int j = i; j < tokens.size(); j++) {
+        for (int i = 0; i < tokens.size(); i++) {
+            Token token = tokens.get(i);
+
+            if (i > 1 && tokens.get(i - 1).getKey().equals("SEP")) {
+                continue;
+            }
+
+            if (!token.getKey().equals("COD")) {
+                continue;
+            }
+
+            if (i < tokens.size() - 1 && !(tokens.get(i + 1).getKey().equals("STb") && tokens.get(i + 1).getVal().equals("("))) {
+                continue;
+            }
+
+            int j = i + 1;
+            if (j >= tokens.size()) {
+                continue;
+            }
+
+            int c = ExpressionUtils.getClosingBracket(j, tokens);
+            List<Token> func = ExpressionUtils.getRange(i, c, this.tokens);
+
+            String funcName = func.get(0).getVal().toString();
+            func.remove(0);
+
+            try {
+                boolean b = executor.runFunction(funcName, func);
+                Token t = executor.getFuncReturn();
+
+                if (b) {
+                    for (int k = c; k > i; k--) {
+                        tokens.remove(k);
+                    }
+                    tokens.set(i, t);
+                } else {
+                    String pointer = ExpressionUtils.getPointer(tokens, i);
+                    expressionState.addError("The Function '" + funcName + "()' was not found\n" + pointer);
+                }
+            } catch (Exception e) {
+                String pointer = ExpressionUtils.getPointer(tokens, i);
+                expressionState.addError("An unexpected Error occurred while executing the function '" + funcName + "()'\n" + pointer);
+            }
+        }
+    }
+
+    private void replaceVariables() {
+        if (variableState == null) {
+            return;
+        }
+
+        for (int i = 0; i < tokens.size(); i++) {
+            Token token = tokens.get(i);
+
+            if (i > 1 && tokens.get(i - 1).getKey().equals("SEP")) {
+                continue;
+            }
+
+            if (i < tokens.size() - 2 && tokens.get(i + 1).getKey().equals("STb") && tokens.get(i + 1).getVal().equals("(")) {
+                continue;
+            }
+
+            if (token.getKey().equals("COD")) {
+                if (variableState.isVariable(tokens.get(i).getVal().toString())) {
+                    tokens.set(i, new Token(variableState.getVarType(tokens.get(i).getVal().toString()), variableState.getVarValue(tokens.get(i).getVal().toString())));
+                } else {
+                    String pointer = ExpressionUtils.getPointer(tokens, i);
+                    expressionState.addError("The Variable '" + token.getVal() + "' is not assigned\n" + pointer);
+                }
+            }
+
+        }
+    }
+
+    private void specialFunctions() {
+        StringFunctions.execute(tokens, variableState, executor, expressionState);
+    }
+
+    private void buildOther() {
+        List<Integer> priorities = ExpressionUtils.getPriorities(tokens, 1);
+        int max = ExpressionUtils.getMax(priorities);
+        while (max != -1) {
+            specialFunctions();
+            ExpressionUtils.removeBrackets(tokens);
+
+            if (tokens.get(max).getKey().equals("LOG")) {
+                if (tokens.get(max).getKey().equals("LOG") && tokens.get(max).getVal().toString().equals("!!")) {
+
+                    if (!tokens.get(max + 1).getKey().equals("bol")) {
+                        continue;
+                    }
+
+                    tokens.set(max + 1, new Token("bol", !(boolean)tokens.get(max + 1).getVal()));
+
+                    tokens.remove(max);
+                    priorities.remove(max);
+
+                    max = ExpressionUtils.getMax(priorities);
+                    continue;
+                }
+
+                boolean b = ExpressionUtils.compare(tokens.get(max - 1), tokens.get(max), tokens.get(max + 1));
+
+                priorities.remove(max + 1);
+                tokens.remove(max + 1);
+
+                priorities.set(max, 0);
+                tokens.set(max, new Token("bol", b));
+
+                priorities.remove(max - 1);
+                tokens.remove(max - 1);
+            } else {
+                List<List<Token>> logic = ExpressionUtils.getLogic(tokens, max);
+                List<Token> tokenList = ExpressionUtils.evaluateTokenList(logic, variableState, executor, expressionState);
+
+                boolean b = ExpressionUtils.compare(tokenList.get(0), tokens.get(max), tokenList.get(1));
+                ExpressionUtils.removeLogic(tokens, new Token("bol", b), priorities, max);
+            }
+            max = ExpressionUtils.getMax(priorities);
+        }
+
+        ExpressionUtils.removeBrackets(tokens);
+        specialFunctions();
+
+        if (tokens.size() == 1) {
+            expressionState.setResult(tokens.get(0));
+            return;
+        }
+
+        int startIndex = 0;
+        while (startIndex != -1) {
+            specialFunctions();
+            int start = ExpressionUtils.getOpenBracket(startIndex, tokens);
+            if (start == -1) {
+                startIndex = start;
+                continue;
+            }
+            int stop = ExpressionUtils.getClosingBracket(start, tokens);
+            List<Token> range = ExpressionUtils.getRange(start, stop, tokens);
+
+            if (ExpressionUtils.isCalculation(range)) {
+                Calculator calculator = new Calculator(range);
+                Object output = calculator.calculate();
+
+                Token t = ExpressionUtils.getToken(output);
+
+                ExpressionUtils.removeFromTo(start, stop, tokens);
+                tokens.add(start, t);
+            } else {
+                startIndex = start;
+                if (startIndex != -1) {
+                    startIndex++;
+                }
+            }
+        }
+
+        for (int i = tokens.size() - 1; i >= 0; i--) {
+            if (tokens.get(i).getKey().equals("STb")) {
+                tokens.remove(i);
+            }
+        }
+
+        specialFunctions();
+
+        for (int i = 0; i < tokens.size() - 2; i += 3) {
+            if (!(!tokens.get(i).getKey().equals("OPE") && tokens.get(i + 1).getKey().equals("OPE") && tokens.get(i + 1).getVal().equals("+") && !tokens.get(i + 2).getKey().equals("OPE"))) {
+                String pointer = ExpressionUtils.getPointer(tokens, i + 1, i + 2);
+                expressionState.addError("Too many or too few Operators\n" + pointer);
+            }
+        }
+
+        StringBuilder st = new StringBuilder();
+        for (Token token : tokens) {
+            if (token.getKey().equals("OPE") && token.getVal().equals("+")) {
+                continue;
+            }
+            st.append(token.getVal().toString());
+        }
+
+        expressionState.setResult(new Token("str", st.toString()));
+
+    }
+
+}
+
+class ExpressionUtils {
+
+    private ExpressionUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static String getPointer(List<Token> tokens, int... indices) {
+        List<Integer> points = new ArrayList<>();
+
+        int length = 0;
+        for (int i = 0; i < tokens.size(); i++) {
+            if (i != 0) {
+                length++;
+            }
+
+            boolean b = false;
+            for (int j : indices) {
+                if (j  == i) {
+                    b = true;
+                }
+            }
+            if (b) {
+                points.add(length);
+            }
+
+            length += tokens.get(i).getVal().toString().length();
+        }
+
+        List<Integer> tokenEnd = new ArrayList<>();
+
+        StringBuilder st1 = new StringBuilder();
+        for (int i = 0; i < tokens.size(); i++) {
+            if (i != 0) {
+                tokenEnd.add(st1.length() - 1);
+                st1.append(" ");
+            }
+            st1.append(tokens.get(i).getVal().toString());
+        }
+
+        StringBuilder st2 = new StringBuilder();
+        boolean inUnderline = false;
+        for (int i = 0; i < length; i++) {
+            if (inUnderline) {
+                st2.append("~");
+            } else {
+                if (points.contains(i)) {
+                    st2.append("^");
+                    inUnderline = true;
+                } else {
+                    st2.append(" ");
+                }
+            }
+            if (tokenEnd.contains(i)) {
+                inUnderline = false;
+            }
+        }
+
+        return st1 + "\n" + st2;
+    }
+
+    public static void removeBrackets(List<Token> tokens) {
+        for (int i = tokens.size() - 1; i >= 0; i--) {
+            if (tokens.get(i).getKey().equals("STb")) {
+                continue;
+            }
+            if (i > 0 && i < tokens.size() - 1 && tokens.get(i - 1).getKey().equals("STb") && tokens.get(i - 1).getVal().equals("(") && tokens.get(i + 1).getKey().equals("STb") && tokens.get(i + 1).getVal().equals(")")) {
+                tokens.remove(i + 1);
+                tokens.remove(i - 1);
+            }
+        }
+    }
+
+    public static int getClosingBracket(int i, List<Token> tokens) {
+        if (!(tokens.get(i).getKey().equals("STb") && tokens.get(i).getVal().equals("("))) {
+            return i;
+        }
+
+        int bracket = 1;
+        i++;
+        for (int j = i; j < tokens.size(); j++) {
             if (tokens.get(j).getKey().equals("STb") && tokens.get(j).getVal().equals("(")) {
                 bracket++;
             }
@@ -124,709 +400,10 @@ public class Expression {
                 break;
             }
         }
-	    return i;
+        return i;
     }
 
-    private ArrayList<Token> getRange(int start, int stop) {
-	    ArrayList<Token> newTokens = new ArrayList<>();
-	    for (int i = start; i <= stop; i++) {
-	        newTokens.add(tokens.get(i));
-        }
-	    return newTokens;
-    }
-
-    private ArrayList<Token> replace(ArrayList<Token> tokens) {
-	    if (executor != null) {
-            for (int i = 0; i < tokens.size(); i++) {
-                if (!tokens.get(i).getKey().equals("COD")) {
-                    continue;
-                }
-                if (i < tokens.size() - 1 && !(tokens.get(i + 1).getKey().equals("STb") && tokens.get(i + 1).getVal().equals("("))) {
-                    continue;
-                }
-                int j = i + 1;
-                if (!(j < tokens.size())) {
-                    continue;
-                }
-
-                int c = getClosingBracket(j);
-
-                ArrayList<Token> func = getRange(i, c);
-
-                String funcName = func.get(0).getVal().toString();
-                func.remove(0);
-
-                boolean b = executor.runFunction(funcName, func);
-                Token t = executor.getFuncReturn();
-
-                if (b) {
-                    for (int k = c; k > i; k--) {
-                        tokens.remove(k);
-                    }
-                    tokens.set(i, t);
-                }
-
-            }
-        }
-
-        if (variableState != null) {
-            for (int i = 0; i < tokens.size(); i++) {
-                if (i > 1 && tokens.get(i - 1).getKey().equals("SEP")) {
-                    continue;
-                }
-                if (tokens.get(i).getKey().equals("COD")) {
-                    if (variableState.isVariable(tokens.get(i).getVal().toString())) {
-                        tokens.set(i, new Token(variableState.getVarType(tokens.get(i).getVal().toString()), variableState.getVarValue(tokens.get(i).getVal().toString())));
-                    } else {
-                        error = "It is not allowed to have Statements in Expressions or the Variable is not assigned";
-                        return new ArrayList<>();
-                    }
-                }
-            }
-        }
-
-        return tokens;
-    }
-
-    private void booleanOutput() {
-        type = "bol";
-        if (tokens.size() == 1 && tokens.get(0).getKey().equals("bol")) {
-            outputBoolean = (boolean)tokens.get(0).getVal();
-            return;
-        }
-
-        tokens = replace(tokens);
-
-        ArrayList<Token> compareToken = new ArrayList<>();
-        ArrayList<Integer> priority = new ArrayList<>();
-        int p = 0;
-        ArrayList<ArrayList<Token>> lineToken = new ArrayList<>();
-
-        ArrayList<Token> nTokens = new ArrayList<>();
-
-        if (tokens.size() == 0) {
-            return;
-        }
-
-        for (Token token : tokens) {
-            if (token.getKey().equals("LOb")) {
-                if (token.getVal().toString().equals(">>")) {
-                    p--;
-                } else if (token.getVal().toString().equals("<<")) {
-                    p++;
-                }
-                continue;
-            }
-            if (token.getKey().equals("LOG")) {
-                compareToken.add(token);
-                priority.add(p);
-                lineToken.add(nTokens);
-                nTokens = new ArrayList<>();
-            } else {
-                nTokens.add(token);
-            }
-        }
-
-        if (nTokens.size() > 0) {
-            lineToken.add(nTokens);
-        }
-
-        ArrayList<Boolean> booleans = new ArrayList<>();
-
-        try {
-            for (ArrayList<Token> lTokens : lineToken) {
-                boolean b = booleanOutput(lTokens);
-                booleans.add(b);
-            }
-        } catch (NullPointerException e) {
-            error = "This Boolean Expression does not have any Compares";
-            return;
-        }
-
-        if (compareToken.size() == 1 && booleans.size() == 1 && compareToken.get(0).getVal().toString().equals("!!")) {
-            booleans.set(0, !booleans.get(0));
-        }
-        while (booleans.size() > 1) {
-            int index = getTop(priority);
-
-            String logic = compareToken.get(index).getVal().toString();
-            Boolean b1 = booleans.get(index);
-            Boolean b2 = booleans.get(index + 1);
-
-            if (logic.equals("!!")) {
-                priority.set(index, -1);
-                booleans.set(index, !booleans.get(index));
-                compareToken.remove(index);
-                continue;
-            }
-
-            if (logic.equals("||")) {
-                priority.set(index, -1);
-                booleans.remove(index + 1);
-                compareToken.remove(index);
-                if (b1 || b2) {
-                    booleans.set(index, true);
-                } else {
-                    booleans.set(index, false);
-                }
-            }
-            if (logic.equals("&&")) {
-                priority.set(index, -1);
-                booleans.remove(index + 1);
-                compareToken.remove(index);
-                if (b1 && b2) {
-                    booleans.set(index, true);
-                } else {
-                    booleans.set(index, false);
-                }
-            }
-
-            if (logic.equals("!&")) {
-                priority.set(index, -1);
-                booleans.remove(index + 1);
-                compareToken.remove(index);
-                if (b1 && b2) {
-                    booleans.set(index, false);
-                } else {
-                    booleans.set(index, true);
-                }
-            }
-            if (logic.equals("n|")) {
-                priority.set(index, -1);
-                booleans.remove(index + 1);
-                compareToken.remove(index);
-                if (b1 || b2) {
-                    booleans.set(index, false);
-                } else {
-                    booleans.set(index, true);
-                }
-            }
-            if (logic.equals("x|")) {
-                priority.set(index, -1);
-                booleans.remove(index + 1);
-                compareToken.remove(index);
-                if ((b1 || b2) && !(b1 && b2)) {
-                    booleans.set(index, true);
-                } else {
-                    booleans.set(index, false);
-                }
-            }
-            if (logic.equals("xn")) {
-                priority.set(index, -1);
-                booleans.remove(index + 1);
-                compareToken.remove(index);
-                if ((b1 || b2) && !(b1 && b2)) {
-                    booleans.set(index, false);
-                } else {
-                    booleans.set(index, true);
-                }
-            }
-        }
-
-        outputBoolean = booleans.get(0);
-    }
-
-    private int getTop(ArrayList<Integer> priorities) {
-        int index = 0;
-        int pri = 0;
-        for (int i = 0; i < priorities.size(); i++) {
-            if (pri < priorities.get(i)) {
-                index = i;
-                pri = priorities.get(i);
-            }
-        }
-        return index;
-    }
-
-    private boolean booleanOutput(ArrayList<Token> tokens) {
-        boolean b = false;
-        ArrayList<Token> tokens1 = new ArrayList<>();
-        ArrayList<Token> tokens2 = new ArrayList<>();
-        Token compareToken = null;
-
-        for (Token token : tokens) {
-            if (token.getKey().equals("COM")) {
-                b = true;
-                compareToken = token;
-                continue;
-            }
-            if (b) {
-                tokens2.add(token);
-            } else {
-                tokens1.add(token);
-            }
-        }
-
-        if (compareToken == null) {
-            if (tokens1.size() == 1 && tokens1.get(0).getKey().equals("bol")) {
-                return (boolean)tokens1.get(0).getVal();
-            }
-
-            throw new NullPointerException();
-        }
-
-        Expression expression1 = new Expression(tokens1, variableState, executor);
-        expression1.build();
-
-        Expression expression2 = new Expression(tokens2, variableState, executor);
-        expression2.build();
-
-        plusTime += expression1.getExpressionTime();
-        plusTime += expression2.getExpressionTime();
-
-        Object s1 = expression1.getObject();
-        Object s2 = expression2.getObject();
-        String t1 = expression1.getType();
-        String t2 = expression2.getType();
-
-        String compare = compareToken.getVal().toString();
-
-        if (t2.equals("typ") && compare.equals("typeof")) {
-            if (t1.equals(tokens2.get(0).getVal().toString())) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        if (t2.equals("typ") && compare.equals("canbe")) {
-            String typeTo = tokens2.get(0).getVal().toString();
-            if (typeTo.equals("str")) {
-                return true;
-            }
-            if (typeTo.equals("int")) {
-                try {
-                    Integer.parseInt(s1.toString());
-                    return true;
-                } catch (Exception e) {
-
-                }
-                try {
-                    if (s1.toString().startsWith("##")) {
-                        Integer.parseInt(s1.toString().substring(2), 16);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (Exception e2) {
-
-                }
-                return false;
-            }
-            if (typeTo.equals("num")) {
-                try {
-                    Double.parseDouble(s1.toString());
-                    return true;
-                } catch (Exception e) {
-                    return false;
-                }
-            }
-            if (typeTo.equals("bol")) {
-                return true;
-            }
-            if (typeTo.equals("chr")) {
-                return true;
-            }
-        }
-
-        if (compare.equals("==")) {
-            if (s1.equals(s2) && t1.equals(t2)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        if (compare.equals("!=")) {
-            if (!s1.equals(s2) || !t1.equals(t2)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        if ((t1.equals("str") && t2.equals("str")) || (t1.equals("str") && t2.equals("chr"))) {
-            if (compare.equals("equals")) {
-                if (s1.toString().equals(s2.toString())) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("equalsIgnoreCase")) {
-                if (s1.toString().equalsIgnoreCase(s2.toString())) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("startsWith")) {
-                if (s1.toString().startsWith(s2.toString())) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("endsWith")) {
-                if (s1.toString().endsWith(s2.toString())) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("contains")) {
-                if (s1.toString().contains(s2.toString())) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("containsIgnoreCase")) {
-                if (s1.toString().toLowerCase().contains(s2.toString().toLowerCase())) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        if (t1.equals("num") && t2.equals("num")) {
-            if (compare.equals(">")) {
-                if ((double)s1 > (double)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("<")) {
-                if ((double)s1 < (double)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals(">=")) {
-                if ((double)s1 >= (double)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("<=")) {
-                if ((double)s1 <= (double)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        if (t1.equals("int") && t2.equals("num")) {
-            if (compare.equals(">")) {
-                if ((int)s1 > (double)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("<")) {
-                if ((int)s1 < (double)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals(">=")) {
-                if ((int)s1 >= (double)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("<=")) {
-                if ((int)s1 <= (double)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        if (t1.equals("int") && t2.equals("int")) {
-            if (compare.equals(">")) {
-                if ((int)s1 > (int)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("<")) {
-                if ((int)s1 < (int)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals(">=")) {
-                if ((int)s1 >= (int)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("<=")) {
-                if ((int)s1 <= (int)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        if (t1.equals("num") && t2.equals("int")) {
-            if (compare.equals(">")) {
-                if ((double)s1 > (int)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("<")) {
-                if ((double)s1 < (int)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals(">=")) {
-                if ((double)s1 >= (int)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (compare.equals("<=")) {
-                if ((double)s1 <= (int)s2) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private boolean isOnlyInt(ArrayList<Token> tokens) {
-	    for (Token token : tokens) {
-	        if (token.getKey().equals("num")) {
-	            return false;
-            }
-        }
-	    return true;
-    }
-
-    private void stringFunctions() {
-        for (int i = 0; i < tokens.size() - 2; i++) {
-            Token tok1 = tokens.get(i);
-            Token tok2 = tokens.get(i + 1);
-            Token tok3 = tokens.get(i + 2);
-
-            if (!tok1.getKey().equals("str") || !tok2.getKey().equals("SEP") || !tok2.getVal().toString().equals(":") || !tok3.getKey().equals("COD")) {
-                continue;
-            }
-
-            if (tok3.getVal().toString().equals("length")) {
-                int lenght = tok1.getVal().toString().length();
-                tokens.set(i, new Token("int", lenght));
-                tokens.remove(i + 1);
-                tokens.remove(i + 1);
-            }
-
-            if (tok3.getVal().toString().equals("trim")) {
-                String trim = tok1.getVal().toString().trim();
-                tokens.set(i, new Token("str", trim));
-                tokens.remove(i + 1);
-                tokens.remove(i + 1);
-            }
-
-            if (tok3.getVal().toString().equals("toUpperCase")) {
-                String toUpperCase = tok1.getVal().toString().toUpperCase();
-                tokens.set(i, new Token("str", toUpperCase));
-                tokens.remove(i + 1);
-                tokens.remove(i + 1);
-            }
-
-            if (tok3.getVal().toString().equals("toLowerCase")) {
-                String toLowerCase = tok1.getVal().toString().toLowerCase();
-                tokens.set(i, new Token("str", toLowerCase));
-                tokens.remove(i + 1);
-                tokens.remove(i + 1);
-            }
-        }
-    }
-
-    private void stringOutput() {
-
-	    tokens = replace(tokens);
-	    if (tokens.size() == 0) {
-	        return;
-        }
-
-	    stringFunctions();
-
-        if (isCalculation(tokens)) {
-            Calculator calculator = new Calculator(tokens);
-            Object b = calculator.calculate();
-            outputString = b.toString();
-            if (b instanceof Integer) {
-                type = "int";
-            } else if (b instanceof Double) {
-                type = "num";
-            } else if (b instanceof Long) {
-                type = "lon";
-            }
-            return;
-        }
-
-        int startIndex = 0;
-
-        while (startIndex != -1) {
-            int start = getOpenBracket(startIndex, tokens);
-            ArrayList<Token> tokens = getTokensToClosingBracket(this.tokens, start);
-            if (isCalculation(tokens)) {
-                Calculator calculator = new Calculator(tokens);
-                Object b = calculator.calculate();
-
-                String t = "";
-                int i = 0;
-                double d = 0;
-                long l = 0;
-
-                if (b instanceof Integer) {
-                    t = "int";
-                    i = (int)b;
-                } else if (b instanceof Double) {
-                    t = "num";
-                    d = (double)b;
-                } else if (b instanceof Long) {
-                    t = "lon";
-                    l = (long)b;
-                }
-
-                Token token = null;
-                if (t.equals("int")) {
-                    token = new Token(t, i);
-                } else if (t.equals("num")) {
-                    token = new Token(t, d);
-                } else if (t.equals("lon")) {
-                    token = new Token(t, l);
-                }
-
-                removeToClosingBracket(this.tokens, start);
-                if (token != null) {
-                    this.tokens.add(start, token);
-                }
-            } else {
-                startIndex = start;
-                if (startIndex != -1) {
-                    startIndex++;
-                }
-            }
-        }
-
-        stringFunctions();
-
-        for (int i = tokens.size() - 1; i >= 0; i--) {
-            if (tokens.get(i).getKey().equals("STb")) {
-                tokens.remove(i);
-            }
-        }
-
-        for (int i = 0; i < tokens.size()-1; i += 2) {
-            if (!(tokens.get(i).isType() && tokens.get(i + 1).getKey().equals("OPE") && tokens.get(i + 1).getVal().equals("+"))) {
-                error = "To many or to few Operators";
-                return;
-            }
-        }
-
-        type = "str";
-        outputString = toStringOutput();
-    }
-
-    private String toStringOutput() {
-        StringBuilder st = new StringBuilder();
-        for (Token token : tokens) {
-            if (token.getKey().equals("OPE") && token.getVal().equals("+")) {
-                continue;
-            }
-            if (token.getKey().equals("num")) {
-                st.append(token.getVal().toString());
-                continue;
-            }
-            st.append(token.getVal().toString());
-        }
-        return st.toString();
-    }
-
-
-	/**
-	 * Gets an expressed string (if the output was equal to a string value)
-	 *
-	 * @return the expressed string.
-	 */
-	public String getString() {
-        if (outputString == null && error == null) {
-            error = "This Expression was not detected as a String Expression";
-        }
-        return outputString;
-    }
-
-	/**
-	 * Gets boolean.
-	 *
-	 * @return the boolean
-	 */
-	public Boolean getBoolean() {
-        if (outputBoolean == null && error == null) {
-            error = "This Expression was not detected as a Boolean Expression";
-        }
-        return outputBoolean;
-    }
-
-	/**
-	 * Gets object.
-	 *
-	 * @return the object
-	 */
-	public Object getObject() {
-        return outputObject;
-    }
-
-	/**
-	 * Gets error.
-	 *
-	 * @return the error
-	 */
-	public String getError() {
-        return error;
-    }
-
-	/**
-	 * Gets expression time.
-	 *
-	 * @return the expression time
-	 */
-	public long getExpressionTime() {
-        return expressionTime + plusTime;
-    }
-
-	/**
-	 * Gets type.
-	 *
-	 * @return the type
-	 */
-	public String getType() {
-        return type;
-    }
-
-
-    private int getOpenBracket(int start, ArrayList<Token> tokens) {
+    public static int getOpenBracket(int start, List<Token> tokens) {
         for (int i = start; i < tokens.size(); i++) {
             if (tokens.get(i).getKey().equals("STb") && tokens.get(i).getVal().equals("(")) {
                 return i;
@@ -835,71 +412,64 @@ public class Expression {
         return -1;
     }
 
-    private ArrayList<Token> getTokensToClosingBracket(ArrayList<Token> tokens, int start) {
-        if (start == -1) {
-            start++;
+    public static List<Token> getRange(int start, int stop, List<Token> tokens) {
+        List<Token> newTokens = new ArrayList<>();
+        for (int i = start; i <= stop; i++) {
+            newTokens.add(tokens.get(i));
         }
-        ArrayList<Token> arrayList = new ArrayList<>();
-        boolean st = false;
-        int brCount = 0;
-        while (!st || (brCount != 0 && start < tokens.size())) {
-            if (tokens.get(start).getKey().equals("STb") && tokens.get(start).getVal().toString().equals("(")) {
-                brCount++;
-            }
-            if (brCount != 0) {
-                arrayList.add(tokens.get(start));
-            }
-            if (tokens.get(start).getKey().equals("STb") && tokens.get(start).getVal().toString().equals(")")) {
-                brCount--;
-            }
-            st = true;
-            start++;
-        }
-        return arrayList;
+        return newTokens;
     }
 
-    private ArrayList<Token> removeToClosingBracket(ArrayList<Token> tokens, int start) {
-        int brCount = 0;
-        boolean st = false;
-        int stop = start;
-        while (!st || (brCount != 0 && stop < tokens.size())) {
-            if (tokens.get(stop).getKey().equals("STb") && tokens.get(stop).getVal().toString().equals("(")) {
-                brCount++;
-            }
-            if (tokens.get(stop).getKey().equals("STb") && tokens.get(stop).getVal().toString().equals(")")) {
-                brCount--;
-            }
-            st = true;
-            stop++;
+    public static List<List<Token>> getSplitTokens(List<Token> bracketTokens) {
+        if (bracketTokens.get(0).getKey().equals("STb") && bracketTokens.get(0).getVal().equals("(")) {
+            bracketTokens.remove(0);
         }
-        stop--;
-        while (stop >= start) {
-            tokens.remove(stop);
-            stop--;
+        if (bracketTokens.get(bracketTokens.size() - 1).getKey().equals("STb") && bracketTokens.get(bracketTokens.size() - 1).getVal().equals(")")) {
+            bracketTokens.remove(bracketTokens.size() - 1);
         }
-        return tokens;
+
+        List<List<Token>> tokenList = new ArrayList<>();
+        List<Token> list = new ArrayList<>();
+        for (int i = 0; i < bracketTokens.size(); i++) {
+            if (bracketTokens.get(i).getKey().equals("SEP") && bracketTokens.get(i).getVal().equals(",")) {
+                tokenList.add(list);
+                list = new ArrayList<>();
+            } else {
+                list.add(bracketTokens.get(i));
+            }
+        }
+
+        if (!list.isEmpty()) {
+            tokenList.add(list);
+        }
+
+        return tokenList;
     }
 
+    public static List<Token> evaluateTokenList(List<List<Token>> tokenList, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<Token> list = new ArrayList<>();
 
-    private boolean isLogic() {
-        for (Token token : tokens) {
-            if (token.getKey().equals("LOG")) {
-                return true;
-            }
-            if (token.getKey().equals("COM")) {
-                return true;
+        for (List<Token> tokens : tokenList) {
+            Expression expression = new Expression(tokens, variableState, executor);
+            expression.build();
+
+            ExpressionState exState = expression.getResult();
+            expressionState.addTime(exState.getTime());
+            if (exState.hasErrors()) {
+                for (String s : exState.getErrors()) {
+                    expressionState.addError(s);
+                }
+                list.add(null);
+            } else {
+                list.add(exState.getResult());
             }
         }
-        if (tokens.size() == 1) {
-            if (tokens.get(0).getKey().equals("bol")) {
-                return true;
-            }
-        }
-        return false;
+
+        return list;
     }
 
-    private boolean isCalculation(ArrayList<Token> tokens) {
-        if (tokens.size() == 0) {
+    public static boolean isCalculation(List<Token> tokens) {
+        if (tokens.isEmpty()) {
             return false;
         }
         for (int i = 0; i < tokens.size(); i++) {
@@ -911,45 +481,763 @@ public class Expression {
         return true;
     }
 
+    public static Token getToken(Object o) {
+        if (o instanceof Integer) {
+            return new Token("int", (int)o);
+        }
+        if (o instanceof Double) {
+            return new Token("num", (double)o);
+        }
+        if (o instanceof Long) {
+            return new Token("lon", (long)o);
+        }
 
-    private boolean advancedInfo = false;
-
-	/**
-	 * Advanced info expression.
-	 *
-	 * @return the expression
-	 */
-	public ExpressionAdvancedInfo advancedInfo() {
-        advancedInfo = true;
-		ExpressionAdvancedInfo advancedObject = new ExpressionAdvancedInfo();
-		advancedObject.set(InfoID.TOKENS, tokens);
-        return advancedObject;
+        if (o instanceof Character) {
+            return new Token("chr", (char)o);
+        }
+        return new Token("str", o.toString());
     }
 
-    @Override
-    public String toString() {
-        if (advancedInfo) {
-            advancedInfo = false;
-            return "Expression{" +
-                    "tokens=" + tokens +
-                    ", outputString='" + outputString + '\'' +
-                    ", outputBoolean=" + outputBoolean +
-                    ", outputObject=" + outputObject +
-                    ", expressionTime=" + expressionTime +
-                    ", plusTime=" + plusTime +
-                    ", type='" + type + '\'' +
-                    ", error='" + error + '\'' +
-                    '}';
-        } else {
-            return "Expression{" +
-                    "outputString='" + outputString + '\'' +
-                    ", outputBoolean=" + outputBoolean +
-                    ", outputObject=" + outputObject +
-                    ", expressionTime=" + expressionTime +
-                    ", plusTime=" + plusTime +
-                    ", type='" + type + '\'' +
-                    ", error='" + error + '\'' +
-                    '}';
+    public static void removeFromTo(int start, int stop, List<Token> tokens) {
+        for (int i = stop; i >= start; i--) {
+            tokens.remove(i);
         }
     }
+
+    public static boolean isType(Token[] list, String... types) {
+        return isType(Arrays.asList(list), types);
+    }
+
+    public static boolean isType(List<Token> list, String... types) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) == null) {
+                return false;
+            }
+            boolean b = false;
+            for (String s : types) {
+                if (list.get(i).getKey().equals(s)) {
+                    b = true;
+                }
+            }
+            if (!b) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static List<Integer> getPriorities(List<Token> list, int mode) {
+        List<Integer> priorities = new ArrayList<>();
+
+        int p = 0;
+        for (Token t : list) {
+            if (t.getKey().equals("STb") && t.getVal().equals("(")) {
+                if (mode == 1) {
+                    p += 2;
+                } else {
+                    p++;
+                }
+            }
+            if (mode == 1 && t.getKey().equals("COM")) {
+                priorities.add(p + 2);
+            } else if (mode == 1 && t.getKey().equals("LOG")) {
+                priorities.add(p + 1);
+            } else if (mode == 0 && t.getKey().equals("OPE") && t.getVal().equals("+")) {
+                priorities.add(p + 1);
+            }
+            else {
+                priorities.add(0);
+            }
+            if (t.getKey().equals("STb") && t.getVal().equals(")")) {
+                if (mode == 1) {
+                    p -= 2;
+                } else {
+                    p--;
+                }
+            }
+        }
+
+        return priorities;
+    }
+
+    public static int getMax(List<Integer> list) {
+        if (list.isEmpty()) {
+            return -1;
+        }
+
+        int value = list.get(0);
+        int index = 0;
+        for (int i = 0; i < list.size(); i++) {
+            if (value < list.get(i)) {
+                value = list.get(i);
+                index = i;
+            }
+        }
+
+        if (list.get(index) == 0) {
+            return -1;
+        }
+
+        return index;
+    }
+
+    public static List<List<Token>> getLogic(List<Token> tokens, int index) {
+        if (!tokens.get(index).getKey().equals("COM")) {
+            return new ArrayList<>();
+        }
+
+        List<List<Token>> lists = new ArrayList<>();
+
+        List<Token> tokenList = new ArrayList<>();
+        for (int i = index - 1; i >= 0; i--) {
+            if (tokens.get(i).getKey().equals("STb") || tokens.get(i).getKey().equals("LOG")) {
+                break;
+            }
+            tokenList.add(0, tokens.get(i));
+        }
+        lists.add(tokenList);
+        tokenList = new ArrayList<>();
+
+        for (int i = index + 1; i < tokens.size(); i++) {
+            if (tokens.get(i).getKey().equals("STb") || tokens.get(i).getKey().equals("LOG")) {
+                break;
+            }
+            tokenList.add(tokens.get(i));
+        }
+        lists.add(tokenList);
+
+        return lists;
+    }
+
+    public static void removeLogic(List<Token> tokens, Token token, List<Integer> priorities, int index) {
+        if (!tokens.get(index).getKey().equals("COM")) {
+            return;
+        }
+
+        int j = 0;
+        for (int i = index + 1; i < tokens.size(); i++) {
+            if (tokens.get(i).getKey().equals("STb") || tokens.get(i).getKey().equals("LOG")) {
+                break;
+            }
+            j = i;
+        }
+
+        for (int i = j; i >= index + 1; i--) {
+            tokens.remove(i);
+            priorities.remove(i);
+        }
+
+        tokens.set(index, token);
+        priorities.set(index, 0);
+
+        for (int i = index - 1; i >= 0; i--) {
+            if (tokens.get(i).getKey().equals("STb") || tokens.get(i).getKey().equals("LOG")) {
+                break;
+            }
+            tokens.remove(i);
+            priorities.remove(i);
+        }
+    }
+
+    public static boolean compare(Token token1, Token compare, Token token2) {
+        String compareString = compare.getVal().toString();
+
+        if (compare.getKey().equals("COM")) {
+            if (token2.getKey().equals("typ")) {
+                return compareType(token1, token2, compareString);
+            }
+
+            if (compareString.equals("==")) {
+                return token1.getVal().toString().equals(token2.getVal().toString());
+            }
+            if (compareString.equals("!=")) {
+                return !token1.getVal().toString().equals(token2.getVal().toString());
+            }
+
+            return compareOther(token1, token2, compareString);
+        } else if (compare.getKey().equals("LOG")) {
+            return compareLogic(token1, token2, compareString);
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean compareType(Token token1, Token token2, String compareString) {
+        if (compareString.equals("typeof")) {
+            return token1.getKey().equals(token2.getVal().toString());
+        }
+
+        if (compareString.equals("canbe")) {
+
+            String typeTo = token2.getVal().toString();
+
+            if (typeTo.equals("str")) {
+                return true;
+            }
+            if (typeTo.equals("int")) {
+                try {
+                    Integer.parseInt(token1.getVal().toString());
+                    return true;
+                } catch (Exception e) {
+                    // Ignoring Exception
+                }
+                try {
+                    if (!token1.getVal().toString().startsWith("##")) {
+                        return false;
+                    }
+                    Integer.parseInt(token1.getVal().toString().substring(2), 16);
+                    return true;
+                } catch (Exception e) {
+                    // Ignoring Exception
+                }
+                return false;
+            }
+            if (typeTo.equals("num")) {
+                try {
+                    Double.parseDouble(token1.getVal().toString());
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            if (typeTo.equals("bol")) {
+                return true;
+            }
+            if (typeTo.equals("chr")) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
+    private static boolean compareOther(Token token1, Token token2, String compareString) {
+        boolean b = isType(new Token[]{token1, token2}, "int", "num", "lon");
+        if (!b) {
+            return false;
+        }
+
+        if (compareString.equals(">=")) {
+            if (token1.getKey().equals("int") && token2.getKey().equals("int")) {
+                return (int)token1.getVal() >= (int)token2.getVal();
+            }
+            if (token1.getKey().equals("int") && token2.getKey().equals("num")) {
+                return (int)token1.getVal() >= (double)token2.getVal();
+            }
+            if (token1.getKey().equals("int") && token2.getKey().equals("lon")) {
+                return (int)token1.getVal() >= (long)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("int")) {
+                return (double)token1.getVal() >= (int)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("num")) {
+                return (double)token1.getVal() >= (double)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("lon")) {
+                return (double)token1.getVal() >= (long)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("int")) {
+                return (long)token1.getVal() >= (int)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("num")) {
+                return (long)token1.getVal() >= (double)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("lon")) {
+                return (long)token1.getVal() >= (long)token2.getVal();
+            }
+        }
+        if (compareString.equals("<=")) {
+            if (token1.getKey().equals("int") && token2.getKey().equals("int")) {
+                return (int)token1.getVal() <= (int)token2.getVal();
+            }
+            if (token1.getKey().equals("int") && token2.getKey().equals("num")) {
+                return (int)token1.getVal() <= (double)token2.getVal();
+            }
+            if (token1.getKey().equals("int") && token2.getKey().equals("lon")) {
+                return (int)token1.getVal() <= (long)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("int")) {
+                return (double)token1.getVal() <= (int)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("num")) {
+                return (double)token1.getVal() <= (double)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("lon")) {
+                return (double)token1.getVal() <= (long)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("int")) {
+                return (long)token1.getVal() <= (int)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("num")) {
+                return (long)token1.getVal() <= (double)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("lon")) {
+                return (long)token1.getVal() <= (long)token2.getVal();
+            }
+        }
+        if (compareString.equals(">")) {
+            if (token1.getKey().equals("int") && token2.getKey().equals("int")) {
+                return (int)token1.getVal() > (int)token2.getVal();
+            }
+            if (token1.getKey().equals("int") && token2.getKey().equals("num")) {
+                return (int)token1.getVal() > (double)token2.getVal();
+            }
+            if (token1.getKey().equals("int") && token2.getKey().equals("lon")) {
+                return (int)token1.getVal() > (long)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("int")) {
+                return (double)token1.getVal() > (int)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("num")) {
+                return (double)token1.getVal() > (double)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("lon")) {
+                return (double)token1.getVal() > (long)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("int")) {
+                return (long)token1.getVal() > (int)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("num")) {
+                return (long)token1.getVal() > (double)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("lon")) {
+                return (long)token1.getVal() > (long)token2.getVal();
+            }
+        }
+        if (compareString.equals("<")) {
+            if (token1.getKey().equals("int") && token2.getKey().equals("int")) {
+                return (int)token1.getVal() < (int)token2.getVal();
+            }
+            if (token1.getKey().equals("int") && token2.getKey().equals("num")) {
+                return (int)token1.getVal() < (double)token2.getVal();
+            }
+            if (token1.getKey().equals("int") && token2.getKey().equals("lon")) {
+                return (int)token1.getVal() < (long)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("int")) {
+                return (double)token1.getVal() < (int)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("num")) {
+                return (double)token1.getVal() < (double)token2.getVal();
+            }
+            if (token1.getKey().equals("num") && token2.getKey().equals("lon")) {
+                return (double)token1.getVal() < (long)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("int")) {
+                return (long)token1.getVal() < (int)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("num")) {
+                return (long)token1.getVal() < (double)token2.getVal();
+            }
+            if (token1.getKey().equals("lon") && token2.getKey().equals("lon")) {
+                return (long)token1.getVal() < (long)token2.getVal();
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean compareLogic(Token token1, Token token2, String compareString) {
+        boolean b = isType(new Token[]{token1, token2}, "bol");
+        if (!b) {
+            return false;
+        }
+
+        if (compareString.equals("||")) {
+            return (boolean)token1.getVal() || (boolean)token2.getVal();
+        }
+        if (compareString.equals("&&")) {
+            return (boolean)token1.getVal() && (boolean)token2.getVal();
+        }
+
+        if (compareString.equals("!&")) {
+            return !((boolean)token1.getVal() && (boolean)token2.getVal());
+        }
+
+        if (compareString.equals("n|")) {
+            return !((boolean)token1.getVal() || (boolean)token2.getVal());
+        }
+        if (compareString.equals("x|")) {
+            return (((boolean)token1.getVal() || (boolean)token2.getVal()) && !((boolean)token1.getVal() && (boolean)token2.getVal()));
+        }
+        if (compareString.equals("xn")) {
+            return !(((boolean)token1.getVal() || (boolean)token2.getVal()) && !((boolean)token1.getVal() && (boolean)token2.getVal()));
+        }
+
+        return false;
+    }
+
+}
+
+class StringFunctions {
+
+    private StringFunctions() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static void execute(List<Token> tokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        for (int i = 0; i < tokens.size(); i++) {
+            if (i > tokens.size() - 3) {
+                continue;
+            }
+
+            if (!tokens.get(i).getKey().equals("str")) {
+                continue;
+            }
+
+            if (!(tokens.get(i + 1).getKey().equals("SEP") && tokens.get(i + 1).getVal().equals("."))) {
+                continue;
+            }
+
+            if (!tokens.get(i + 2).getKey().equals("COD")) {
+                continue;
+            }
+
+            if (!(tokens.get(i + 3).getKey().equals("STb") && tokens.get(i + 3).getVal().equals("("))) {
+                continue;
+            }
+
+            int c = ExpressionUtils.getClosingBracket(i + 3, tokens);
+            List<Token> bracketTokens = ExpressionUtils.getRange(i + 3, c, tokens);
+
+            String name = tokens.get(i + 2).getVal().toString();
+
+            Token t = null;
+
+            switch (name) {
+                case "length":
+                    t = lengthFunction(tokens.get(i));
+                    break;
+                case "trim":
+                    t = trimFunction(tokens.get(i));
+                    break;
+                case "toUpperCase":
+                    t = toUpperCaseFunction(tokens.get(i));
+                    break;
+                case "toLowerCase":
+                    t = toLowerCaseFunction(tokens.get(i));
+                    break;
+                case "substring":
+                    t = substringFunction(tokens.get(i), bracketTokens, variableState, executor, expressionState);
+                    break;
+                case "isEmpty":
+                    t = isEmptyFunction(tokens.get(i));
+                    break;
+                case "isBlank":
+                    t = isBlankFunction(tokens.get(i));
+                    break;
+                case "charAt":
+                    t = charAtFunction(tokens.get(i), bracketTokens, variableState, executor, expressionState);
+                    break;
+                case "startsWith":
+                    t = startsWithFunction(tokens.get(i), bracketTokens, variableState, executor, expressionState);
+                    break;
+                case "endsWith":
+                    t = endsWithFunction(tokens.get(i), bracketTokens, variableState, executor, expressionState);
+                    break;
+                case "indexOf":
+                    t = indexOfFunction(tokens.get(i), bracketTokens, variableState, executor, expressionState);
+                    break;
+                case "lastIndexOf":
+                    t = lastIndexOfFunction(tokens.get(i), bracketTokens, variableState, executor, expressionState);
+                    break;
+                case "repeat":
+                    t = repeatFunction(tokens.get(i), bracketTokens, variableState, executor, expressionState);
+                    break;
+                case "contains":
+                    t = containsFunction(tokens.get(i), bracketTokens, variableState, executor, expressionState);
+                    break;
+                case "containsIgnoreCase":
+                    t = containsIgnoreCaseFunciont(tokens.get(i), bracketTokens, variableState, executor, expressionState);
+                    break;
+                case "equals":
+                    t = equalsFunction(tokens.get(i), bracketTokens, variableState, executor, expressionState);
+                    break;
+                case "equalsIgnoreCase":
+                    t = equalsIgnoreCaseFunction(tokens.get(i), bracketTokens, variableState, executor, expressionState);
+                    break;
+                default:
+                    break;
+            }
+
+            ExpressionUtils.removeFromTo(i, c, tokens);
+            tokens.add(i, t);
+        }
+    }
+
+    private static Token lengthFunction(Token token) {
+        int i = token.getVal().toString().length();
+        return new Token("int", i);
+    }
+
+    private static Token trimFunction(Token token) {
+        String s = token.getVal().toString().trim();
+        return new Token("str", s);
+    }
+
+    private static Token toUpperCaseFunction(Token token) {
+        String s = token.getVal().toString().toUpperCase();
+        return new Token("str", s);
+    }
+
+    private static Token toLowerCaseFunction(Token token) {
+        String s = token.getVal().toString().toLowerCase();
+        return new Token("str", s);
+    }
+
+    private static Token substringFunction(Token token, List<Token> bracketTokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<List<Token>> tokenList = ExpressionUtils.getSplitTokens(bracketTokens);
+        List<Token> list = ExpressionUtils.evaluateTokenList(tokenList, variableState, executor, expressionState);
+
+        boolean b = ExpressionUtils.isType(list, "int");
+        if (!b) {
+            return token;
+        }
+
+        if (list.isEmpty()) {
+            return token;
+        }
+
+        int i = (int)list.get(0).getVal();
+        if (i < 0) {
+            i = 0;
+        }
+        if (i > token.getVal().toString().length()) {
+            i = token.getVal().toString().length();
+        }
+        if (list.size() == 2) {
+            int j = (int)list.get(1).getVal();
+            if (j > token.getVal().toString().length()) {
+                j = token.getVal().toString().length();
+            }
+
+            if (j < i) {
+                j = i;
+            }
+
+            list.set(1, new Token("int", j));
+        }
+        list.set(0, new Token("int", i));
+
+        if (list.size() == 1) {
+            String s = token.getVal().toString().substring((int)list.get(0).getVal());
+            return new Token("str", s);
+        }
+        if (list.size() == 2) {
+            String s = token.getVal().toString().substring((int)list.get(0).getVal(), (int)list.get(1).getVal());
+            return new Token("str", s);
+        }
+
+        return token;
+    }
+
+    private static Token isEmptyFunction(Token token) {
+        boolean b = token.getVal().toString().isEmpty();
+        return new Token("bol", b);
+    }
+
+    private static Token isBlankFunction(Token token) {
+        boolean b = token.getVal().toString().isBlank();
+        return new Token("bol", b);
+    }
+
+    private static Token charAtFunction(Token token, List<Token> bracketTokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<List<Token>> tokenList = ExpressionUtils.getSplitTokens(bracketTokens);
+        List<Token> list = ExpressionUtils.evaluateTokenList(tokenList, variableState, executor, expressionState);
+
+        boolean b = ExpressionUtils.isType(list, "int");
+        if (!b) {
+            return token;
+        }
+
+        if (list.size() == 1) {
+            int i = (int)list.get(0).getVal();
+            return new Token("chr", token.getVal().toString().charAt(i));
+        }
+
+        return token;
+    }
+
+    private static Token startsWithFunction(Token token, List<Token> bracketTokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<List<Token>> tokenList = ExpressionUtils.getSplitTokens(bracketTokens);
+        List<Token> list = ExpressionUtils.evaluateTokenList(tokenList, variableState, executor, expressionState);
+
+        boolean b = ExpressionUtils.isType(list, "str");
+        if (!b) {
+            return token;
+        }
+
+        if (list.size() == 1) {
+            String s = list.get(0).getVal().toString();
+            return new Token("bol", token.getVal().toString().startsWith(s));
+        }
+
+        return token;
+    }
+
+    private static Token endsWithFunction(Token token, List<Token> bracketTokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<List<Token>> tokenList = ExpressionUtils.getSplitTokens(bracketTokens);
+        List<Token> list = ExpressionUtils.evaluateTokenList(tokenList, variableState, executor, expressionState);
+
+        boolean b = ExpressionUtils.isType(list, "str");
+        if (!b) {
+            return token;
+        }
+
+        if (list.size() == 1) {
+            String s = list.get(0).getVal().toString();
+            return new Token("bol", token.getVal().toString().endsWith(s));
+        }
+
+        return token;
+    }
+
+    private static Token indexOfFunction(Token token, List<Token> bracketTokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<List<Token>> tokenList = ExpressionUtils.getSplitTokens(bracketTokens);
+        List<Token> list = ExpressionUtils.evaluateTokenList(tokenList, variableState, executor, expressionState);
+
+        boolean b = ExpressionUtils.isType(list, "str", "int");
+        if (!b) {
+            return token;
+        }
+
+        if (list.size() == 1) {
+            if (!list.get(0).getKey().equals("str")) {
+                return token;
+            }
+            String s = list.get(0).getVal().toString();
+            return new Token("int", token.getVal().toString().indexOf(s));
+        }
+        if (list.size() == 2) {
+            if (!list.get(0).getKey().equals("str") || !list.get(1).getKey().equals("int")) {
+                return token;
+            }
+
+            String s = list.get(0).getVal().toString();
+            int i = (int)list.get(0).getVal();
+            return new Token("int", token.getVal().toString().indexOf(s, i));
+        }
+
+        return token;
+    }
+
+    private static Token lastIndexOfFunction(Token token, List<Token> bracketTokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<List<Token>> tokenList = ExpressionUtils.getSplitTokens(bracketTokens);
+        List<Token> list = ExpressionUtils.evaluateTokenList(tokenList, variableState, executor, expressionState);
+
+        boolean b = ExpressionUtils.isType(list, "str", "int");
+        if (!b) {
+            return token;
+        }
+
+        if (list.size() == 1) {
+            if (!list.get(0).getKey().equals("str")) {
+                return token;
+            }
+            String s = list.get(0).getVal().toString();
+            return new Token("int", token.getVal().toString().lastIndexOf(s));
+        }
+        if (list.size() == 2) {
+            if (!list.get(0).getKey().equals("str") || !list.get(1).getKey().equals("int")) {
+                return token;
+            }
+
+            String s = list.get(0).getVal().toString();
+            int i = (int)list.get(1).getVal();
+            return new Token("int", token.getVal().toString().lastIndexOf(s, i));
+        }
+
+        return token;
+    }
+
+    private static Token repeatFunction(Token token, List<Token> bracketTokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<List<Token>> tokenList = ExpressionUtils.getSplitTokens(bracketTokens);
+        List<Token> list = ExpressionUtils.evaluateTokenList(tokenList, variableState, executor, expressionState);
+
+        boolean b = ExpressionUtils.isType(list, "int");
+        if (!b) {
+            return token;
+        }
+
+        if (list.size() == 1) {
+            int i = (int)list.get(0).getVal();
+            try {
+                return new Token("str", token.getVal().toString().repeat(i));
+            } catch (OutOfMemoryError | IllegalArgumentException e) {
+                return token;
+            }
+        }
+
+        return token;
+    }
+
+    private static Token containsFunction(Token token, List<Token> bracketTokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<List<Token>> tokenList = ExpressionUtils.getSplitTokens(bracketTokens);
+        List<Token> list = ExpressionUtils.evaluateTokenList(tokenList, variableState, executor, expressionState);
+
+        boolean b = ExpressionUtils.isType(list, "str");
+        if (!b) {
+            return token;
+        }
+
+        if (list.size() == 1) {
+            String s = list.get(0).getVal().toString();
+            return new Token("bol", token.getVal().toString().contains(s));
+        }
+
+        return token;
+    }
+
+    private static Token containsIgnoreCaseFunciont(Token token, List<Token> bracketTokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<List<Token>> tokenList = ExpressionUtils.getSplitTokens(bracketTokens);
+        List<Token> list = ExpressionUtils.evaluateTokenList(tokenList, variableState, executor, expressionState);
+
+        boolean b = ExpressionUtils.isType(list, "str");
+        if (!b) {
+            return token;
+        }
+
+        if (list.size() == 1) {
+            String s = list.get(0).getVal().toString();
+            return new Token("bol", token.getVal().toString().toLowerCase().contains(s.toLowerCase()));
+        }
+
+        return token;
+    }
+
+    private static Token equalsFunction(Token token, List<Token> bracketTokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<List<Token>> tokenList = ExpressionUtils.getSplitTokens(bracketTokens);
+        List<Token> list = ExpressionUtils.evaluateTokenList(tokenList, variableState, executor, expressionState);
+
+        boolean b = ExpressionUtils.isType(list, "str");
+        if (!b) {
+            return token;
+        }
+
+        if (list.size() == 1) {
+            String s = list.get(0).getVal().toString();
+            return new Token("bol", token.getVal().toString().equals(s));
+        }
+
+        return token;
+    }
+
+    private static Token equalsIgnoreCaseFunction(Token token, List<Token> bracketTokens, VariableState variableState, Executor executor, ExpressionState expressionState) {
+        List<List<Token>> tokenList = ExpressionUtils.getSplitTokens(bracketTokens);
+        List<Token> list = ExpressionUtils.evaluateTokenList(tokenList, variableState, executor, expressionState);
+
+        boolean b = ExpressionUtils.isType(list, "str");
+        if (!b) {
+            return token;
+        }
+
+        if (list.size() == 1) {
+            String s = list.get(0).getVal().toString();
+            return new Token("bol", token.getVal().toString().equalsIgnoreCase(s));
+        }
+
+        return token;
+    }
+
 }

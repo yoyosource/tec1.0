@@ -34,7 +34,7 @@ public class FileStatement implements Statement {
             Expression expression = new Expression(tokenArrayList, variableState, executor);
             expression.build();
 
-            String object = expression.getObject().toString();
+            String object = expression.getResult().getResult().getVal().toString();
             if (!object.startsWith("FILE:")) {
                 return false;
             }
@@ -76,8 +76,8 @@ public class FileStatement implements Statement {
             return false;
         }
 
-        String type = expression.getType();
-        String object = expression.getObject().toString();
+        String type = expression.getResult().getResult().getKey();
+        String object = expression.getResult().getResult().getVal().toString();
         if (object.startsWith("*")) {
             object = executor.getGroundPath() + object.substring(1);
         }

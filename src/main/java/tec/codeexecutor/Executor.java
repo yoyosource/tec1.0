@@ -109,12 +109,19 @@ public class Executor {
 	}
 
     public boolean runExpressionInfo(Expression expression) {
-        if (expression.getObject() == null) {
-            System.out.println("Token: " + index);
-            System.out.println("ERROR: " + expression.getError());
-            return false;
-        }
-        return true;
+		if (expression.getResult().hasErrors()) {
+			boolean b = false;
+			for (String e : expression.getResult().getErrors()) {
+				if (b) {
+					System.out.println("");
+				}
+				System.out.println(e);
+				b = true;
+			}
+			System.out.println("Time Elapsed: " + expression.getResult().getTime() + "ms");
+			return false;
+		}
+		return true;
     }
 
     private void funcJumpPoints() {
@@ -532,7 +539,7 @@ public class Executor {
 					return false;
 				}
 
-				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+				if (!(expression.getResult().getResult().getKey().equals("num") || expression.getResult().getResult().getKey().equals("int"))) {
 					return false;
 				}
 
@@ -543,11 +550,11 @@ public class Executor {
 				VariableState variableState = variableStateStack.lastElement();
 
 				if (variableState.getVarType(name).equals("int")) {
-					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) + (int)expression.getObject(), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) + (int)expression.getResult().getResult().getVal(), variableState.getVarType(name)))) {
 						return true;
 					}
 				} else {
-					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) + (float)expression.getObject(), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (double)variableState.getVarValue(name) + (double)expression.getResult().getResult().getVal(), variableState.getVarType(name)))) {
 						return true;
 					}
 				}
@@ -565,7 +572,7 @@ public class Executor {
 					return false;
 				}
 
-				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+				if (!(expression.getResult().getResult().getKey().equals("num") || expression.getResult().getResult().getKey().equals("int"))) {
 					return false;
 				}
 
@@ -576,11 +583,11 @@ public class Executor {
 				VariableState variableState = variableStateStack.lastElement();
 
 				if (variableState.getVarType(name).equals("int")) {
-					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) - (int)expression.getObject(), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) - (int)expression.getResult().getResult().getVal(), variableState.getVarType(name)))) {
 						return true;
 					}
 				} else {
-					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) - (float)expression.getObject(), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (double)variableState.getVarValue(name) - (double)expression.getResult().getResult().getVal(), variableState.getVarType(name)))) {
 						return true;
 					}
 				}
@@ -598,7 +605,7 @@ public class Executor {
 					return false;
 				}
 
-				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+				if (!(expression.getResult().getResult().getKey().equals("num") || expression.getResult().getResult().getKey().equals("int"))) {
 					return false;
 				}
 
@@ -609,11 +616,11 @@ public class Executor {
 				VariableState variableState = variableStateStack.lastElement();
 
 				if (variableState.getVarType(name).equals("int")) {
-					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) * (int)expression.getObject(), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) * (int)expression.getResult().getResult().getVal(), variableState.getVarType(name)))) {
 						return true;
 					}
 				} else {
-					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) * (float)expression.getObject(), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (double)variableState.getVarValue(name) * (double)expression.getResult().getResult().getVal(), variableState.getVarType(name)))) {
 						return true;
 					}
 				}
@@ -631,7 +638,7 @@ public class Executor {
 					return false;
 				}
 
-				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+				if (!(expression.getResult().getResult().getKey().equals("num") || expression.getResult().getResult().getKey().equals("int"))) {
 					return false;
 				}
 
@@ -642,11 +649,11 @@ public class Executor {
 				VariableState variableState = variableStateStack.lastElement();
 
 				if (variableState.getVarType(name).equals("int")) {
-					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) / (int)expression.getObject(), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) / (int)expression.getResult().getResult().getVal(), variableState.getVarType(name)))) {
 						return true;
 					}
 				} else {
-					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) / (float)expression.getObject(), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (double)variableState.getVarValue(name) / (double)expression.getResult().getResult().getVal(), variableState.getVarType(name)))) {
 						return true;
 					}
 				}
@@ -665,7 +672,7 @@ public class Executor {
 					return false;
 				}
 
-				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+				if (!(expression.getResult().getResult().getKey().equals("num") || expression.getResult().getResult().getKey().equals("int"))) {
 					return false;
 				}
 
@@ -676,11 +683,11 @@ public class Executor {
 				VariableState variableState = variableStateStack.lastElement();
 
 				if (variableState.getVarType(name).equals("int")) {
-					if (variableState.setVar(name, new Var(name, (int)Math.pow((int)variableState.getVarValue(name), (int)expression.getObject()), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (int)Math.pow((int)variableState.getVarValue(name), (int)expression.getResult().getResult().getVal()), variableState.getVarType(name)))) {
 						return true;
 					}
 				} else {
-					if (variableState.setVar(name, new Var(name, (float)Math.pow((float)variableState.getVarValue(name), (float)expression.getObject()), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (float)Math.pow((double)variableState.getVarValue(name), (double)expression.getResult().getResult().getVal()), variableState.getVarType(name)))) {
 						return true;
 					}
 				}
@@ -698,7 +705,7 @@ public class Executor {
 					return false;
 				}
 
-				if (!expression.getType().equals("num") && !expression.getType().equals("int")) {
+				if (!(expression.getResult().getResult().getKey().equals("num") || expression.getResult().getResult().getKey().equals("int"))) {
 					return false;
 				}
 
@@ -709,11 +716,11 @@ public class Executor {
 				VariableState variableState = variableStateStack.lastElement();
 
 				if (variableState.getVarType(name).equals("int")) {
-					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) % (int)expression.getObject(), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (int)variableState.getVarValue(name) % (int)expression.getResult().getResult().getVal(), variableState.getVarType(name)))) {
 						return true;
 					}
 				} else {
-					if (variableState.setVar(name, new Var(name, (float)variableState.getVarValue(name) % (float)expression.getObject(), variableState.getVarType(name)))) {
+					if (variableState.setVar(name, new Var(name, (double)variableState.getVarValue(name) % (double)expression.getResult().getResult().getVal(), variableState.getVarType(name)))) {
 						return true;
 					}
 				}
@@ -733,7 +740,7 @@ public class Executor {
 				return false;
 			}
 
-			if (variableStateStack.lastElement().setVar(name, new Var(name, expression.getObject(), expression.getType()))) {
+			if (variableStateStack.lastElement().setVar(name, new Var(name, expression.getResult().getResult().getVal(), expression.getResult().getResult().getKey()))) {
 				return true;
 			}
 
@@ -813,8 +820,8 @@ public class Executor {
 				return false;
 			}
 
-			parameter.add(expression.getObject());
-			type.add(expression.getType());
+			parameter.add(expression.getResult().getResult().getVal());
+			type.add(expression.getResult().getResult().getKey());
 		}
 
 		StringBuilder st = new StringBuilder();

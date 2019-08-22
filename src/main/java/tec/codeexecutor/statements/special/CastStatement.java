@@ -40,56 +40,56 @@ public class CastStatement implements Statement {
             return false;
         }
 
-        String typeOf = expression.getType();
+        String typeOf = expression.getResult().getResult().getKey();
 
         if (typeOf.equals(typeTo)) {
-            variableState.addVar(new Var(varName, expression.getObject(), typeTo));
+            variableState.addVar(new Var(varName, expression.getResult().getResult().getVal(), typeTo));
             return true;
         }
 
         if (typeTo.equals("str")) {
-            variableState.addVar(new Var(varName, expression.getObject() + "", typeTo));
+            variableState.addVar(new Var(varName, expression.getResult().getResult().getVal() + "", typeTo));
             return true;
         }
 
         if (typeOf.equals("str")) {
             if (typeTo.equals("chr")) {
-                if ((expression.getObject() + "").length() > 0) {
-                    char c = (expression.getObject() + "").toCharArray()[0];
+                if ((expression.getResult().getResult().getVal() + "").length() > 0) {
+                    char c = (expression.getResult().getResult().getVal() + "").toCharArray()[0];
                     variableState.addVar(new Var(varName, c, typeTo));
                 } else {
                     variableState.addVar(new Var(varName,"", typeTo));
                 }
             }
             if (typeTo.equals("bol")) {
-                if ((expression.getObject() + "").equalsIgnoreCase("true")) {
+                if ((expression.getResult().getResult().getVal() + "").equalsIgnoreCase("true")) {
                     variableState.addVar(new Var(varName, true, typeTo));
                 } else {
                     variableState.addVar(new Var(varName, false, typeTo));
                 }
             }
             if (typeTo.equals("int")) {
-                if (expression.getObject().toString().startsWith("##")) {
-                    variableState.addVar(new Var(varName, Integer.parseInt(expression.getObject().toString().substring(2), 16), typeTo));
+                if (expression.getResult().getResult().getVal().toString().startsWith("##")) {
+                    variableState.addVar(new Var(varName, Integer.parseInt(expression.getResult().getResult().getVal().toString().substring(2), 16), typeTo));
                     return true;
                 }
-                variableState.addVar(new Var(varName, Integer.parseInt(expression.getObject() + ""), typeTo));
+                variableState.addVar(new Var(varName, Integer.parseInt(expression.getResult().getResult().getVal() + ""), typeTo));
             }
             if (typeTo.equals("num")) {
-                variableState.addVar(new Var(varName, Double.parseDouble(expression.getObject() + ""), typeTo));
+                variableState.addVar(new Var(varName, Double.parseDouble(expression.getResult().getResult().getVal() + ""), typeTo));
             }
             return true;
         }
         if (typeOf.equals("chr")) {
             if (typeTo.equals("bol")) {
-                if ((expression.getObject() + "").equals("1")) {
+                if ((expression.getResult().getResult().getVal() + "").equals("1")) {
                     variableState.addVar(new Var(varName, true, typeTo));
                 } else {
                     variableState.addVar(new Var(varName, false, typeTo));
                 }
             }
             if (typeTo.equals("int") || typeTo.equals("num")) {
-                String s = expression.getObject() + "";
+                String s = expression.getResult().getResult().getVal() + "";
                 if (s.length() > 0) {
                     int i = (int) s.toCharArray()[0];
                     variableState.addVar(new Var(varName, i, typeTo));
@@ -100,7 +100,7 @@ public class CastStatement implements Statement {
             return true;
         }
         if (typeOf.equals("num")) {
-            float i = (float)expression.getObject();
+            float i = (float)expression.getResult().getResult().getVal();
             if (typeTo.equals("bol")) {
                 if (i <= 0) {
                     variableState.addVar(new Var(varName, false, typeTo));
@@ -117,7 +117,7 @@ public class CastStatement implements Statement {
             return true;
         }
         if (typeOf.equals("int")) {
-            int i = (int)expression.getObject();
+            int i = (int)expression.getResult().getResult().getVal();
             if (typeTo.equals("bol")) {
                 if (i <= 0) {
                     variableState.addVar(new Var(varName, false, typeTo));
@@ -134,7 +134,7 @@ public class CastStatement implements Statement {
             return true;
         }
         if (typeOf.equals("bol")) {
-            boolean i = (boolean)expression.getObject();
+            boolean i = (boolean)expression.getResult().getResult().getVal();
             if (typeTo.equals("int")) {
                 if (i) {
                     variableState.addVar(new Var(varName, 1, typeTo));

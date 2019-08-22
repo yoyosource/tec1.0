@@ -37,8 +37,8 @@ public class ConstStatement implements Statement {
             return false;
         }
 
-        String type = expression.getType();
-        Object object = expression.getObject();
+        String type = expression.getResult().getResult().getKey();
+        Object object = expression.getResult().getResult().getVal();
 
         Var var = new Var(name, object, type);
         var.setConstant();

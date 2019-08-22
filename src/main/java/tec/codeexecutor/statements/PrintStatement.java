@@ -28,7 +28,7 @@ public class PrintStatement implements Statement {
 			return false;
 		}
 
-		System.out.println(expression.getObject());
+		System.out.println(expression.getResult().getResult().getVal());
 
 		return true;
 	}

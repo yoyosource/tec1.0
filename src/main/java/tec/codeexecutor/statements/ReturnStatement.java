@@ -29,9 +29,9 @@ public class ReturnStatement implements Statement {
             return false;
         }
 
-        executor.jumpBackFunc(expression.getType());
+        executor.jumpBackFunc(expression.getResult().getResult().getKey());
         if (executor.getFuncReturn() != null) {
-            executor.setFuncReturn(new Token(expression.getType(), expression.getObject()));
+            executor.setFuncReturn(new Token(expression.getResult().getResult().getKey(), expression.getResult().getResult().getVal()));
         }
         return true;
     }

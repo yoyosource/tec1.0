@@ -7,7 +7,6 @@ import tec.interfaces.Statement;
 import tec.utils.Token;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * The type If statement.
@@ -46,7 +45,9 @@ public class IfStatement implements Statement {
             }
 
             jumpPoint.add(stop + 1);
-            booleans.add(expression.getBoolean());
+            if (expression.getResult().getResult().getKey().equals("bol")) {
+                booleans.add((boolean) expression.getResult().getResult().getVal());
+            }
         }
 
         if (ints[ints.length - 1] < jumpPoint.get(jumpPoint.size() - 1)) {

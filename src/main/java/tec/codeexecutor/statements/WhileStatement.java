@@ -38,7 +38,11 @@ public class WhileStatement implements Statement {
             return false;
         }
 
-        if (expression.getBoolean()) {
+        if (!expression.getResult().getResult().getKey().equals("bol")) {
+            return false;
+        }
+
+        if ((boolean)expression.getResult().getResult().getVal()) {
             executor.addVariableStateRemoveTrigger(ints[1]);
             executor.addJumpBackTrigger(ints[1]);
             executor.createVariableStateFromPrevious();
