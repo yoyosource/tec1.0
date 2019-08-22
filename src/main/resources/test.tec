@@ -1,3 +1,9 @@
 import std:Benchmark
 
-benchmarkLoop()
+startBenchmark()
+print "Starting to Sleep"
+
+sleep 10
+
+print "Finished to Sleep"
+stopBenchmark()

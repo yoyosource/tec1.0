@@ -50,6 +50,11 @@ public class Calculator {
 
     private void replace() {
         List<Token> nTokens = new ArrayList<>();
+
+        if (tokens.get(0).getKey().equals("OPE")) {
+            nTokens.add(new Token("int", 0));
+        }
+
         for (int i = 0; i < tokens.size(); i++) {
 
             if (i == 0) {
@@ -156,6 +161,10 @@ public class Calculator {
     private void calc(List<Integer> priorities) {
         removeBrackets(priorities);
 
+        if (priorities.size() == 1) {
+            return;
+        }
+
         int max = getMax(priorities);
 
         Object val = calcC(tokens.get(max), tokens.get(max - 1), tokens.get(max + 1));
@@ -178,6 +187,8 @@ public class Calculator {
             remove(max, priorities);
             remove(max, tokens);
         }
+
+        removeBrackets(priorities);
 
         if (tokens.size() != 1) {
             calc(priorities);

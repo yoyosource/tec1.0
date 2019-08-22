@@ -6,7 +6,6 @@ import tec.utils.DebugLevel;
 import tec.utils.Token;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 /**
  * The expression class.
@@ -29,16 +28,6 @@ public class Expression {
         this.variableState = variableState;
         this.executor = executor;
     }
-
-	/**
-	 * Instantiates a new Expression.
-	 *
-	 * @param tokens the tokens
-	 */
-	public Expression(ArrayList<Token> tokens) {
-        this.tokens = tokens;
-    }
-
 
     /**
      * The Output string (if the output was equal to a string value)
@@ -696,26 +685,48 @@ public class Expression {
         }
 
         int startIndex = 0;
-        int startIndex2 = 0;
 
-        while (startIndex2 != -1) {
-            int start = getOpentBracket(startIndex, tokens);
+        while (startIndex != -1) {
+            int start = getOpenBracket(startIndex, tokens);
             ArrayList<Token> tokens = getTokensToClosingBracket(this.tokens, start);
             if (isCalculation(tokens)) {
                 Calculator calculator = new Calculator(tokens);
                 Object b = calculator.calculate();
-                outputString = b.toString();
+
+                String t = "";
+                int i = 0;
+                double d = 0;
+                long l = 0;
+
                 if (b instanceof Integer) {
-                    type = "int";
+                    t = "int";
+                    i = (int)b;
                 } else if (b instanceof Double) {
-                    type = "num";
+                    t = "num";
+                    d = (double)b;
                 } else if (b instanceof Long) {
-                    type = "lon";
+                    t = "lon";
+                    l = (long)b;
+                }
+
+                Token token = null;
+                if (t.equals("int")) {
+                    token = new Token(t, i);
+                } else if (t.equals("num")) {
+                    token = new Token(t, d);
+                } else if (t.equals("lon")) {
+                    token = new Token(t, l);
+                }
+
+                removeToClosingBracket(this.tokens, start);
+                if (token != null) {
+                    this.tokens.add(start, token);
                 }
             } else {
                 startIndex = start;
-                startIndex2 = start;
-                startIndex++;
+                if (startIndex != -1) {
+                    startIndex++;
+                }
             }
         }
 
@@ -815,7 +826,7 @@ public class Expression {
     }
 
 
-    private int getOpentBracket(int start, ArrayList<Token> tokens) {
+    private int getOpenBracket(int start, ArrayList<Token> tokens) {
         for (int i = start; i < tokens.size(); i++) {
             if (tokens.get(i).getKey().equals("STb") && tokens.get(i).getVal().equals("(")) {
                 return i;

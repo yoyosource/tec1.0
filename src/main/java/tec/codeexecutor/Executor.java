@@ -4,8 +4,8 @@ import tec.interfaces.Statement;
 import tec.utils.Token;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -17,16 +17,16 @@ public class Executor {
 	private int index = 0;
 	private boolean running = true;
 	private Implementor implementor;
-	private ArrayList<Token> tokens;
+	private List<Token> tokens;
 
 	private Stack<VariableState> variableStateStack = new Stack<>();
 
-	private ArrayList<Integer> triggerVariableStackRemove = new ArrayList<>();
-    private ArrayList<Integer> triggerJumpBack = new ArrayList<>();
+	private List<Integer> triggerVariableStackRemove = new ArrayList<>();
+    private List<Integer> triggerJumpBack = new ArrayList<>();
 
-    private ArrayList<Integer> jumpBackPointFunction = new ArrayList<>();
-    private ArrayList<Integer> triggerJumpBackFunction = new ArrayList<>();
-    private ArrayList<String> currentReturnType = new ArrayList<>();
+    private List<Integer> jumpBackPointFunction = new ArrayList<>();
+    private List<Integer> triggerJumpBackFunction = new ArrayList<>();
+    private List<String> currentReturnType = new ArrayList<>();
     private HashMap<String, Integer> funcPoints = new HashMap<>();
     private HashMap<String, String> returnType = new HashMap<>();
 
@@ -62,7 +62,7 @@ public class Executor {
 	 * @param tokens      the tokens
 	 * @param implementor the implementor
 	 */
-	public Executor(ArrayList<Token> tokens, Implementor implementor) {
+	public Executor(List<Token> tokens, Implementor implementor) {
 		this.implementor = implementor;
 		this.tokens = tokens;
 	}
@@ -774,7 +774,7 @@ public class Executor {
 		return runFunction(tokens.get(index).getVal().toString(), getTokensToNextLine());
 	}
 
-	public boolean runFunction(String funcName, ArrayList<Token> tokens) {
+	public boolean runFunction(String funcName, List<Token> tokens) {
 		if (tokens.get(0).getKey().equals("STb") && tokens.get(tokens.size() - 1).getKey().equals("STb")) {
 			tokens.remove(0);
 			tokens.remove(tokens.size() - 1);

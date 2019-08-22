@@ -49,6 +49,15 @@ public class Token {
         return false;
     }
 
+	/**
+	 * Compact Representation of this Token.
+	 *
+	 * @return the String
+	 */
+	public String compact() {
+		return "<" + key + ">" + val;
+	}
+
 
     @Override
     public String toString() {

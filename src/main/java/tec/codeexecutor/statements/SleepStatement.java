@@ -18,24 +18,25 @@ public class SleepStatement implements Statement {
     @Override
     public boolean execute(ArrayList<Token> tokens, VariableState variableState, Executor executor) {
 
-        Expression expression = new Expression(tokens);
+        Expression expression = new Expression(tokens, variableState, executor);
         expression.build();
 
         if (!executor.runExpressionInfo(expression)) {
             return false;
         }
 
-        if (!expression.getType().equals("num")) {
+        if (!expression.getType().equals("lon") && !expression.getType().equals("int")) {
             return false;
         }
 
-        if (!expression.getType().equals("int")) {
-            return false;
-        }
-
-        long t = System.currentTimeMillis();
-        while (System.currentTimeMillis() - t < (int)expression.getObject()) {
-
+        try {
+            if (expression.getObject() instanceof Integer) {
+                Thread.sleep((long)(int) expression.getObject());
+            } else {
+                Thread.sleep((long) expression.getObject());
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
 
         return true;

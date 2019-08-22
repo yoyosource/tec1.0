@@ -1,5 +1,18 @@
-%checksum de14d3bd1e541480a2f4a20c7936caf4
+%checksum 3a825af4ea9aa324b1ee1c2b4438a8ad
 import std:Benchmark
-<COD>benchmarkLoop
+<COD>startBenchmark
+<STb>(
+<STb>)
+<NNN>
+<COD>print
+<str>Starting to Sleep
+<NNN>
+<COD>sleep
+<int>10
+<NNN>
+<COD>print
+<str>Finished to Sleep
+<NNN>
+<COD>stopBenchmark
 <STb>(
 <STb>)

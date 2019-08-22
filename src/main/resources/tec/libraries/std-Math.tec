@@ -240,7 +240,7 @@ func isPrime(*int i) -> *bol {
     }
     var j = 2 root i
     var r = 2
-    while (r < j - 1) {
+    while (r <= j - 1) {
         if (r % 2 == 0) {
             r = r + 1
         }
