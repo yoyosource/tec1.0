@@ -22,6 +22,7 @@ public class Work {
         variableState.addVar(new Var("k", "Hello World", "str"));
         variableState.addVar(new Var("l", System.currentTimeMillis(), "lon"));
         variableState.addVar(new Var("m", 'c', "chr"));
+        variableState.addVar(new Var("n", true, "bol"));
 
         Expression expression = new Expression(tokens, variableState, new Executor(lexer.getTokens(), new Implementor()));
         expression.build();

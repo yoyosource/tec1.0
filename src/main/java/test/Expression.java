@@ -600,11 +600,11 @@ class ExpressionUtils {
                 }
             }
             if (mode == 1 && t.getKey().equals("COM")) {
-                priorities.add(p + 1);
+                priorities.add(p + 2);
             } else if (mode == 1 && t.getKey().equals("LOG")) {
-                priorities.add(p);
-            }else if (mode == 0 && t.getKey().equals("OPE") && t.getVal().equals("+")) {
-                priorities.add(p);
+                priorities.add(p + 1);
+            } else if (mode == 0 && t.getKey().equals("OPE") && t.getVal().equals("+")) {
+                priorities.add(p + 1);
             }
             else {
                 priorities.add(0);
