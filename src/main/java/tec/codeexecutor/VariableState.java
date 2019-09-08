@@ -152,6 +152,16 @@ public class VariableState {
         return vars;
     }
 
+    public Var getVar(String name) {
+		if (name.equals("TIMESTAMP")) {
+			return new Var("TIMESTAMP", System.currentTimeMillis(), "lon");
+		}
+		if (contains(name)) {
+			return vars.get(indexOf(name));
+		}
+		return null;
+	}
+
 	/**
 	 * Derived.
 	 *

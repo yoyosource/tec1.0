@@ -1,31 +1,31 @@
 // Length Functions
 
 func length(*str string) -> *int {
-	return string:length
+	return string:length()
 }
 
 func len(*str string) -> *int {
-	return string:length
+	return string:length()
 }
 
 // String manipulations
 
 func toUpperCase(*str string) -> *str {
-    return string:toUpperCase
+    return string:toUpperCase()
 }
 
 func upperCase(*str string) -> *str {
-    return string:toUpperCase
+    return string:toUpperCase()
 }
 
 func toLowerCase(*str string) -> *str {
-    return string:toLowerCase
+    return string:toLowerCase()
 }
 
 func lowerCase(*str string) -> *str {
-    return string:toLowerCase
+    return string:toLowerCase()
 }
 
 func trim(*str string) -> *str {
-    return string:trim
+    return string:trim()
 }

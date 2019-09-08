@@ -20,11 +20,12 @@ public class BuildTeclLibs {
     private static ArrayList<String> imports = new ArrayList<>();
 
     public static void main(String[] args) {
+        if (true) {
+            return;
+        }
         if (args.length != 1) {
             return;
         }
-
-        System.out.println(args[0]);
 
         try {
             generateTecL(args[0]);
@@ -34,28 +35,27 @@ public class BuildTeclLibs {
     }
 
     private static void generateTecL(String arg) throws FileNotFoundException {
-        FileScanner fileScanner = new FileScanner();
-        fileScanner.scan(new FileInputStream(arg), "");
+        FileScanner fileScanner = new FileScanner(new FileInputStream(arg), "");
 
         TrimmerManager trimmerManager = new TrimmerManager();
-        trimmerManager.trim(fileScanner.getText(), fileScanner.isTecc());
+        trimmerManager.trim(fileScanner.getText(), fileScanner.isTecl());
 
         CommentScanner commentScanner = new CommentScanner();
-        commentScanner.removeComments(trimmerManager.getText(), fileScanner.isTecc());
+        commentScanner.removeComments(trimmerManager.getText(), fileScanner.isTecl());
 
         String code = commentScanner.getCode();
 
         List<String> strings = addNewImports(code);
 
         Lexer lexer = new Lexer();
-        lexer.createTokens(strings.stream().collect(Collectors.joining("\n")), fileScanner.isTecc());
+        lexer.createTokens(strings.stream().collect(Collectors.joining("\n")), fileScanner.isTecl());
 
         List<Token> tokens = lexer.getTokens();
 
-        if (!fileScanner.isTecc()) {
+        if (!fileScanner.isTecl()) {
             StringBuilder tecl = new StringBuilder();
             tecl.append("%checksum ");
-            tecl.append(fileScanner.getCheckSum());
+            //tecl.append(fileScanner.getCheckSum());
             for (String cImport : imports) {
                 tecl.append("\n");
                 tecl.append("import ");

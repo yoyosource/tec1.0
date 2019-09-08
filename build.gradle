@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'tec'
-version '3.8-ALPHA'
+version 'ALPHA'
 
 mainClassName = 'tec.Tec'
 

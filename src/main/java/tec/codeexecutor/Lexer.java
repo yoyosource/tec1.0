@@ -1,33 +1,50 @@
 package tec.codeexecutor;
 
-import tec.exceptions.StringException;
 import tec.utils.Token;
 
 import java.util.ArrayList;
+import java.util.List;
 
-/**
- * The type Lexer.
- */
 public class Lexer {
 
-    private ArrayList<Token> tokens = new ArrayList<>();
-    private StringBuilder s = new StringBuilder();
+    private List<Token> tokens = new ArrayList<>();
 
-    /**
-     * Create tokens.
-     *
-     * @param codes the codes
-     */
-    public void createTokens(String codes, boolean tecc) {
-        if (tecc) {
-            codes = codes.substring(1);
-            String[] strings = codes.split("\n<");
-            Token token;
-            String s = "";
-            String t = "";
-            for (String string : strings) {
-                s = string.substring(4);
-                t = string.substring(0, 3);
+    private long time = 0;
+
+    public void createTokens(String codes, boolean tecl) {
+        time = System.currentTimeMillis();
+        if (!tokens.isEmpty()) {
+            tokens.clear();
+        }
+        if (tecl) {
+            createTokensTecl(codes);
+        } else {
+            createTokensTec(codes);
+        }
+        time = System.currentTimeMillis() - time;
+    }
+
+    public List<Token> getTokens() {
+        return tokens;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    private void createTokensTecl(String codes) {
+        codes = codes.substring(1);
+        String[] lines = codes.split("\n<NNN>(\n<)?");
+
+        String s = "";
+        String t = "";
+        Token token;
+
+        for (String line : lines) {
+            String[] toks = line.split("\n<");
+            for (String tok : toks) {
+                s = tok.substring(4);
+                t = tok.substring(0, 3);
 
                 if (t.equals("num")) {
                     token = new Token(t, Double.parseDouble(s));
@@ -44,92 +61,118 @@ public class Lexer {
 
                 tokens.add(token);
             }
-            return;
+            tokens.add(new Token("NNN", ""));
         }
+    }
 
-        char[] chars = codes.toCharArray();
-        ArrayList<Token> cTokens = new ArrayList<>();
-
-        boolean inString = false;
-        boolean backspace = false;
-        boolean endLine = false;
-
-        for (char c : chars) {
-            if (endLine) {
-                cTokens.addAll(tokify(s.toString().trim()));
-                cTokens.add(new Token("NNN", ""));
-                endLine = false;
-                s = new StringBuilder();
+    private void createTokensTec(String codes) {
+        String[] lines = codes.split("\n");
+        int i = 0;
+        for (String line : lines) {
+            tokifyLine(line);
+            if (i != lines.length - 1) {
+                tokens.add(new Token("NNN", ""));
             }
-            if (c == '\n') {
-                endLine = true;
-            }
+            i++;
+        }
+    }
 
-            if (c == ' ' && !inString && !backspace) {
-                cTokens.addAll(tokify(s.toString()));
-                s = new StringBuilder();
+    private void tokifyLine(String line) {
+        boolean string = false;
+        boolean escape = false;
+
+        char[] chars = line.toCharArray();
+
+        StringBuilder st = new StringBuilder();
+
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+            if (!string && !escape && c == ' ') {
+                tokens.addAll(tokify(st.toString()));
+                st = new StringBuilder();
             } else if (c == '"' || c == '\'') {
-                if (!(backspace)) {
-                    if (inString) {
-                        inString = false;
-                    } else {
-                        inString = true;
-                    }
+                if (!escape) {
+                    string = !string;
                 } else {
-                    backspace = false;
+                    escape = false;
                 }
-                s.append(c);
-            } else if (c == '\\' && inString) {
-                backspace = true;
-            }
-            else {
-                if (!inString && !backspace) {
+                if (st.length() > 0 && st.charAt(0) == '"') {
+                    st.append(c);
+                    tokens.addAll(tokify(st.toString()));
+                    st = new StringBuilder();
+                    continue;
+                }
+                if (st.length() > 0) {
+                    tokens.addAll(tokify(st.toString()));
+                    st = new StringBuilder();
+                }
+                st.append(c);
+            } else if (c == '\\' && string) {
+                escape = true;
+            } else {
+                if (!string && !escape) {
+                    boolean startLineBreak = i > 0 && chars[i - 1] != '\n';
+                    boolean endLineBreak = i < chars.length - 1 && chars[i + 1] != '\n';
                     switch (c) {
+                        case '{':
+                            tokify(st);
+                            tokify(c);
+                            if (endLineBreak) {
+                                tokens.add(new Token("NNN", ""));
+                            }
+                            st = new StringBuilder();
+                            break;
+                        case '}':
+                            tokify(st);
+                            if (startLineBreak) {
+                                tokens.add(new Token("NNN", ""));
+                            }
+                            tokify(c);
+                            if (endLineBreak) {
+                                tokens.add(new Token("NNN", ""));
+                            }
+                            st = new StringBuilder();
+                            break;
                         case '(':
                         case ')':
-                        case '{':
-                        case '}':
                         case '[':
                         case ']':
                         case ':':
-                            cTokens.addAll(tokify(s.toString()));
-                            s = new StringBuilder();
-                            cTokens.addAll(tokify(c + ""));
+                        case '+':
+                        case '/':
+                        case ',':
+                            tokify(st);
+                            tokify(c);
+                            st = new StringBuilder();
                             break;
                         default:
-                            s.append(c);
+                            st.append(c);
                             break;
                     }
-                } else {
-                    if (c == 'n' && backspace) {
-                        s.append("\\");
-                    }
-                    s.append(c);
+                    continue;
                 }
-                backspace = false;
+                if (escape) {
+                    st.append("\\");
+                }
+                st.append(c);
+                escape = false;
             }
-
         }
 
-        if (s.length() != 0) {
-            cTokens.addAll(tokify(s.toString()));
+        if (st.length() > 0) {
+            tokens.addAll(tokify(st.toString()));
         }
-
-        tokens = cTokens;
-
     }
 
-    /**
-     * Gets tokens.
-     *
-     * @return the tokens
-     */
-    public ArrayList<Token> getTokens() {
-        return tokens;
+    private void tokify(StringBuilder st) {
+        tokens.addAll(tokify(st.toString()));
     }
 
-    private ArrayList<Token> tokify(String s) {
+    private void tokify(char c) {
+        tokens.addAll(tokify(c + ""));
+    }
 
+    private List<Token> tokify(String s) {
         ArrayList<Token> tokens = new ArrayList<>();
 
         if (s.length() == 0) {
@@ -156,6 +199,14 @@ public class Lexer {
             tokens.add(new Token("num", Double.parseDouble(s)));
             return tokens;
         }
+        if (s.matches("-?(\\d+)D")) {
+            tokens.add(new Token("num", Double.parseDouble(s.substring(0, s.length() - 1))));
+            return tokens;
+        }
+        if (s.matches("-?(\\d+)L")) {
+            tokens.add(new Token("lon", Long.parseLong(s.substring(0, s.length() - 1))));
+            return tokens;
+        }
         if (s.matches("-?(\\d+)")) {
             long l = Long.parseLong(s);
             if (l >= -2147483647 && l <= 2147483647) {
@@ -165,7 +216,13 @@ public class Lexer {
             }
             return tokens;
         }
-        if (s.matches("##[0-9a-f]+")) {
+        if (s.matches("(##|0x)[0-9a-f]+L")) {
+            s = s.substring(2, s.length() - 1);
+            long l = Long.parseLong(s, 16);
+            tokens.add(new Token("lon", l));
+            return tokens;
+        }
+        if (s.matches("(##|0x)[0-9a-f]+")) {
             s = s.substring(2);
             long l = Long.parseLong(s, 16);
             if (l >= -2147483647 && l <= 2147483647) {
@@ -210,16 +267,6 @@ public class Lexer {
             return tokens;
         }
 
-        if (s.matches("(>>)|(<<)|(»)|(«)")) {
-            if (s.matches("(»)")) {
-                s = ">>";
-            }
-            if (s.matches("(«)")) {
-                s = "<<";
-            }
-            tokens.add(new Token("LOb", s));
-            return tokens;
-        }
         if (s.matches("\\(|\\)")) {
             tokens.add(new Token("STb", s));
             return tokens;
@@ -266,7 +313,7 @@ public class Lexer {
             return tokens;
         }
 
-        String[] splitter = new String[]{"+", "-", "*", "/", "%", "^", "|", "(", ")", "root", "sin", "cos", "tan", "asin", "acos", "atan", "sigmoid", "gauss", "ln", "log", ",", ":", "."};
+        String[] splitter = new String[]{"+", "-", "*", "/", "%", "^", "|", "(", ")", "root", "sin", "cos", "tan", "asin", "acos", "atan", "sigmoid", "gauss", "ln", "log", ",", ":", ".", "<", ">", "<=", ">=", "==", "!=", "="};
         int checks = 0;
         for (String check : splitter) {
             if (s.contains(check)) {
@@ -288,21 +335,34 @@ public class Lexer {
     private static String[] splitString(String string, String[] splitStrings, boolean reviveSplitted, boolean addToLast) {
         char[] chars = string.toCharArray();
         if (chars.length == 0) {
-            throw new StringException("No String");
+            throw new NullPointerException("No String");
         }
         if (splitStrings.length == 0) {
-            throw new StringException("No Split Strings");
+            throw new NullPointerException("No Split Strings");
         }
 
-        ArrayList<String> words = new ArrayList<>();
+        List<String> words = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
 
         int i = 0;
         int lastSplit = 0;
 
+        boolean inString = false;
+        boolean escape = false;
+
         while (i < chars.length) {
             int splitStringTest = 0;
             char c = chars[i];
+            if (c == '"' && !escape) {
+                inString = !inString;
+            }
+            if (inString && c == '\\') {
+                escape = true;
+                continue;
+            }
+            if (inString) {
+                continue;
+            }
             String s = "";
             for (String st : splitStrings) {
                 StringBuilder sb = new StringBuilder();
@@ -324,6 +384,17 @@ public class Lexer {
                 stringBuilder.append(c);
             } else {
                 i += s.length() - 1;
+                if (stringBuilder.length() == 0) {
+                    if (reviveSplitted && !addToLast) {
+                        words.add(s);
+                    } else if (reviveSplitted && addToLast) {
+                        words.add(stringBuilder + s);
+                    }
+                    stringBuilder = new StringBuilder();
+                    lastSplit = i;
+                    i++;
+                    continue;
+                }
                 if (reviveSplitted) {
                     if (addToLast) {
                         words.add(stringBuilder.toString() + s);
@@ -340,6 +411,9 @@ public class Lexer {
             i++;
         }
         if (lastSplit != string.length()) {
+            if (stringBuilder.length() == 0) {
+                return words.toArray(new String[0]);
+            }
             words.add(stringBuilder.toString());
         }
         return words.toArray(new String[0]);

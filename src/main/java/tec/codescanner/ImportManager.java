@@ -4,10 +4,12 @@ import tec.Tec;
 import tec.codeexecutor.Lexer;
 import tec.utils.Token;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,19 +22,16 @@ public class ImportManager {
 
     private ArrayList<Token> lexTokens = new ArrayList<>();
 
-    long total = 0;
+    private long total = 0;
+    private long length = 0;
 
     public ImportManager(File file) {
-        System.out.println("---");
         try {
             long time = System.currentTimeMillis();
 
-            importFile(new FileInputStream(file), file.getAbsolutePath() + "l");
+            importFile(new FileInputStream(file), file.getAbsolutePath());
 
-            FileScanner fileScanner = new FileScanner();
-            fileScanner.filePath(file);
-
-            groundPath = fileScanner.getGroundPath();
+            groundPath = FileScanner.filePath(file)[0];
 
             manageAllImports();
 
@@ -40,10 +39,6 @@ public class ImportManager {
         } catch (FileNotFoundException e) {
             total = -1;
         }
-        System.out.println("");
-        System.out.println("Total Time             > " + total + "ms");
-        System.out.println("Tokens                 > " + lexTokens.size());
-        System.out.println("---");
     }
 
     public String getGroundPath() {
@@ -54,25 +49,34 @@ public class ImportManager {
         return lexTokens;
     }
 
+    public long getLength() {
+        return length;
+    }
+
+    public long getTotal() {
+        return total;
+    }
+
     public void importFile(InputStream inputStream, String tecL) {
-        FileScanner fileScanner = new FileScanner();
-        fileScanner.scan(inputStream, tecL);
+        FileScanner fileScanner = new FileScanner(inputStream, tecL);
 
         TrimmerManager trimmerManager = new TrimmerManager();
-        trimmerManager.trim(fileScanner.getText(), fileScanner.isTecc());
+        trimmerManager.trim(fileScanner.getText(), fileScanner.isTecl());
 
         CommentScanner commentScanner = new CommentScanner();
-        commentScanner.removeComments(trimmerManager.getText(), fileScanner.isTecc());
+        commentScanner.removeComments(trimmerManager.getText(), fileScanner.isTecl());
 
         String code = commentScanner.getCode();
 
         List<String> strings = addNewImports(code);
+        length += strings.stream().collect(Collectors.joining("\n")).length();
 
         Lexer lexer = new Lexer();
-        lexer.createTokens(strings.stream().collect(Collectors.joining("\n")), fileScanner.isTecc());
+        lexer.createTokens(strings.stream().collect(Collectors.joining("\n")), fileScanner.isTecl());
 
         List<Token> tokens = lexer.getTokens();
 
+        /*
         if (!fileScanner.isTecc()) {
             StringBuilder tecl = new StringBuilder();
             tecl.append("%checksum ");
@@ -100,14 +104,14 @@ public class ImportManager {
 
             }
         }
+        */
 
         if (lexTokens.size() == 0) {
             lexTokens.addAll(tokens);
         } else {
+            lexTokens.add(0, new Token("NNN", ""));
             lexTokens.addAll(0, tokens);
         }
-        lexTokens.add(0, new Token("NNN", ""));
-        lexTokens.add(0, new Token("###", ""));
     }
 
     private List<String> addNewImports(String code) {
@@ -153,7 +157,7 @@ public class ImportManager {
             } else {
                 try {
                     inputStream = new FileInputStream(groundPath + s + ".tec");
-                    tecl = groundPath + s + ".tecl";
+                    tecl = groundPath + s + ".tec";
                 } catch (FileNotFoundException e) {
                     continue;
                 }

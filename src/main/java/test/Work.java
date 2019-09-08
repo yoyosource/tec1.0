@@ -1,55 +1,16 @@
 package test;
 
-import tec.codeexecutor.*;
-import tec.utils.Token;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.FileOutputStream;
 
 public class Work {
 
-    public static void main(String[] args) {
-        String s = "\"hi\".repeat(\"hi\".length())";
-
-        Lexer lexer = new Lexer();
-        lexer.createTokens(s, false);
-
-        List<Token> tokens = copy(lexer.getTokens());
-
-        VariableState variableState = new VariableState();
-        variableState.addVar(new Var("i", 2, "int"));
-        variableState.addVar(new Var("j", 1.0, "num"));
-        variableState.addVar(new Var("k", "Hello World", "str"));
-        variableState.addVar(new Var("l", System.currentTimeMillis(), "lon"));
-        variableState.addVar(new Var("m", 'c', "chr"));
-        variableState.addVar(new Var("n", true, "bol"));
-
-        Expression expression = new Expression(tokens, variableState, new Executor(lexer.getTokens(), new Implementor()));
-        expression.build();
-
-        ExpressionState expressionState = expression.getResult();
-
-        if (expressionState.hasErrors()) {
-            boolean b = false;
-            for (String e : expressionState.getErrors()) {
-                if (b) {
-                    System.out.println("");
-                }
-                System.out.println(e);
-                b = true;
-            }
-        } else {
-            System.out.println(expressionState.getResult().compact());
-        }
-        System.out.println("Time Elapsed: " + expressionState.getTime() + "ms");
-    }
-
-    private static List<Token> copy(List<Token> tokens) {
-        List<Token> list = new ArrayList<>();
-        for (Token token : tokens) {
-            list.add(token);
-        }
-        return list;
+    public static void main(String[] args) throws Exception {
+        byte[] data = new byte[]{0x0E, 0x01, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x54, 0x49, 0x4D, 0x45, 0x53, 0x54, 0x41, 0x4D, 0x50, 0x0C, (byte)0x80, 0x01, 0x00, 0x00};
+        FileOutputStream fos = new FileOutputStream(new File("/Users/jojo/IdeaProjects/tec/src/main/resources/test.tecc"));
+        fos.write(data);
+        fos.flush();
+        fos.close();
     }
 
 }

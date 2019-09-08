@@ -1,0 +1,17 @@
+Tec version 3.9 ALPHA
+Tecc version 1.0
+
+This version features are:
+- New File Format 'tecc'
+- New Command arguments when using tec jar
+- New Expression System
+
+- Drop of the support of Old 'tecl' File Format
+- You can still use it. It just wont be created
+
+Creator:
+- YoyoNow
+- tecc
+
+Special Thanks to:
+- ButterCup

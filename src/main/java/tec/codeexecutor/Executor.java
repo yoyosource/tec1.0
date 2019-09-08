@@ -108,6 +108,22 @@ public class Executor {
 	    index = in;
 	}
 
+	public boolean runExpressionInfo(ExpressionState expressionState) {
+		if (expressionState.hasErrors()) {
+			boolean b = false;
+			for (String e : expressionState.getErrors()) {
+				if (b) {
+					System.out.println("");
+				}
+				System.out.println(e);
+				b = true;
+			}
+			System.out.println("Time Elapsed: " + expressionState.getTime() + "ms");
+			return false;
+		}
+		return true;
+	}
+
     public boolean runExpressionInfo(Expression expression) {
 		if (expression.getResult().hasErrors()) {
 			boolean b = false;

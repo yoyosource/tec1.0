@@ -3,6 +3,7 @@ package tec.codeexecutor;
 import tec.exceptions.AccessException;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -56,6 +57,16 @@ public class Var {
         return value;
     }
 
+    public List<Object> getValueAsArray() {
+	    if (!array) {
+            throw new AccessException("This variable is not an array");
+        }
+        if (!(value instanceof ArrayList)) {
+            throw new AccessException("This variable is not of type Array but was changed to array beforehand");
+        }
+        return ((List<Object>)value);
+    }
+
     public Object getValue(int index) {
 	    if (!array) {
 	        throw new AccessException("This variable is not an array");
@@ -63,7 +74,7 @@ public class Var {
 	    if (!(value instanceof ArrayList)) {
 	        throw new AccessException("This variable is not of type Array but was changed to array beforehand");
         }
-        return ((ArrayList)value).get(index);
+        return ((List<Object>)value).get(index);
     }
 
 	/**
@@ -108,18 +119,18 @@ public class Var {
                 throw new AccessException("This variable is not of type Array but was changed to array beforehand");
             }
             if (value instanceof ArrayList) {
-                throw new AccessException("You cannot add an Array to and Array");
+                throw new AccessException("You cannot add an Array to an Array");
             }
-            ((ArrayList)this.value).add(value);
+            ((List<Object>)this.value).add(value);
         }
         if (this.type.equals("int") && type.equals("num")) {
             if (!(this.value instanceof ArrayList)) {
                 throw new AccessException("This variable is not of type Array but was changed to array beforehand");
             }
             if (value instanceof ArrayList) {
-                throw new AccessException("You cannot add an Array to and Array");
+                throw new AccessException("You cannot add an Array to an Array");
             }
-            ((ArrayList)this.value).add(value);
+            ((List<Object>)this.value).add(value);
         }
     }
 
@@ -138,7 +149,15 @@ public class Var {
 	    if (!(value instanceof ArrayList)) {
 	        throw new AccessException("You cannot clear a not Array variable");
         }
-        ((ArrayList)value).clear();
+        ((List<Object>)value).clear();
+    }
+
+    public boolean isArray() {
+        return array;
+    }
+
+    public boolean isConstant() {
+        return constant;
     }
 
     @Override

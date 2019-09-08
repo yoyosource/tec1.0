@@ -1,18 +1,18 @@
-%checksum 3a825af4ea9aa324b1ee1c2b4438a8ad
-import std:Benchmark
-<COD>startBenchmark
-<STb>(
-<STb>)
+%checksum b883ab59007d41632980e937a0f6ea91
+<COD>var
+<COD>i
+<ASG>=
+<ACb>[
+<int>0
+<SEP>,
+<int>1
+<SEP>,
+<int>2
+<ACb>]
 <NNN>
 <COD>print
-<str>Starting to Sleep
-<NNN>
-<COD>sleep
-<int>10
-<NNN>
-<COD>print
-<str>Finished to Sleep
-<NNN>
-<COD>stopBenchmark
+<COD>i
+<SEP>.
+<COD>size
 <STb>(
 <STb>)
