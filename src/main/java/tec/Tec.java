@@ -12,7 +12,7 @@ import tec.codeexecutor.statements.special.CastStatement;
 import tec.codeexecutor.statements.special.HashStatement;
 import tec.codescanner.FileScanner;
 import tec.codescanner.ImportManager;
-import tec.codescanner.TeccParser;
+import tec.codescanner.compiler.TeccParser;
 import tec.utils.Token;
 
 import java.io.*;

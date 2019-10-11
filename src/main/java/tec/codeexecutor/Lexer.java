@@ -358,9 +358,13 @@ public class Lexer {
             }
             if (inString && c == '\\') {
                 escape = true;
+                i++;
+                stringBuilder.append(c);
                 continue;
             }
             if (inString) {
+                i++;
+                stringBuilder.append(c);
                 continue;
             }
             String s = "";

@@ -1,5 +1,7 @@
 package tec.codescanner;
 
+import tec.codescanner.compiler.TeccParser;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.Scanner;

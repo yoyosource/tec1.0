@@ -1,10 +1,8 @@
-package tec.codescanner;
+package tec.codescanner.compiler;
 
 import tec.Tec;
-import tec.utils.FileUtils;
 import tec.utils.Token;
 
-import javax.swing.text.html.parser.Entity;
 import java.io.*;
 import java.util.*;
 
