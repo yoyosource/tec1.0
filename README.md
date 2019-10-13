@@ -1,4 +1,4 @@
-[![License: GPL v3+](https://img.shields.io/badge/License-GPL%20v3%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: GPL v3+](https://img.shields.io/badge/License-GPL%20v3%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) ![Tec Version: V3.9](https://img.shields.io/badge/Tec%20Version-V3.9--ALPHA-red) ![Tecc Version: V1.0](https://img.shields.io/badge/Tecc%20Version-V1.0-red)
 
 # tec
 '**tec**' is a new programming languge that is user friendly as you can just write your Code. You do not have to mess with any **main** functions if you do not want to. If you want to start with tec you do not need to have any knowledge of any programming languages what so ever.
