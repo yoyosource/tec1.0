@@ -1,7 +1,7 @@
 [![License: GPL v3+](https://img.shields.io/badge/License-GPL%20v3%2B-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) ![Tec Version: V3.9](https://img.shields.io/badge/Tec%20Version-V3.9--ALPHA-red) ![Tecc Version: V1.0](https://img.shields.io/badge/Tecc%20Version-V1.0-red)
 
 # tec
-'**tec**' is a new programming languge that is user friendly as you can just write your Code. You do not have to mess with any **main** functions if you do not want to. If you want to start with tec you do not need to have any knowledge of any programming languages what so ever.
+'**tec**' is a new programming language that is user friendly as you can just write your Code. You do not have to mess with any **main** functions if you do not want to. If you want to start with tec you do not need to have any knowledge of any programming languages what so ever.
 To change to a new language you can use this as a ground basis to change to Java, Swift, Python, JavaScript, Go. If you have any knowledge in Java, Swift, Python, Go or JavaScript you should not have any trouble with writing programs in **tec** as soon as you know the basics.
 
 ## Getting started
@@ -10,6 +10,25 @@ Create a file with the suffix **.tec**. Open the file and now you can write your
 print "Hello World"
 ```
 If you execute this Program it will output Hello World.
+
+## How to use Tec
+To execute a **tec** file you use the **jar** and execute it.
+```
+// Run a tec file with
+java -jar <TecJar> -run <TecFile>
+
+// Info about the tec file with
+java -jar <TecJar> -info <TecFile>
+
+// Help about the usage of the Jar
+java -jar <TecJar> -help
+
+// Comprime a tec Directory to one File
+java -jar <TecJar> -compile <TecDirectory>
+
+// Show a tec File
+java -jar <TecJar> -show <TecFile>
+```
 
 ## Comments
 One line Comments start with '//'. There are also Block comments which start with '\*' at the start of a line and end with '*/' at the end of a line.

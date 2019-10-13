@@ -1,6 +1,5 @@
 package tec.codescanner.compiler;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -12,8 +11,8 @@ public class Compression {
     private List<String> strings;
     private List<Count> counts = new ArrayList<>();
 
-    public Compression(ProjectFile projectFile) {
-        strings = Arrays.stream(splitString(projectFile.getContentAsString(), new String[]{" ", "\n", ",", ".", "!", "?"}, true, false)).collect(Collectors.toList());
+    public Compression(String content, String name) {
+        strings = Arrays.stream(splitString(content, new String[]{" ", "\n", ",", ".", "!", "?"}, true, false)).collect(Collectors.toList());
         count();
         if (counts.isEmpty()) {
             return;
@@ -24,9 +23,9 @@ public class Compression {
             totalLoss += count.getLoss();
         }
 
-        System.out.println(projectFile.getFileName());
+        System.out.println(name);
         System.out.println(counts.size() + " " + counts.get(0).getByteRange() +  " " + counts);
-        System.out.println(totalLoss + " " + (projectFile.getContentAsString().length() - totalLoss) + " " + projectFile.getContentAsString().length());
+        System.out.println(totalLoss + " " + (content.length() - totalLoss) + " " + content.length());
         System.out.println();
     }
 

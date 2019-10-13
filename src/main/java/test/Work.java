@@ -32,6 +32,9 @@ public class Work {
         System.out.println(bigInteger.toString(16));
         */
 
+        System.out.println(countWords("Dis  is     a test   which    w ill not work"));
+        System.out.println(countWordsMe("Dis  is     a test   which    w ill not work"));
+
         File file = new File("/Users/jojo/TecProjects/test");
         TeccCompiler teccCompiler = new TeccCompiler(file, "src/test.tec");
 
@@ -52,6 +55,50 @@ public class Work {
         fos.write(bytes);
         fos.flush();
         fos.close();
+    }
+
+    public static int countWords(String inputString) {
+
+        int wordCount = 0;
+
+        char[] input = inputString.toCharArray();
+
+        int iterator1 = 0;
+
+        while(iterator1 < input.length) {
+
+            //Going over all possible spaces
+            while(iterator1 < input.length) {
+
+                if(input[iterator1] != ' ' && input[iterator1] != '\n') {
+
+                    break;
+                }
+
+                iterator1++;
+            }
+
+            //Going over the word
+            while(iterator1 < input.length) {
+
+                if(input[iterator1] == ' ' || input[iterator1] == '\n') {
+
+                    break;
+                }
+
+                iterator1++;
+            }
+
+            wordCount++;
+
+            iterator1++;
+        }
+
+        return wordCount;
+    }
+
+    public static int countWordsMe(String input) {
+        return input.replaceAll(" +", " ").replaceAll("\n+", "\n").replaceAll("\t+", "\t").split("[ \n.-?!,]").length;
     }
 
 }

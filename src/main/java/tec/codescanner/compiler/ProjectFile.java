@@ -44,7 +44,6 @@ public class ProjectFile {
         content = bytes;
 
         if (getFileSuffix().equals(".tec")) {
-
             Lexer lexer = new Lexer();
             lexer.createTokens(getContentAsString(), false);
 
@@ -52,7 +51,7 @@ public class ProjectFile {
             content = teccParser.createTecc(lexer.getTokens());
         }
         if (stringSuffix.contains(getFileSuffix())) {
-            compression = new Compression(this);
+            compression = new Compression(getContentAsString(), path);
         }
     }
 
