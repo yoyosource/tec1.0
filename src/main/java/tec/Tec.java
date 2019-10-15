@@ -44,6 +44,7 @@ public class Tec {
             InputStream in = Tec.class.getResourceAsStream("/tec/info/tec.cnf");
             String version = new Scanner(in).useDelimiter("\\A").next();
             System.out.println(version);
+            UpdateChecker.checkUpdate(version.split("\n")[0].substring("Tec Version ".length()));
             return;
         }
 
